@@ -197,7 +197,6 @@
                     </Button>
 
                     <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#closeGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
-                    <Button fx:id="button4" layoutX="192.0" layoutY="101.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
