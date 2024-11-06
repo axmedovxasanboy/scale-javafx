@@ -2,7 +2,7 @@ package uz.tenzorsoft.scaleapplication.domain;
 
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
 
-public class Instances {
+public class Instances<T> {
     public static Boolean isConnected = false;
     public static UserEntity currentUser = null;
 
@@ -10,8 +10,14 @@ public class Instances {
         isConnected = false;
     }
 
-    public static void reinitialize(Object obj){
+    public static Object reinitialize(Object obj) {
         obj = null;
+        return obj;
+    }
+
+    public T reinitialize(T obj, T value) {
+        obj = value;
+        return obj;
     }
 
 }
