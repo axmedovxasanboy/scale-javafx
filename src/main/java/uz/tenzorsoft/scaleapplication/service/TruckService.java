@@ -4,15 +4,21 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
+import uz.tenzorsoft.scaleapplication.repository.AttachRepository;
+import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +28,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
 
     private final TruckRepository truckRepository;
+    private final AttachRepository attachRepository;
+    private final TruckPhotoRepository truckPhotoRepository;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -81,15 +89,30 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public List<TruckEntity> findEnteredTrucks() {
-        return null;
+        return truckRepository.findEnteredTrucks(TruckAction.ENTRANCE);
     }
 
     public TruckEntity create(Long attachId, String truckNumber) {
-        return null;
+        TruckEntity truckEntity = new TruckEntity();
+        truckEntity.setTruckNumber(truckNumber);
+
+        TruckActionEntity truckAction = new TruckActionEntity();
+        truckAction.setAction(TruckAction.ENTRANCE); // Set action as ENTRANCE
+        truckEntity.setTruckAction(truckAction);
+
+        AttachEntity attachEntity = attachRepository.findById(attachId).orElseThrow(() -> new RuntimeException("Attach not found"));
+        TruckPhotosEntity truckPhotoEntity = new TruckPhotosEntity();
+        truckPhotoEntity.setTruckPhoto(attachEntity);
+        truckPhotoEntity.setAttachStatus(AttachStatus.ENTRANCE_PHOTO);
+
+        truckPhotoRepository.save(truckPhotoEntity);
+        truckEntity.setTruckPhotos(Collections.singletonList(truckPhotoEntity));
+
+        return truckRepository.save(truckEntity);
     }
 
     public TruckEntity findByTruckNumber(String truckNumber, TruckAction truckAction) {
-        return null;
+        return truckRepository.findByTruckNumberAndAction(truckNumber, truckAction);
     }
 
     public List<TableViewData> getNotSentData() {
