@@ -21,7 +21,9 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.Scene?>
 
+<?import javafx.scene.control.PasswordField?>
 <AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
   <children>
     <MenuBar prefHeight="26.0" prefWidth="134.0">
@@ -276,23 +278,27 @@
         </Tab>
         <Tab fx:id="userTab" closable="false" text="Foydalanuvchi">
           <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="350.0" prefWidth="600.0">
               <children>
                 <Pane layoutX="56.0" layoutY="31.0" prefHeight="291.0" prefWidth="552.0">
                   <children>
+                    <!-- User Information Fields -->
                     <Label layoutX="23.0" layoutY="28.0" prefHeight="20.0" prefWidth="124.0" text="Foydalanuvchi ismi">
                       <font>
                         <Font size="14.0" />
                       </font>
                     </Label>
                     <TextField fx:id="username" editable="false" layoutX="174.0" layoutY="25.0" prefHeight="25.0" prefWidth="213.0" />
+
                     <Label layoutX="23.0" layoutY="70.0" prefHeight="20.0" prefWidth="142.0" text="Foydalanuvchi nomeri">
                       <font>
                         <Font size="14.0" />
                       </font>
                     </Label>
                     <TextField fx:id="phoneNumber" editable="false" layoutX="174.0" layoutY="68.0" prefHeight="25.0" prefWidth="213.0" />
-                    <Text fill="#0080ff" layoutX="23.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parolni almashtirish" underline="true">
+
+                    <!-- Change Password Link -->
+                    <Text fx:id="changePasswordText" fill="#0080ff" layoutX="23.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parolni almashtirish" underline="true">
                       <cursor>
                         <Cursor fx:constant="HAND" />
                       </cursor>
@@ -300,6 +306,32 @@
                         <Font size="13.0" />
                       </font>
                     </Text>
+
+                    <!-- Password Change Pane (Initially Hidden) -->
+                    <Pane fx:id="passwordChangePane" layoutX="23.0" layoutY="150.0" visible="false">
+                      <children>
+                        <!-- Step 1: Phone Number Input for SMS Verification -->
+                        <Label text="Telefon nomerini kiriting:" layoutY="0.0" />
+                        <TextField fx:id="phoneInput" layoutY="20.0" prefWidth="200.0" promptText="Telefon nomer" />
+
+                        <Button style="-fx-background-color: red" fx:id="sendSmsButton" layoutY="60.0" prefWidth="100.0" text="SMS Yuborish" />
+
+                        <!-- Step 2: SMS Code Input (Initially Disabled) -->
+                        <Label fx:id="smsLabel" layoutY="100.0" text="SMS kodini kiriting:" visible="false" />
+                        <TextField fx:id="smsInput" layoutY="120.0" prefWidth="200.0" promptText="SMS kod" visible="false" />
+
+                        <!-- Step 3: New Password Fields (Initially Disabled) -->
+                        <Label fx:id="newPasswordLabel" layoutY="160.0" text="Yangi parol:" visible="false" />
+                        <PasswordField fx:id="newPasswordInput" layoutY="180.0" prefWidth="200.0" promptText="Yangi parol" visible="false" />
+
+                        <Label fx:id="confirmPasswordLabel" layoutY="220.0" text="Parolni qayta kiriting:" visible="false" />
+                        <PasswordField fx:id="confirmPasswordInput" layoutY="240.0" prefWidth="200.0" promptText="Parolni qayta kiriting" visible="false" />
+
+                        <Button fx:id="confirmPasswordButton" layoutY="280.0" prefWidth="100.0" text="Tasdiqlash" visible="false" />
+                      </children>
+                    </Pane>
+
+                    <!-- Log Out Button -->
                     <Button contentDisplay="RIGHT" layoutX="23.0" layoutY="233.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="158.0" style="-fx-background-color: red;" text="Sistemadan chiqish" textAlignment="CENTER" textFill="WHITE">
                       <font>
                         <Font name="Arial" size="14.0" />
