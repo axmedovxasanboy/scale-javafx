@@ -89,4 +89,7 @@ public class TableController {
         ));
     }
 
+    public void addLastRecord() {
+
+    }
 }

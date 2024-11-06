@@ -3,7 +3,6 @@ package uz.tenzorsoft.scaleapplication.ui;
 import com.ghgande.j2mod.modbus.ModbusException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,6 +31,14 @@ public class ButtonController {
         }
     }
 
+    public void openGate1(int truckPosition) {
+        try {
+            controllerService.openGate1(truckPosition);
+        } catch (ModbusException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+    }
+
     public void closeGate1() {
         try {
             controllerService.closeGate1();
@@ -43,6 +50,14 @@ public class ButtonController {
     public void openGate2() {
         try {
             controllerService.openGate2();
+        } catch (ModbusException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+    }
+
+    public void openGate2(int truckPosition) {
+        try {
+            controllerService.openGate2(truckPosition);
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }

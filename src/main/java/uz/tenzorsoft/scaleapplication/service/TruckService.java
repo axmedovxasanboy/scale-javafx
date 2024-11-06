@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
@@ -72,5 +73,21 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public TruckEntity save(TruckEntity truck) {
         return truckRepository.save(truck);
+    }
+
+    public TruckEntity findEnteredByTruckNumber(String truckNumber) {
+        return null;
+    }
+
+    public List<TruckEntity> findEnteredTrucks() {
+        return null;
+    }
+
+    public TruckEntity create(Long attachId, String truckNumber) {
+        return null;
+    }
+
+    public TruckEntity findByTruckNumber(String truckNumber, TruckAction truckAction) {
+        return null;
     }
 }

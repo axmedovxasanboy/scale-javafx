@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.repository.AttachRepository;
 
@@ -53,6 +55,10 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         } catch (IOException e) {
             throw new RuntimeException("File could not upload");
         }
+    }
+
+    public AttachResponse saveToSystem(MultipartFile file, AttachStatus attachStatus) {
+        return null;
     }
 
 

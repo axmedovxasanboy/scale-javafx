@@ -14,10 +14,12 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 @Component
@@ -81,4 +83,7 @@ public class MainController {
     }
 
 
+    public String showNumberVerificationDialog(String truckNumber, List<TruckEntity> enteredTrucks) {
+        return null;
+    }
 }

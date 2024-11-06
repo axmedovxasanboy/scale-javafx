@@ -8,6 +8,8 @@ public class Instances<T> {
     public static UserEntity currentUser = null;
     public static TruckEntity currentTruckEntity = null;
 
+    public static String truckNumber = "";
+
     public static boolean gate1Connection = false;
     public static boolean gate2Connection = false;
     public static boolean camera1Connection = false;
@@ -16,6 +18,7 @@ public class Instances<T> {
     public static boolean sensor1Connection = false;
     public static boolean sensor2Connection = false;
     public static boolean sensor3Connection = false;
+    public static boolean isWaiting = false;
 
 
 
