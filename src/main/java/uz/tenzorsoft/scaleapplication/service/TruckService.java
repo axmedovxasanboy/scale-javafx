@@ -14,6 +14,7 @@ import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +90,29 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public TruckEntity findByTruckNumber(String truckNumber, TruckAction truckAction) {
         return null;
+    }
+
+    public List<TableViewData> getNotSentData() {
+        List<TableViewData> result = new ArrayList<>();
+        List<TruckEntity> notSentData = truckRepository.findByIsSent(false);
+        for (TruckEntity truck : notSentData) {
+            if (truck.getTruckAction() == null)
+                continue;
+            result.add(new TableViewData()
+            );
+        }
+        return result;
+    }
+
+    public void dataSent(List<TableViewData> notSentData, Map<Long, Long> truckMap) {
+        if (truckMap == null || truckMap.isEmpty()) {
+            return;
+        }
+        notSentData.forEach(truck -> {
+            TruckEntity entity = truckRepository.findById(truck.getId()).orElseThrow(() -> new RuntimeException(truck.getId() + " is not found from database"));
+            entity.setIsSent(true);
+            entity.setIdOnServer(truckMap.get(entity.getId()));
+            truckRepository.save(entity);
+        });
     }
 }

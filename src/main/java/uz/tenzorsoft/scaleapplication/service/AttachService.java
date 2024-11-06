@@ -1,11 +1,9 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.repository.AttachRepository;
@@ -15,16 +13,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Calendar;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class AttachService implements BaseService<AttachEntity, AttachResponse, Object> {
 
     private final AttachRepository attachRepository;
+    private final TruckService truckService;
 
-//    @Value("${attach.upload.folder}")
+    //    @Value("${attach.upload.folder}")
     private String attachUploadFolder;
 
     public AttachResponse saveToSystem(MultipartFile file) {
@@ -79,6 +77,33 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         return fileName.substring(lastIndex + 1);
     }
 
+    public List<AttachResponse> getNotSentData() {
+        List<AttachResponse> result = new ArrayList<>();
+        List<AttachEntity> notSentData = attachRepository.findByIsSent(false);
+        for (AttachEntity attach : notSentData) {
+            if (attach.getType().equals("xml")) continue;
+            try {
+                result.add(entityToResponse(attach));
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                System.out.println("Error occurred with attach id: " + attach.getId());
+            }
+        }
+        return result;
+    }
+
+    public void dataSent(List<AttachResponse> notSentData, Map<Long, Long> attachMap) {
+        if (attachMap == null || attachMap.isEmpty()) {
+            return;
+        }
+        notSentData.forEach(attach -> {
+            AttachEntity entity = attachRepository.findById(attach.getId()).orElseThrow(() -> new RuntimeException(attach.getId() + " is not found from database"));
+            entity.setIsSent(true);
+            entity.setIdOnServer(attachMap.get(entity.getId()));
+            attachRepository.save(entity);
+        });
+    }
+
 
     @Override
     public AttachResponse entityToResponse(AttachEntity entity) {
@@ -92,4 +117,6 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     public AttachEntity requestToEntity(Object request) {
         return null;
     }
+
+
 }

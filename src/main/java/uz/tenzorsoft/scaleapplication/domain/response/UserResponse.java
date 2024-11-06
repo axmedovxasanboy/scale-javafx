@@ -9,8 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Setter
 @Getter
-public class UserResponse {
+public class UserResponse extends BaseResponse {
     private String username;
     private String password;
     private String phoneNumber;
+
 }

@@ -17,7 +17,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 @RequiredArgsConstructor
 public class ControllerService {
 
-    private void connect() throws Exception {
+    public void connect() throws Exception {
         address = InetAddress.getByName(CONTROLLER_IP);
         connection = new TCPMasterConnection(address);
         connection.setPort(port);
@@ -115,6 +115,13 @@ public class ControllerService {
         } else {
             ReadCoilsResponse readResponse = (ReadCoilsResponse) response;
             return readResponse.getCoils().getBit(0) ? 1 : 0;
+        }
+    }
+
+    public void disconnect() {
+        if (connection != null && connection.isConnected()) {
+            connection.close();
+            isConnected = false;
         }
     }
 }

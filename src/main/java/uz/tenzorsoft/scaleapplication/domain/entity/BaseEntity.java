@@ -20,4 +20,7 @@ public class BaseEntity {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    private Long idOnServer;
+    private Boolean isSent;
 }

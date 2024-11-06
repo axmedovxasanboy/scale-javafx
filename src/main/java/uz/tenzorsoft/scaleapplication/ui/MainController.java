@@ -3,10 +3,10 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -16,11 +16,18 @@ import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
+import uz.tenzorsoft.scaleapplication.service.SendDataService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnectedToInternet;
 
 @Component
 @RequiredArgsConstructor
@@ -29,17 +36,55 @@ public class MainController {
     private final ExecutorService executors;
     private final ControllerService controllerService;
     private final TruckService truckService;
+    private final SendDataService sendDataService;
 
     @FXML
     private Pane scaleAutomationPane;
 
+    @FXML
+    private Button connectButton;
+
     public void load() {
         try {
-            Scene scene = scaleAutomationPane.getScene();
-            scene.setCursor(Cursor.WAIT);
             loadMainMenu();
             loadCameraMenu();
-            scene.setCursor(Cursor.DEFAULT);
+            executors.execute(() -> {
+                while (true) {
+                    sendDataService.sendStatuses();
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    }
+                }
+            });
+            executors.execute(() -> {
+                while (true) {
+                    if (isConnectedToInternet) sendDataService.sendNotSentData();
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    }
+                }
+            });
+
+            executors.execute(() -> {
+                while (true) {
+                    try (Socket socket = new Socket()) {
+                        SocketAddress address = new InetSocketAddress("8.8.8.8", 53);
+                        socket.connect(address, 2000);
+                        isConnectedToInternet = true;
+                    } catch (IOException ignored) {
+                        isConnectedToInternet = false;
+                    }
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    }
+                }
+            });
         } catch (IOException | RuntimeException e) {
             showAlert(Alert.AlertType.WARNING, "Warning", e.getMessage());
         }
@@ -72,6 +117,20 @@ public class MainController {
 
     private void loadCameraMenu() {
 
+    }
+
+    @FXML
+    private void connectToController() {
+        try {
+            if (isConnected) {
+                controllerService.disconnect();
+                connectButton.setText("Connect to controller");
+            }
+            controllerService.connect();
+            connectButton.setText("Disconnect from controller");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
     }
 
     public static void showAlert(Alert.AlertType alertType, String headerText, String message) {

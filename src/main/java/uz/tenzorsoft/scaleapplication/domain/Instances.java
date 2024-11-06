@@ -7,6 +7,7 @@ public class Instances<T> {
     public static Boolean isConnected = false;
     public static UserEntity currentUser = null;
     public static TruckEntity currentTruckEntity = null;
+    public static boolean isConnectedToInternet = false;
 
     public static String truckNumber = "";
 

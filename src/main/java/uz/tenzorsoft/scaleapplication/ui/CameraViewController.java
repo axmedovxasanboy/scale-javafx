@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 //@RequiredArgsConstructor
-public class CameraController {
+public class CameraViewController {
 
 //    @FXML
 //    private ImageView camera1;

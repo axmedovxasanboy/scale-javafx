@@ -3,8 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<Tab closable="false" text="Kamera" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-     fx:controller="uz.tenzorsoft.scaleapplication.ui.CameraController">
+<Tab closable="false" text="Kamera" xmlns="http://javafx.com/javafx">
 
   <content>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">

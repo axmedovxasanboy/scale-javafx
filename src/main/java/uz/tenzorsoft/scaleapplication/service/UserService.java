@@ -9,6 +9,10 @@ import uz.tenzorsoft.scaleapplication.domain.request.UserRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.UserResponse;
 import uz.tenzorsoft.scaleapplication.repository.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements BaseService<UserEntity, UserResponse, UserRequest> {
@@ -25,6 +29,34 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
         }
         Instances.currentUser = user;
         return entityToResponse(user);
+    }
+
+    public List<UserResponse> getNotSentData() {
+        List<UserResponse> result = new ArrayList<>();
+        List<UserEntity> notSentData = userRepository.findByIsSent(false);
+        for (UserEntity user : notSentData) {
+            UserResponse response = new UserResponse(
+                    user.getUsername(), user.getPassword(), user.getPhoneNumber()
+            );
+            response.setId(user.getId());
+            response.setCreatedAt(user.getCreatedAt());
+            response.setIdOnServer(user.getIdOnServer());
+            result.add(response);
+        }
+        return result;
+    }
+
+    public void dataSent(List<UserResponse> notSentData, Map<Long, Long> userMap) {
+        if (userMap == null || userMap.isEmpty()) {
+            return;
+        }
+        notSentData.forEach(user -> {
+            UserEntity entity = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(user.getId() + " is not found from database"));
+            entity.setIsSent(true);
+            entity.setIdOnServer(userMap.get(entity.getId()));
+            userRepository.save(entity);
+        });
+
     }
 
     @Override
