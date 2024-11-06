@@ -8,11 +8,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 @Configuration
 @RequiredArgsConstructor
 public class BeanConfig {
 
     private final ApplicationContext context;
+
+    @Bean
+    public ExecutorService executors() {
+        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    }
 
     @Bean
     public FXMLLoader fxmlLoader() {
