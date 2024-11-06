@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -20,7 +19,6 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.Pair;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
@@ -35,7 +33,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.currentUser;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
@@ -151,11 +148,11 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        setupButtonPressEffect(button1, "#b2f5a9", "#a8e69f");
-        setupButtonPressEffect(button2, "#b2f5a9", "#a8e69f");
-        setupButtonPressEffect(button3, "#ebed72", "#e3e360");
-        setupButtonPressEffect(button4, "#f56e6e", "#e46464");
-        setupButtonPressEffect(button5, "#f56e6e", "#e46464");
+        setupButtonPressEffect(button1, "#64FF4BFF", "#a8e69f");
+        setupButtonPressEffect(button2, "#64FF4BFF", "#a8e69f");
+        setupButtonPressEffect(button3, "#F6FA42FF", "#e3e360");
+        setupButtonPressEffect(button4, "#FF3D3DFF", "#e46464");
+        setupButtonPressEffect(button5, "#FF3D3DFF", "#e46464");
 
 
         id.setCellValueFactory(new PropertyValueFactory<>("Id"));
@@ -299,18 +296,11 @@ public class MainController {
         System.out.println("SMS code stored in DB: " + smsCode);
     }
 
-    // Sets the button press effect for color changes
     private void setupButtonPressEffect(Button button, String normalColor, String pressedColor) {
-        // Set the cursor to hand for the button
-        button.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;");
+        button.setOnMousePressed(event -> button.setStyle("-fx-background-color: " + pressedColor + "; -fx-border-color: black; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
 
-        // Handle mouse pressed and released events for button color change
-        button.setOnMousePressed(event -> button.setStyle("-fx-background-color: " + pressedColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
-
-        button.setOnMouseReleased(event -> button.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
+        button.setOnMouseReleased(event -> button.setStyle("-fx-background-color: " + normalColor + "; -fx-border-color: black; -fx-text-fill: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
     }
-
-
 
     @FXML
     private void handleLogoutClick() {
@@ -414,7 +404,6 @@ public class MainController {
     }
 
     private void loadCameraMenu() {
-
 
     }
 
