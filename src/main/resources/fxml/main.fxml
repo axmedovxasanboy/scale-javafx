@@ -51,25 +51,25 @@
               <children>
                 <ScrollPane layoutX="9.0" layoutY="44.0" prefWidth="921.0">
                   <content>
-                    <TableView prefHeight="594.0" prefWidth="919.0" style="-fx-background-color: #f0f0f0;">
+                    <TableView fx:id="tableData" prefHeight="594.0" prefWidth="919.0" style="-fx-background-color: #f0f0f0;">
                       <columns>
-                        <TableColumn prefWidth="60.0" text="No" />
+                        <TableColumn fx:id="id" prefWidth="60.0" text="No" />
                         <TableColumn maxWidth="6000.0" prefWidth="404.8000030517578" text="Kirish">
                           <columns>
-                            <TableColumn prefWidth="100.0" style="-fx-background-color: s;" text="Moshina raqami" />
-                            <TableColumn text="Kun, oy, yil" />
-                            <TableColumn prefWidth="70.0" text="Vaqt" />
-                            <TableColumn prefWidth="70.0" text="Massa (kg)" />
-                            <TableColumn prefWidth="90.0" text="Navbatchi" />
+                            <TableColumn fx:id="enteredTruckNumber" prefWidth="100.0" style="-fx-background-color: s;" text="Moshina raqami" />
+                            <TableColumn fx:id="enteredDate" text="Kun, oy, yil" />
+                            <TableColumn fx:id="enteredTime" prefWidth="70.0" text="Vaqt" />
+                            <TableColumn fx:id="enteredWeight" prefWidth="70.0" text="Massa (kg)" />
+                            <TableColumn fx:id="enteredOnDuty" prefWidth="90.0" text="Navbatchi" />
                           </columns>
                         </TableColumn>
                         <TableColumn maxWidth="6000.0" prefWidth="435.20001220703125" text="Chiqish">
                           <columns>
-                            <TableColumn prefWidth="100.0" text="Moshina raqami" />
-                            <TableColumn text="Kun, oy, yil" />
-                            <TableColumn minWidth="0.0" prefWidth="70.0" text="Vaqt" />
-                            <TableColumn prefWidth="70.0" text="Massa (kg)" />
-                            <TableColumn prefWidth="90.0" text="Navbatchi" />
+                            <TableColumn fx:id="exitedTruckNumber" prefWidth="100.0" text="Moshina raqami" />
+                            <TableColumn fx:id="exitedDate" text="Kun, oy, yil" />
+                            <TableColumn fx:id="exitedTime" minWidth="0.0" prefWidth="70.0" text="Vaqt" />
+                            <TableColumn fx:id="exitedWeight" prefWidth="70.0" text="Massa (kg)" />
+                            <TableColumn fx:id="exitedOnDuty" prefWidth="90.0" text="Navbatchi" />
                           </columns>
                         </TableColumn>
                       </columns>
@@ -103,60 +103,60 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   </rowConstraints>
                   <children>
-                    <ImageView fitHeight="17.0" fitWidth="19.0">
+                    <ImageView fx:id="controller" fitHeight="20.0" fitWidth="20.0">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <Label text="Sensor 1" GridPane.columnIndex="1" />
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.rowIndex="1">
+                    <Label text="Controller" GridPane.columnIndex="1" />
+                    <ImageView fx:id="camera1" fitHeight="20.0" fitWidth="20.0" GridPane.rowIndex="1">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <Label text="Sensor 2" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.rowIndex="2">
+                    <Label text="Camera 1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                    <ImageView fx:id="camera2" fitHeight="20.0" fitWidth="20.0" GridPane.rowIndex="2">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <Label text="Sensor 3" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="2">
+                    <Label text="Sensor 1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                    <ImageView fx:id="gate1" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <ImageView fx:id="sensor1" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <ImageView fx:id="sensor2" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <Label text="Sensor 4" GridPane.columnIndex="3" />
-                    <Label text="Sensor 5" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                    <Label text="Sensor 6" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="4">
+                    <Label text="Gate 1" GridPane.columnIndex="3" />
+                    <Label text="Camera 2" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                    <Label text="Sensor 2" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                    <ImageView fx:id="gate2" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
+                    <ImageView fx:id="camera3" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <ImageView fitHeight="17.0" fitWidth="19.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
+                    <ImageView fx:id="sensor3" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
                       <image>
-                        <Image url="@../images/img.png" />
+                        <Image url="@../images/green_light.png" />
                       </image>
                     </ImageView>
-                    <Label text="Sensor 7" GridPane.columnIndex="5" />
-                    <Label text="Sensor 8" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-                    <Label text="Sensor 9" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+                    <Label text="Gate 2" GridPane.columnIndex="5" />
+                    <Label text="Camera 3" GridPane.columnIndex="5" GridPane.rowIndex="1" />
+                    <Label text="Sensor 3" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                   </children>
                 </GridPane>
                 <Pane layoutX="962.0" layoutY="414.0" prefHeight="230.0" prefWidth="374.0" style="-fx-border-color: #000; -fx-border-style: solid;">
@@ -169,7 +169,7 @@
                 </Pane>
                 <Pane layoutX="960.0" layoutY="217.0" prefHeight="151.0" prefWidth="377.0" style="-fx-border-color: black;">
                   <children>
-                    <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
+                    <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#openGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
@@ -178,7 +178,7 @@
                       </cursor>
                     </Button>
 
-                    <Button fx:id="button2" layoutX="10.0" layoutY="101.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
+                    <Button fx:id="button2" layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#openGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
@@ -196,7 +196,7 @@
                       </cursor>
                     </Button>
 
-                    <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
+                    <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#closeGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
@@ -205,7 +205,7 @@
                       </cursor>
                     </Button>
 
-                    <Button fx:id="button5" layoutX="192.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
+                    <Button fx:id="button5" layoutX="192.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
