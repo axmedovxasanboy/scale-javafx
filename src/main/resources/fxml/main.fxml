@@ -22,7 +22,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="713.0" prefWidth="1346.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
+<AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
   <children>
     <MenuBar prefHeight="26.0" prefWidth="134.0">
       <menus>
@@ -43,11 +43,11 @@
         </Menu>
       </menus>
     </MenuBar>
-    <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1338.0">
+    <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1395.0">
       <tabs>
         <Tab closable="false" text="Bosh sahifa">
           <content>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1338.0">
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1374.0">
               <children>
                 <ScrollPane layoutX="9.0" layoutY="44.0" prefWidth="921.0">
                   <content>
@@ -88,7 +88,7 @@
                     </Label>
                   </children>
                 </Pane>
-                <GridPane alignment="CENTER_LEFT" layoutX="960.0" layoutY="46.0" prefHeight="157.0" prefWidth="330.0" style="-fx-border-color: black;">
+                <GridPane alignment="CENTER_LEFT" layoutX="960.0" layoutY="46.0" prefHeight="153.0" prefWidth="375.0" style="-fx-border-color: black;">
                   <columnConstraints>
                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="107.20001220703125" minWidth="10.0" prefWidth="22.40001220703125" />
                     <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="187.19998168945312" minWidth="10.0" prefWidth="67.99998779296875" />
@@ -159,55 +159,59 @@
                     <Label text="Sensor 9" GridPane.columnIndex="5" GridPane.rowIndex="2" />
                   </children>
                 </GridPane>
-                <Pane layoutX="960.0" layoutY="414.0" prefHeight="222.0" prefWidth="330.0" style="-fx-border-color: #000; -fx-border-style: solid;">
+                <Pane layoutX="962.0" layoutY="414.0" prefHeight="230.0" prefWidth="374.0" style="-fx-border-color: #000; -fx-border-style: solid;">
                   <children>
-                    <Pane layoutX="7.0" layoutY="5.0" prefHeight="105.0" prefWidth="155.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="169.0" layoutY="5.0" prefHeight="105.0" prefWidth="155.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="7.0" layoutY="113.0" prefHeight="105.0" prefWidth="155.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="170.0" layoutY="113.0" prefHeight="105.0" prefWidth="155.0" style="-fx-border-color: black;" />
+                    <Pane layoutX="11.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
+                    <Pane layoutX="192.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
+                    <Pane layoutX="12.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
+                    <Pane layoutX="192.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
                   </children>
                 </Pane>
-                <Pane layoutX="960.0" layoutY="217.0" prefHeight="150.0" prefWidth="329.0" style="-fx-border-color: black;">
+                <Pane layoutX="960.0" layoutY="217.0" prefHeight="151.0" prefWidth="377.0" style="-fx-border-color: black;">
                   <children>
-                    <Button layoutX="10.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="150.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
+                    <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
+                      <cursor>
+                        <Cursor fx:constant="HAND" />
+                      </cursor>
                     </Button>
-                    <Button layoutX="10.0" layoutY="101.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="150.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
+
+                    <Button fx:id="button2" layoutX="10.0" layoutY="101.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #b2f5a9; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
+                      <cursor>
+                        <Cursor fx:constant="HAND" />
+                      </cursor>
                     </Button>
-                    <Button layoutX="9.0" layoutY="55.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="310.0" style="-fx-background-color: #ebed72; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
+
+                    <Button fx:id="button3" layoutX="9.0" layoutY="55.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="357.0" style="-fx-background-color: #ebed72; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
+                      <cursor>
+                        <Cursor fx:constant="HAND" />
+                      </cursor>
                     </Button>
-                    <Button layoutX="167.0" layoutY="101.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="150.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
+
+                    <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
+                      <cursor>
+                        <Cursor fx:constant="HAND" />
+                      </cursor>
                     </Button>
-                    <Button layoutX="168.0" layoutY="14.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="150.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
+
+                    <Button fx:id="button5" layoutX="192.0" layoutY="14.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #f56e6e; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
                       <font>
                         <Font name="Yu Gothic UI Semilight" size="13.5" />
                       </font>
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
+                      <cursor>
+                        <Cursor fx:constant="HAND" />
+                      </cursor>
                     </Button>
                   </children>
                 </Pane>
@@ -252,6 +256,20 @@
                     </Label>
                   </children>
                 </Pane>
+                        <Pane layoutX="491.0" layoutY="402.0" prefHeight="244.0" prefWidth="378.0">
+                           <children>
+                              <Label layoutX="110.0" layoutY="14.0" text="Tarozi massasi">
+                                 <font>
+                                    <Font size="25.0" />
+                                 </font>
+                              </Label>
+                              <TextField alignment="CENTER" layoutX="6.0" layoutY="50.0" prefHeight="171.0" prefWidth="366.0" text="1234567">
+                                 <font>
+                                    <Font size="72.0" />
+                                 </font>
+                              </TextField>
+                           </children>
+                        </Pane>
               </children>
             </AnchorPane>
           </content>
@@ -267,13 +285,13 @@
                         <Font size="14.0" />
                       </font>
                     </Label>
-                    <TextField fx:id="username" layoutX="174.0" layoutY="25.0" prefHeight="25.0" prefWidth="213.0" />
+                    <TextField fx:id="username" editable="false" layoutX="174.0" layoutY="25.0" prefHeight="25.0" prefWidth="213.0" />
                     <Label layoutX="23.0" layoutY="70.0" prefHeight="20.0" prefWidth="142.0" text="Foydalanuvchi nomeri">
                       <font>
                         <Font size="14.0" />
                       </font>
                     </Label>
-                    <TextField fx:id="phoneNumber" layoutX="174.0" layoutY="68.0" prefHeight="25.0" prefWidth="213.0" />
+                    <TextField fx:id="phoneNumber" editable="false" layoutX="174.0" layoutY="68.0" prefHeight="25.0" prefWidth="213.0" />
                     <Text fill="#0080ff" layoutX="23.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parolni almashtirish" underline="true">
                       <cursor>
                         <Cursor fx:constant="HAND" />
