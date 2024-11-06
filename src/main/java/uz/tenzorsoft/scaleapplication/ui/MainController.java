@@ -387,7 +387,7 @@ public class MainController {
                     throw new RuntimeException(e);
                 }
             });
-            executors.execute(this::loadTableData);
+//            executors.execute(this::loadTableData);
 
         } catch (IOException | RuntimeException e) {
             showAlert(Alert.AlertType.WARNING, "Warning", e.getMessage());
@@ -472,51 +472,21 @@ public class MainController {
         }
     }
 
-    private void loadTableData() {
-        truckService.save(new TruckEntity(
-                "01A777AA", new TruckActionEntity(
-                100.0, TruckAction.ENTRANCE, currentUser
-        ), null
-        ));
-        List<TableViewData> collection = truckService.getTruckData();
-        tableData.setItems(FXCollections.observableArrayList(
-                collection
-        ));
-    }
+//    private void loadTableData() {
+//        truckService.save(new TruckEntity(
+//                "01A777AA", new TruckActionEntity(
+//                100.0, TruckAction.ENTRANCE, currentUser
+//        ), null
+//        ));
+//        List<TableViewData> collection = truckService.getTruckData();
+//        tableData.setItems(FXCollections.observableArrayList(
+//                collection
+//        ));
+//    }
 
-    public void openGate1() {
-        try {
-            controllerService.openGate1();
-        } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-    }
 
-    public void closeGate1() {
-        try {
-            controllerService.closeGate1();
-        } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-    }
 
-    public void openGate2() {
-        try {
-            controllerService.openGate2();
-        } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-    }
-
-    public void closeGate2() {
-        try {
-            controllerService.closeGate2();
-        } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-    }
-
-    private static void showAlert(Alert.AlertType alertType, String headerText, String message) {
+    public static void showAlert(Alert.AlertType alertType, String headerText, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(headerText);
         alert.setHeaderText(null);

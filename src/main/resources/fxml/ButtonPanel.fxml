@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Pane?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.Cursor?>
+<Pane layoutX="960.0" layoutY="217.0" prefHeight="151.0" style="-fx-border-color: black;" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.ButtonController">
+  <children>
+    <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#openGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #64ff4b; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
+      <font>
+        <Font name="Yu Gothic UI Semilight" size="13.5" />
+      </font>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+
+    <Button fx:id="button2" layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#openGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #64ff4b; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
+      <font>
+        <Font name="Yu Gothic UI Semilight" size="13.5" />
+      </font>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+
+    <Button fx:id="button3" layoutX="9.0" layoutY="57.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="357.0" style="-fx-background-color: #f6fa42; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
+      <font>
+        <Font name="Yu Gothic UI Semilight" size="13.5" />
+      </font>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+
+    <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#closeGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #ff3d3d; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
+      <font>
+        <Font name="Yu Gothic UI Semilight" size="13.5" />
+      </font>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+
+    <Button fx:id="button5" layoutX="192.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #ff3d3d; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
+      <font>
+        <Font name="Yu Gothic UI Semilight" size="13.5" />
+      </font>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+  </children>
+</Pane>

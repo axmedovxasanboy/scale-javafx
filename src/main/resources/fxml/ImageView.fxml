@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.Pane?>
+
+<?import javafx.scene.image.ImageView?>
+<Pane xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"  layoutX="962.0" layoutY="414.0" prefHeight="230.0" prefWidth="374.0" style="-fx-border-color: #000; -fx-border-style: solid;" fx:controller="uz.tenzorsoft.scaleapplication.ui.ImageController">
+  <children>
+    <Pane layoutX="11.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+      <children>
+        <ImageView fx:id="imageView1" fitWidth="170" fitHeight="105" preserveRatio="true" />
+      </children>
+    </Pane>
+    <Pane layoutX="192.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+      <children>
+        <ImageView fx:id="imageView2" fitWidth="170" fitHeight="105" preserveRatio="true" />
+      </children>
+    </Pane>
+    <Pane layoutX="12.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+      <children>
+        <ImageView fx:id="imageView3" fitWidth="170" fitHeight="105" preserveRatio="true" />
+      </children>
+    </Pane>
+    <Pane layoutX="192.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+      <children>
+        <ImageView fx:id="imageView4" fitWidth="170" fitHeight="105" preserveRatio="true" />
+      </children>
+    </Pane>
+  </children>
+</Pane>

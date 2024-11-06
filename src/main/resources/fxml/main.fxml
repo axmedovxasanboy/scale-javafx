@@ -24,25 +24,7 @@
 
 <AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
   <children>
-    <MenuBar prefHeight="26.0" prefWidth="134.0">
-      <menus>
-        <Menu mnemonicParsing="false" text="File">
-          <items>
-            <MenuItem mnemonicParsing="false" text="Close" />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Edit">
-          <items>
-            <MenuItem mnemonicParsing="false" text="Delete" />
-          </items>
-        </Menu>
-        <Menu mnemonicParsing="false" text="Help">
-          <items>
-            <MenuItem mnemonicParsing="false" text="About" />
-          </items>
-        </Menu>
-      </menus>
-    </MenuBar>
+    <fx:include source="MenuBar.fxml"/>
     <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1395.0">
       <tabs>
         <Tab closable="false" text="Bosh sahifa">
@@ -51,33 +33,8 @@
               <children>
                 <ScrollPane layoutX="9.0" layoutY="44.0" prefWidth="921.0">
                   <content>
-                    <TableView fx:id="tableData" prefHeight="594.0" prefWidth="919.0" style="-fx-background-color: #f0f0f0;">
-                      <columns>
-                        <TableColumn fx:id="id" prefWidth="60.0" text="No" />
-                        <TableColumn maxWidth="6000.0" prefWidth="404.8000030517578" text="Kirish">
-                          <columns>
-                            <TableColumn fx:id="enteredTruckNumber" prefWidth="100.0" style="-fx-background-color: s;" text="Moshina raqami" />
-                            <TableColumn fx:id="enteredDate" text="Kun, oy, yil" />
-                            <TableColumn fx:id="enteredTime" prefWidth="70.0" text="Vaqt" />
-                            <TableColumn fx:id="enteredWeight" prefWidth="70.0" text="Massa (kg)" />
-                            <TableColumn fx:id="enteredOnDuty" prefWidth="90.0" text="Navbatchi" />
-                          </columns>
-                        </TableColumn>
-                        <TableColumn maxWidth="6000.0" prefWidth="435.20001220703125" text="Chiqish">
-                          <columns>
-                            <TableColumn fx:id="exitedTruckNumber" prefWidth="100.0" text="Moshina raqami" />
-                            <TableColumn fx:id="exitedDate" text="Kun, oy, yil" />
-                            <TableColumn fx:id="exitedTime" minWidth="0.0" prefWidth="70.0" text="Vaqt" />
-                            <TableColumn fx:id="exitedWeight" prefWidth="70.0" text="Massa (kg)" />
-                            <TableColumn fx:id="exitedOnDuty" prefWidth="90.0" text="Navbatchi" />
-                          </columns>
-                        </TableColumn>
-                      </columns>
-                      <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                      </columnResizePolicy>
-                    </TableView>
-                  </content>
+                    <fx:include source="TableView.fxml"/>
+                    </content>
                 </ScrollPane>
                 <Pane layoutX="85.0" prefHeight="54.0" prefWidth="733.0">
                   <children>
@@ -88,150 +45,12 @@
                     </Label>
                   </children>
                 </Pane>
-                <GridPane alignment="CENTER_LEFT" layoutX="960.0" layoutY="46.0" prefHeight="153.0" prefWidth="375.0" style="-fx-border-color: black;">
-                  <columnConstraints>
-                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="107.20001220703125" minWidth="10.0" prefWidth="22.40001220703125" />
-                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="187.19998168945312" minWidth="10.0" prefWidth="67.99998779296875" />
-                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="212.00000000000003" minWidth="0.0" prefWidth="16.80000000000001" />
-                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="212.00000000000003" minWidth="10.0" prefWidth="69.5999755859375" />
-                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="212.00000000000003" minWidth="10.0" prefWidth="21.799951171874966" />
-                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="247.2" minWidth="10.0" prefWidth="50.0" />
-                  </columnConstraints>
-                  <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                  </rowConstraints>
-                  <children>
-                    <ImageView fx:id="controller" fitHeight="20.0" fitWidth="20.0">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <Label text="Controller" GridPane.columnIndex="1" />
-                    <ImageView fx:id="camera1" fitHeight="20.0" fitWidth="20.0" GridPane.rowIndex="1">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <Label text="Camera 1" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <ImageView fx:id="camera2" fitHeight="20.0" fitWidth="20.0" GridPane.rowIndex="2">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <Label text="Sensor 1" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <ImageView fx:id="gate1" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <ImageView fx:id="sensor1" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <ImageView fx:id="sensor2" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <Label text="Gate 1" GridPane.columnIndex="3" />
-                    <Label text="Camera 2" GridPane.columnIndex="3" GridPane.rowIndex="1" />
-                    <Label text="Sensor 2" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-                    <ImageView fx:id="gate2" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <ImageView fx:id="camera3" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4" GridPane.rowIndex="1">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <ImageView fx:id="sensor3" fitHeight="20.0" fitWidth="20.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
-                      <image>
-                        <Image url="@../images/green_light.png" />
-                      </image>
-                    </ImageView>
-                    <Label text="Gate 2" GridPane.columnIndex="5" />
-                    <Label text="Camera 3" GridPane.columnIndex="5" GridPane.rowIndex="1" />
-                    <Label text="Sensor 3" GridPane.columnIndex="5" GridPane.rowIndex="2" />
-                  </children>
-                </GridPane>
-                <Pane layoutX="962.0" layoutY="414.0" prefHeight="230.0" prefWidth="374.0" style="-fx-border-color: #000; -fx-border-style: solid;">
-                  <children>
-                    <Pane layoutX="11.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
-                      <children>
-                        <ImageView fx:id="imageView1" fitWidth="170" fitHeight="105" preserveRatio="true" />
-                      </children>
-                    </Pane>
-                    <Pane layoutX="192.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
-                      <children>
-                        <ImageView fx:id="imageView2" fitWidth="170" fitHeight="105" preserveRatio="true" />
-                      </children>
-                    </Pane>
-                    <Pane layoutX="12.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
-                      <children>
-                        <ImageView fx:id="imageView3" fitWidth="170" fitHeight="105" preserveRatio="true" />
-                      </children>
-                    </Pane>
-                    <Pane layoutX="192.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
-                      <children>
-                        <ImageView fx:id="imageView4" fitWidth="170" fitHeight="105" preserveRatio="true" />
-                      </children>
-                    </Pane>
-                  </children>
-                </Pane>
+                <fx:include source="GridView.fxml"/>
 
-                <Pane layoutX="960.0" layoutY="217.0" prefHeight="151.0" prefWidth="377.0" style="-fx-border-color: black;">
-                  <children>
-                    <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#openGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #64ff4b; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
-                      <font>
-                        <Font name="Yu Gothic UI Semilight" size="13.5" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
+                <fx:include source="ImageView.fxml"/>
 
-                    <Button fx:id="button2" layoutX="10.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#openGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #64ff4b; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni ochish" textAlignment="CENTER">
-                      <font>
-                        <Font name="Yu Gothic UI Semilight" size="13.5" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
+                <fx:include source="ButtonPanel.fxml"/>
 
-                    <Button fx:id="button3" layoutX="9.0" layoutY="57.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="357.0" style="-fx-background-color: #f6fa42; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
-                      <font>
-                        <Font name="Yu Gothic UI Semilight" size="13.5" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
-
-                    <Button fx:id="button4" layoutX="193.0" layoutY="101.0" mnemonicParsing="false" onMouseClicked="#closeGate2" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #ff3d3d; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="2-shlagbaumni yopish" textAlignment="CENTER">
-                      <font>
-                        <Font name="Yu Gothic UI Semilight" size="13.5" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
-
-                    <Button fx:id="button5" layoutX="192.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #ff3d3d; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni yopish" textAlignment="CENTER">
-                      <font>
-                        <Font name="Yu Gothic UI Semilight" size="13.5" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
-                  </children>
-                </Pane>
                 <Pane id="scaleAutomationPane" fx:id="scaleAutomationPane" layoutX="1013.0" layoutY="373.0" prefHeight="35.0" prefWidth="222.0">
 
                 </Pane>
@@ -239,102 +58,10 @@
             </AnchorPane>
           </content>
         </Tab>
-        <Tab fx:id="cameraTab" closable="false" text="Kamera">
-          <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-              <children>
-                <Pane layoutX="26.0" layoutY="135.0" prefHeight="256.0" prefWidth="422.0">
-                  <children>
-                    <Pane layoutX="9.0" layoutY="28.0" prefHeight="222.0" prefWidth="398.0" style="-fx-background-color: #e6f5e8; -fx-border-color: black;" />
-                    <Label layoutX="169.0" layoutY="4.0" prefHeight="20.0" prefWidth="65.0" text="1-kamera" textAlignment="CENTER">
-                      <font>
-                        <Font size="14.0" />
-                      </font>
-                    </Label>
-                  </children>
-                </Pane>
-                <Pane layoutX="469.0" layoutY="135.0" prefHeight="256.0" prefWidth="422.0">
-                  <children>
-                    <Pane layoutX="9.0" layoutY="28.0" prefHeight="222.0" prefWidth="398.0" style="-fx-background-color: #e6f5e8; -fx-border-color: black;" />
-                    <Label layoutX="169.0" layoutY="4.0" prefHeight="20.0" prefWidth="65.0" text="2-kamera" textAlignment="CENTER">
-                      <font>
-                        <Font size="14.0" />
-                      </font>
-                    </Label>
-                  </children>
-                </Pane>
-                <Pane layoutX="915.0" layoutY="135.0" prefHeight="256.0" prefWidth="422.0">
-                  <children>
-                    <Pane layoutX="9.0" layoutY="28.0" prefHeight="222.0" prefWidth="398.0" style="-fx-background-color: #e6f5e8; -fx-border-color: black;" />
-                    <Label layoutX="169.0" layoutY="4.0" prefHeight="20.0" prefWidth="65.0" text="3-kamera" textAlignment="CENTER">
-                      <font>
-                        <Font size="14.0" />
-                      </font>
-                    </Label>
-                  </children>
-                </Pane>
-                        <Pane layoutX="491.0" layoutY="402.0" prefHeight="244.0" prefWidth="378.0">
-                           <children>
-                              <Label layoutX="110.0" layoutY="14.0" text="Tarozi massasi">
-                                 <font>
-                                    <Font size="25.0" />
-                                 </font>
-                              </Label>
-                              <TextField alignment="CENTER" editable="false" layoutX="6.0" layoutY="50.0" prefHeight="171.0" prefWidth="366.0" text="123456 kg">
-                                 <font>
-                                    <Font size="64.0" />
-                                 </font>
-                              </TextField>
-                           </children>
-                        </Pane>
-              </children>
-            </AnchorPane>
-          </content>
-        </Tab>
-        <Tab fx:id="userTab" closable="false" text="Foydalanuvchi">
-          <content>
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-              <children>
-                <Pane layoutX="56.0" layoutY="31.0" prefHeight="291.0" prefWidth="552.0">
-                  <children>
-                    <Label layoutX="23.0" layoutY="28.0" prefHeight="20.0" prefWidth="124.0" text="Foydalanuvchi ismi">
-                      <font>
-                        <Font size="14.0" />
-                      </font>
-                    </Label>
-                    <TextField fx:id="username" editable="false" layoutX="174.0" layoutY="25.0" prefHeight="25.0" prefWidth="213.0" />
-                    <Label layoutX="23.0" layoutY="70.0" prefHeight="20.0" prefWidth="142.0" text="Foydalanuvchi nomeri">
-                      <font>
-                        <Font size="14.0" />
-                      </font>
-                    </Label>
-                    <TextField fx:id="phoneNumber" editable="false" layoutX="174.0" layoutY="68.0" prefHeight="25.0" prefWidth="213.0" />
-                    <Text fx:id="changePasswordText" fill="#0080ff" layoutX="23.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Parolni almashtirish" underline="true">
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                      <font>
-                        <Font size="13.0" />
-                      </font>
-                    </Text>
-                    <Button fx:id="logoutButton" contentDisplay="RIGHT" layoutX="23.0" layoutY="233.0"
-                            mnemonicParsing="false" prefHeight="26.0" prefWidth="158.0"
-                            style="-fx-background-color: red; -fx-text-fill: white;"
-                            text="Sistemadan chiqish" textAlignment="CENTER" textFill="WHITE"
-                            onAction="#handleLogoutClick">
-                      <font>
-                        <Font name="Arial" size="14.0" />
-                      </font>
-                      <cursor>
-                        <Cursor fx:constant="HAND" />
-                      </cursor>
-                    </Button>
-                  </children>
-                </Pane>
-              </children>
-            </AnchorPane>
-          </content>
-        </Tab>
+
+        <fx:include source="CameraView.fxml"/>
+
+        <fx:include source="UserView.fxml"/>
       </tabs>
     </TabPane>
   </children>
