@@ -161,12 +161,29 @@
                 </GridPane>
                 <Pane layoutX="962.0" layoutY="414.0" prefHeight="230.0" prefWidth="374.0" style="-fx-border-color: #000; -fx-border-style: solid;">
                   <children>
-                    <Pane layoutX="11.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="192.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="12.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
-                    <Pane layoutX="192.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;" />
+                    <Pane layoutX="11.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+                      <children>
+                        <ImageView fx:id="imageView1" fitWidth="170" fitHeight="105" preserveRatio="true" />
+                      </children>
+                    </Pane>
+                    <Pane layoutX="192.0" layoutY="7.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+                      <children>
+                        <ImageView fx:id="imageView2" fitWidth="170" fitHeight="105" preserveRatio="true" />
+                      </children>
+                    </Pane>
+                    <Pane layoutX="12.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+                      <children>
+                        <ImageView fx:id="imageView3" fitWidth="170" fitHeight="105" preserveRatio="true" />
+                      </children>
+                    </Pane>
+                    <Pane layoutX="192.0" layoutY="118.0" prefHeight="105.0" prefWidth="170.0" style="-fx-border-color: black;">
+                      <children>
+                        <ImageView fx:id="imageView4" fitWidth="170" fitHeight="105" preserveRatio="true" />
+                      </children>
+                    </Pane>
                   </children>
                 </Pane>
+
                 <Pane layoutX="960.0" layoutY="217.0" prefHeight="151.0" prefWidth="377.0" style="-fx-border-color: black;">
                   <children>
                     <Button fx:id="button1" layoutX="10.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#openGate1" prefHeight="30.0" prefWidth="175.0" style="-fx-background-color: #64ff4b; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="1-shlagbaumni ochish" textAlignment="CENTER">
