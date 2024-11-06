@@ -142,6 +142,7 @@ public class MainController {
     @FXML
     private TableColumn<TableViewData, String> exitedOnDuty;
 
+    @FXML
     private Text changePasswordText;
 
     @FXML
@@ -357,27 +358,6 @@ public class MainController {
                 }
             });
             executors.execute(this::loadTableData);
-            AtomicInteger helper = new AtomicInteger(1);
-            executors.execute(() -> {
-                        while (true) {
-                            TruckEntity truck = truckService.save(
-                                    new TruckEntity(
-                                            "01A77" + helper + "AA",
-                                            new TruckActionEntity(
-                                                    100.0 + helper.get(), TruckAction.ENTRANCE, currentUser
-                                            ), null
-                                    ));
-                            helper.getAndIncrement();
-                            addTableRow(truck);
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-
-                    }
-            );
 
         } catch (IOException | RuntimeException e) {
             showAlert(Alert.AlertType.WARNING, "Warning", e.getMessage());
