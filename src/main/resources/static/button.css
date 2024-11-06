@@ -1,13 +1,13 @@
-.button {
-    -fx-background-color: #4CAF50;
+.connect-button {
+    -fx-background-color: linear-gradient(#24ff03, #21a301);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
     -fx-text-fill: white;
 }
 
-.button:hover {
-    -fx-background-color: #45a049;
-    -fx-cursor: hand;
-}
-
-.button:pressed {
-    -fx-background-color: #388E3C;
+.connect-button:hover {
+    -fx-background-color: linear-gradient(#18b800, #156c00);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
 }

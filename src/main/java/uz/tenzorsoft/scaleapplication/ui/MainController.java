@@ -125,9 +125,10 @@ public class MainController {
             if (isConnected) {
                 controllerService.disconnect();
                 connectButton.setText("Connect to controller");
+            } else {
+                controllerService.connect();
+                connectButton.setText("Disconnect from controller");
             }
-            controllerService.connect();
-            connectButton.setText("Disconnect from controller");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
