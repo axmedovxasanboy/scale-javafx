@@ -36,9 +36,10 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
             ")")
     Optional<TruckEntity> findTruckWithEntranceNoExit(@Param("truckNumber") String truckNumber);
 
-
-
     Optional<TruckEntity> findByTruckPhotosContains(TruckPhotosEntity truckPhotos);
+
+
+    List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
 
 

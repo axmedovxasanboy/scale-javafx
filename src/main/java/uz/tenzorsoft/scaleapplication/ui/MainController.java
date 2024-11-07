@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.POSPrinter;
+import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
@@ -46,6 +46,7 @@ public class MainController {
     private final TableController tableController;
     private final ExecutorService executors;
     private final UserService userService;
+    private final PrintCheck printCheck;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -92,6 +93,7 @@ public class MainController {
         dataSendController.sendNotSentData();
         truckScalingController.start();
         tableController.loadData();
+        printCheck.listAvailablePrinters();
 
     }
 

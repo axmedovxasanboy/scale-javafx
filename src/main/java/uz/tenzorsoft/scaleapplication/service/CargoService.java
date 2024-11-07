@@ -7,6 +7,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.CargoResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 
@@ -22,6 +23,7 @@ import static uz.tenzorsoft.scaleapplication.domain.Instances.truckNumber;
 public class CargoService {
 
     private final CargoRepository cargoRepository;
+
 
     public void saveCargo(TruckEntity truckEntity) {
         CargoEntity cargoEntity = new CargoEntity();
@@ -57,6 +59,28 @@ public class CargoService {
         cargoRepository.save(cargoEntity);
         System.out.println("cargoEntity = " + cargoEntity);
     }
+
+    public void saveCargo(TruckResponse truckResponse) {
+        CargoEntity cargoEntity = new CargoEntity();
+        double enteredWeight = truckResponse.getEnteredWeight();
+        double exitedWeight = truckResponse.getExitedWeight();
+        double netWeight = exitedWeight - enteredWeight;
+
+        System.out.println("enteredWeight = " + enteredWeight);
+        System.out.println("exitedWeight = " + exitedWeight);
+        System.out.println("netWeight = " + netWeight);
+
+        if (netWeight < 0) {
+            cargoEntity.setCargoStatus(CargoStatus.DROP);
+            cargoEntity.setNetWeight(Math.abs(netWeight));
+        } else {
+            cargoEntity.setCargoStatus(CargoStatus.PICKUP);
+            cargoEntity.setNetWeight(Math.abs(netWeight));
+        }
+        cargoRepository.save(cargoEntity);
+        System.out.println("cargoEntity = " + cargoEntity);
+    }
+
 
     public List<WeighingResponse> getNotSentData() {
         List<WeighingResponse> result = new ArrayList<>();

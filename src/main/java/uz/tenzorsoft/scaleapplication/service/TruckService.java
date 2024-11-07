@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.*;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
+import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.MyCoalData;
@@ -221,5 +220,63 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public List<MyCoalData> getMyCoalData() {
         return null;
+    }
+
+    public TruckEntity saveCurrentTruck(TruckResponse currentTruck) {
+
+        List<TruckActionEntity> truckActions = new ArrayList<>();
+        List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+
+        switch (currentTruck.getEnteredStatus()) {
+            case ENTRANCE, MANUAL_ENTRANCE -> {
+
+            }
+        }
+
+        new TruckEntity(
+                currentTruck.getTruckNumber(), truckActions, truckPhotos
+        );
+
+        return null;
+    }
+
+    public TruckEntity saveEnteredTruck(TruckResponse currentTruck) {
+        List<TruckActionEntity> truckActions = new ArrayList<>();
+        truckActions.add(new TruckActionEntity(
+                currentTruck.getEnteredWeight(), currentTruck.getEnteredStatus(), Instances.currentUser
+        ));
+
+        truckActionRepository.saveAll(truckActions);
+
+        List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+        for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
+            truckPhotos.add(new TruckPhotosEntity(
+                    attachService.findById(attach.getId()), attach.getStatus()
+            ));
+        }
+        truckPhotoRepository.saveAll(truckPhotos);
+
+        return truckRepository.save(new TruckEntity(currentTruck.getTruckNumber(), truckActions, truckPhotos));
+    }
+
+    public TruckEntity saveExitedTruck(TruckResponse currentTruck) {
+        List<TruckEntity> truckEntityList = truckRepository.findByTruckNumberOrderByCreatedAtDesc(currentTruck.getTruckNumber());
+        TruckEntity truckEntity = truckEntityList.get(0);
+        truckEntity.getTruckActions().add(
+                truckActionRepository.save(
+                        new TruckActionEntity(currentTruck.getExitedWeight(), currentTruck.getExitedStatus(), Instances.currentUser)
+                )
+        );
+
+        for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
+            if (!truckEntity.getTruckPhotos().stream().map(BaseEntity::getId).toList().contains(attach.getId())) {
+                truckEntity.getTruckPhotos().add(
+                        truckPhotoRepository.save(new TruckPhotosEntity(
+                                attachService.findById(attach.getId()), attach.getStatus()
+                        ))
+                );
+            }
+        }
+        return truckRepository.save(truckEntity);
     }
 }
