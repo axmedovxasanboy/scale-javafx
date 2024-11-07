@@ -9,7 +9,6 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.CargoService;
-import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.ButtonController;
 import uz.tenzorsoft.scaleapplication.ui.CameraViewController;
@@ -35,7 +34,8 @@ public class TruckScalingController {
     private final TableController tableController;
     private final TruckService truckService;
     private final CargoService cargoService;
-    private final PrintCheck printCheck;
+    private final ExecutorService executors;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private boolean isTruckEntered = false;
     private boolean isOnScale = false;
     private boolean isScaled = false;
@@ -43,9 +43,6 @@ public class TruckScalingController {
     private boolean isCargoConfirmationDialogOpened = false;
     private boolean isTruckExited = false;
     private double weigh = 0.0;
-
-    private final ExecutorService executors;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public void start() {
         executors.execute(() -> {
@@ -166,7 +163,7 @@ public class TruckScalingController {
                                 TruckEntity truck = truckService.save(currentTruck);
                                 tableController.updateTableRow(truck);
                                 cargoService.saveCargo(truck);
-                                printCheck.printReceipt(currentTruck);
+//                                printCheck.printReceipt(currentTruck);
                                 isTruckExited = true;
                                 currentTruck = new TruckResponse();
                             }
