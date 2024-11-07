@@ -1,9 +1,13 @@
 package uz.tenzorsoft.scaleapplication.service;
 
+import com.fasterxml.jackson.annotation.JacksonInject;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
@@ -25,7 +29,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     private final TruckRepository truckRepository;
     private final UserService userService;
-    private final AttachService attachService;
+    @Lazy
+    @Autowired
+    private AttachService attachService;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -70,13 +76,39 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return save(truckEntity);
     }
 
-    public List<TableViewData> getNotSentData() {
-        List<TableViewData> result = new ArrayList<>();
+    public List<ActionResponse> getNotSentData() {
+        List<ActionResponse> result = new ArrayList<>();
         List<TruckEntity> notSentData = truckRepository.findByIsSent(false);
+        for (TruckEntity truck : notSentData) {
+            ActionResponse actionResponse = new ActionResponse();
+            List<Long> attachIds = truck.getTruckPhotos().stream().map(
+                    act -> act.getTruckPhoto().getId()
+            ).toList();
+            actionResponse.setId(truck.getId());
+            actionResponse.setAttachIds(attachIds);
+            actionResponse.setTruckNumber(truck.getTruckNumber());
+            for (TruckActionEntity action : truck.getTruckActions()) {
+                switch (action.getAction()) {
+                    case ENTRANCE, MANUAL_ENTRANCE -> {
+                        actionResponse.setEnteredStatus(action.getAction());
+                        actionResponse.setEnteredAt(action.getCreatedAt());
+                        actionResponse.setEnteredWeight(action.getWeight());
+                        actionResponse.setEntranceConfirmedBy(action.getOnDuty().getPhoneNumber());
+                    }
+                    case EXIT, MANUAL_EXIT -> {
+                        actionResponse.setExitedStatus(action.getAction());
+                        actionResponse.setExitedAt(action.getCreatedAt());
+                        actionResponse.setExitedWeight(action.getWeight());
+                        actionResponse.setExitConfirmedBy(action.getOnDuty().getPhoneNumber());
+                    }
+                }
+            }
+            actionResponse.setIdOnServer(truck.getIdOnServer());
+        }
         return result;
     }
 
-    public void dataSent(List<TableViewData> notSentData, Map<Long, Long> truckMap) {
+    public void dataSent(List<ActionResponse> notSentData, Map<Long, Long> truckMap) {
         if (truckMap == null || truckMap.isEmpty()) {
             return;
         }
@@ -149,5 +181,13 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public TruckEntity findById(Long id) {
         return truckRepository.findById(id).orElse(null);
+    }
+
+//    public TruckEntity findTruckByAttachId(AttachEntity attach) {
+//        return truckRepository.find(attach).orElse(null);
+//    }
+
+    public TruckEntity findByTruckPhoto(TruckPhotosEntity truckPhotos) {
+        return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
     }
 }

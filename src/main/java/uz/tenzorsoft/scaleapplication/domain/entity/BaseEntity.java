@@ -22,5 +22,5 @@ public class BaseEntity {
     private LocalDateTime createdAt;
 
     private Long idOnServer;
-    private Boolean isSent;
+    private Boolean isSent = false;
 }

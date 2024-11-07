@@ -7,6 +7,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.CargoResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 
 import java.util.ArrayList;
@@ -57,22 +58,25 @@ public class CargoService {
         System.out.println("cargoEntity = " + cargoEntity);
     }
 
-    public List<CargoResponse> getNotSentData() {
-        List<CargoResponse> result = new ArrayList<>();
+    public List<WeighingResponse> getNotSentData() {
+        List<WeighingResponse> result = new ArrayList<>();
         List<CargoEntity> notSentData = cargoRepository.findByIsSent(false);
         for (CargoEntity cargo : notSentData) {
-            result.add(
-                    new CargoResponse(
-                            cargo.getId(), cargo.getTruck().getTruckNumber(), cargo.getCargoStatus(),
-                            cargo.getNetWeight(), cargo.getScaleId(), cargo.getCreatedAt(), cargo.getIdOnServer()
-                    )
+
+            WeighingResponse response = new WeighingResponse(
+                    1L, cargo.getTruck().getTruckNumber(),
+                    cargo.getCargoStatus(), cargo.getNetWeight(), cargo.getCreatedAt()
             );
+            response.setId(cargo.getId());
+            response.setIdOnServer(cargo.getIdOnServer());
+
+            result.add(response);
         }
 
         return result;
     }
 
-    public void dataSent(List<CargoResponse> notSentData, Map<Long,Long> cargoMap) {
+    public void dataSent(List<WeighingResponse> notSentData, Map<Long,Long> cargoMap) {
         if (cargoMap == null || cargoMap.isEmpty()) {
             return;
         }

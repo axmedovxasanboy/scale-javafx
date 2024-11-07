@@ -4,8 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.response.*;
+import uz.tenzorsoft.scaleapplication.domain.response.AllDataResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.LocalAndServerIds;
+import uz.tenzorsoft.scaleapplication.domain.response.StatusResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserSendResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.CargoService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
@@ -27,19 +32,19 @@ public class SendDataService {
 
     public void sendNotSentData() {
 
-        List<TableViewData> notSentTruckData = truckService.getNotSentData();
-        List<UserResponse> notSentUserData = userService.getNotSentData();
-        List<CargoResponse> notSentWeighingData = cargoService.getNotSentData();
-        List<AttachResponse> notSentAttachmentData = attachService.getNotSentData();
+        List<ActionResponse> notSentTruckData = truckService.getNotSentData();
+        List<UserSendResponse> notSentUserData = userService.getNotSentData();
+        List<WeighingResponse> notSentWeighingData = cargoService.getNotSentData();
+        List<AttachmentResponse> notSentAttachmentData = attachService.getNotSentData();
 
         if (notSentTruckData.isEmpty() && notSentUserData.isEmpty() && notSentWeighingData.isEmpty() && notSentAttachmentData.isEmpty()) {
             return;
         }
 
-        new AllDataResponse();
+        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
         RestTemplate restTemplate = new RestTemplate();
         LocalAndServerIds body = restTemplate.postForObject(
-                "https://api-scale.mycoal.uz/remote/localAndServerIds",
+                "http://192.168.0.134:9090/remote/localAndServerIds",
                 allDataResponse, LocalAndServerIds.class
         );
         if (body == null) {
