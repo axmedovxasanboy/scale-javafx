@@ -18,16 +18,11 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AttachService implements BaseService<AttachEntity, AttachResponse, Object> {
-
     private final AttachRepository attachRepository;
-    private final TruckService truckService;
-
-    //    @Value("${attach.upload.folder}")
-    private String attachUploadFolder;
+    private final String attachUploadFolder = System.getProperty("user.dir") + "/uploads/";
 
     public AttachResponse saveToSystem(MultipartFile file) {
         try {
-
             String pathFolder = getYmDString(); // 2022/04/23
             File folder = new File(attachUploadFolder + pathFolder); // attaches/2022/04/23
 
@@ -55,9 +50,32 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         }
     }
 
-    public AttachResponse saveToSystem(MultipartFile file, AttachStatus attachStatus) {
-        return null;
+    public AttachResponse saveToSystem(byte[] file) {
+        try {
+            String pathFolder = getYmDString(); // 2022/04/23
+            File folder = new File(attachUploadFolder + pathFolder); // attaches/2022/04/23
+
+            if (!folder.exists()) folder.mkdirs();
+
+            String fileName = UUID.randomUUID().toString(); // dasdasd-dasdasda-asdasda-asdasd
+
+            Path path = Paths.get(attachUploadFolder + pathFolder + "/" + fileName + "." + "jpg");
+            File f = Files.write(path, file).toFile();
+
+
+            AttachEntity entity = new AttachEntity(
+                    fileName, fileName, null,
+                    "image/jpeg", "jpg", path.toString()
+            );
+            attachRepository.save(entity);
+
+            return entityToResponse(entity);
+
+        } catch (IOException e) {
+            throw new RuntimeException("File could not upload");
+        }
     }
+
 
 
     public String getYmDString() {
@@ -75,6 +93,10 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         }
         int lastIndex = fileName.lastIndexOf(".");
         return fileName.substring(lastIndex + 1);
+    }
+
+    public AttachEntity findById(Long attachId) {
+        return attachRepository.findById(attachId).orElse(null);
     }
 
     public List<AttachResponse> getNotSentData() {
@@ -119,4 +141,4 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     }
 
 
-}
+    }

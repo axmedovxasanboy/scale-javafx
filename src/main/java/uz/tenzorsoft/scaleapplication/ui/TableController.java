@@ -1,29 +1,35 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.currentUser;
+import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor
 public class TableController {
 
     private final TruckService truckService;
+    private final TableService tableService;
+    private final ExecutorService executors;
+    private final ImageController imageController;
     @FXML
     private TableView<TableViewData> tableData;
 
@@ -75,21 +81,59 @@ public class TableController {
         exitedTime.setCellValueFactory(new PropertyValueFactory<>("ExitedTime"));
         exitedWeight.setCellValueFactory(new PropertyValueFactory<>("ExitedWeight"));
         exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
+
+        tableData.setRowFactory(tv -> {
+            TableRow<TableViewData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (!row.isEmpty()) {
+                    TableViewData rowData = row.getItem();
+                    imageController.showImages(rowData); // Show images based on the selected row data
+                }
+            });
+            return row;
+        });
     }
 
-    private void loadTableData() {
-        truckService.save(new TruckEntity(
-                "01A777AA", new TruckActionEntity(
-                100.0, TruckAction.ENTRANCE, currentUser
-        ), null
-        ));
-        List<TableViewData> collection = truckService.getTruckData();
-        tableData.setItems(FXCollections.observableArrayList(
-                collection
-        ));
+    public void loadData() {
+        executors.execute(() -> {
+            while (true) {
+                try {
+                    List<TableViewData> data = new ArrayList<>();
+                    List<TruckEntity> all = truckService.findAll();
+                    for (TruckEntity truck : all) {
+                        data.add(tableService.entityToTableData(truck));
+                    }
+                    tableData.setItems(FXCollections.observableArrayList(data));
+
+                    Thread.sleep(60000);
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                }
+            }
+        });
+
     }
+
 
     public void addLastRecord() {
-
+        TableViewData record = truckService.findLastRecord();
+        if (record == null) return;
+        tableData.getItems().add(record);
     }
+
+    public void updateTableRow(TruckEntity truckEntity) {
+        ObservableList<TableViewData> items = tableData.getItems();
+        int index = -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId().equals(truckEntity.getId())) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            TableViewData record = truckService.entityToTableViewData(truckEntity);
+            items.set(index, record);
+        }
+    }
+
 }

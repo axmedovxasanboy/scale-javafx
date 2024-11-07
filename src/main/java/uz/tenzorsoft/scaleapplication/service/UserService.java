@@ -72,5 +72,10 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
     public UserResponse save(UserEntity userEntity) {
         return entityToResponse(userRepository.save(userEntity));
     }
+
+    public UserEntity findByPhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isEmpty()) return null;
+        return userRepository.findByPhoneNumber(phoneNumber).orElse(null);
+    }
 }
 

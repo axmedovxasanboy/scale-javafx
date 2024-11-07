@@ -2,15 +2,16 @@ package uz.tenzorsoft.scaleapplication.domain;
 
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 
 public class Instances<T> {
-    public static Boolean isConnected = false;
     public static UserEntity currentUser = null;
-    public static TruckEntity currentTruckEntity = null;
-    public static boolean isConnectedToInternet = false;
+    public static TruckResponse currentTruck = null;
 
     public static String truckNumber = "";
 
+    public static boolean isConnectedToInternet = false;
+    public static boolean isConnected = false;
     public static boolean gate1Connection = false;
     public static boolean gate2Connection = false;
     public static boolean camera1Connection = false;
@@ -20,6 +21,8 @@ public class Instances<T> {
     public static boolean sensor2Connection = false;
     public static boolean sensor3Connection = false;
     public static boolean isWaiting = false;
+    public static boolean isScaleControlOn = false;
+    public static short cargoConfirmationStatus = -1;
 
 
 

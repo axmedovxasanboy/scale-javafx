@@ -1,57 +1,97 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.service.TruckService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor
 public class ImageController {
 
+    private final TruckService truckService;
+    private List<ImageView> images;
     @FXML
     private ImageView imageView1, imageView2, imageView3, imageView4;
 
     @FXML
+    private Pane imageContainer;
+
+    @FXML
     public void initialize() {
+        Image image = new Image("/images/no-image.jpg");
 
-        imageView1.setImage(new Image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSz7anHD2cY-BoGEN5YeyPKsufhb434-nVleQ&s"));
-        imageView2.setImage(new Image("https://media.cnn.com/api/v1/images/stellar/prod/190430171751-mona-lisa.jpg?q=w_2000,c_fill"));
-        imageView3.setImage(new Image("https://media.greatbigphotographyworld.com/wp-content/uploads/2022/04/famous-war-photographers.jpg"));
-        imageView4.setImage(new Image("https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/Chris_Hemsworth_as_Thor.jpg/220px-Chris_Hemsworth_as_Thor.jpg"));
+        imageView1.setImage(image);
+        imageView2.setImage(image);
+        imageView3.setImage(image);
+        imageView4.setImage(image);
+        images = new ArrayList<>();
+        images.add(imageView1);
+        images.add(imageView2);
+        images.add(imageView3);
+        images.add(imageView4);
 
-        // Add click listeners to show images in a modal
-        addClickListener(imageView1);
-        addClickListener(imageView2);
-        addClickListener(imageView3);
-        addClickListener(imageView4);
+        double imageRatio = 0.95;
+        for (ImageView imageView : images) {
+            imageView.fitWidthProperty().bind(imageContainer.widthProperty());
+            imageView.fitHeightProperty().bind(imageContainer.heightProperty());
+            imageView.setPreserveRatio(true);
+        }
     }
 
-    private void addClickListener(ImageView imageView) {
-        imageView.setOnMouseClicked(event -> showImageInModal(imageView.getImage()));
+    public void showImages(TableViewData data) {
+        TruckEntity truck = truckService.findById(data.getId());
+        if(truck == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
+            return;
+        }
+        for (int i = 0; i < images.size(); i++) {
+            String imagePath = truck.getTruckPhotos().get(i).getTruckPhoto().getPath();
+            Image image = new Image(imagePath, true); // Set background loading to true for smoother UI
+            images.get(i).setImage(image);
+            setupImageClick(images.get(i), image);
+        }
     }
 
-    private void showImageInModal(Image image) {
-        // Create a new stage (modal)
-        Stage modalStage = new Stage();
-        modalStage.initModality(Modality.APPLICATION_MODAL);
-        modalStage.setTitle("Image Preview");
+    private void setupImageClick(ImageView imageView, Image image) {
+        imageView.setOnMouseClicked(event -> {
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
 
-        // Create an ImageView to display the image
-        ImageView imageView = new ImageView(image);
-        imageView.setPreserveRatio(true);
-        imageView.setFitWidth(600); // Adjust modal size as needed
+            ImageView fullImageView = new ImageView(image);
+            fullImageView.setPreserveRatio(true);
 
-        // Create layout and add ImageView
-        StackPane root = new StackPane(imageView);
-        Scene scene = new Scene(root, 600, 400); // Adjust modal size as needed
-        modalStage.setScene(scene);
+            // Dynamically size the full image dialog
+            double dialogWidth = 800; // Set desired dialog width
+            double dialogHeight = 600; // Set desired dialog height
+            fullImageView.fitWidthProperty().bind(dialogStage.widthProperty().multiply(0.9));
+            fullImageView.fitHeightProperty().bind(dialogStage.heightProperty().multiply(0.9));
 
-        modalStage.showAndWait();
+            VBox vbox = new VBox(fullImageView);
+            vbox.setAlignment(Pos.CENTER);
+            Scene scene = new Scene(vbox, dialogWidth, dialogHeight);
+            dialogStage.setScene(scene);
+
+            dialogStage.showAndWait();
+        });
     }
+
+
 }

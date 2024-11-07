@@ -16,10 +16,10 @@ import java.util.List;
 public class TruckEntity extends BaseEntity {
     private String truckNumber;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
-    private TruckActionEntity truckAction;
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    private List<TruckActionEntity> truckActions;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     private List<TruckPhotosEntity> truckPhotos;
 
 }

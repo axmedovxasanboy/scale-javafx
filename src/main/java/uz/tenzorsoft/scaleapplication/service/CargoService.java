@@ -29,13 +29,15 @@ public class CargoService {
         double exitedWeight = 0.0;
         double netWeight = 0.0;
 
-        TruckActionEntity truckAction = truckEntity.getTruckAction();
-        switch (truckAction.getAction()) {
-            case ENTRANCE, MANUAL_ENTRANCE -> {
-                enteredWeight = truckAction.getWeight();
-            }
-            case EXIT, MANUAL_EXIT -> {
-                exitedWeight = truckAction.getWeight();
+        List<TruckActionEntity> truckAction = truckEntity.getTruckActions();
+        for (TruckActionEntity action : truckAction) {
+            switch (action.getAction()) {
+                case ENTRANCE, MANUAL_ENTRANCE -> {
+                    enteredWeight = action.getWeight();
+                }
+                case EXIT, MANUAL_EXIT -> {
+                    exitedWeight = action.getWeight();
+                }
             }
         }
 

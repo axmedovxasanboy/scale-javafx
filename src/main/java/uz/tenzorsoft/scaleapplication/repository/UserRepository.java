@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByPhoneNumberAndPassword(String phoneNumber, String password);
 
     List<UserEntity> findByIsSent(boolean isSent);
+
+    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 }

@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
+import com.fazecast.jSerialComm.SerialPort;
 import com.ghgande.j2mod.modbus.ModbusException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -8,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
 
+import java.io.UnsupportedEncodingException;
+
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
@@ -69,5 +73,57 @@ public class ButtonController {
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
+    }
+
+    public void connect() {
+        try {
+            controllerService.connect();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+
+    }
+
+    public void disconnect() {
+        controllerService.disconnect();
+    }
+
+    public double getTruckWeigh() {
+        try {
+            scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+            scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+
+            byte[] readBuffer = new byte[1024];
+            int bytesRead = scalePort.readBytes(readBuffer, readBuffer.length);
+            if (bytesRead > 0) {
+                String data = new String(readBuffer, 0, bytesRead).trim();
+
+                try {
+                    System.out.println("Полученные данные: " + new String(data.getBytes(), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+
+                double numericValue = parseWeightData(data);
+                numericValue /= 10;
+                System.out.println("Kg: " + numericValue);
+                return numericValue;
+            }
+
+        } catch (Exception e) {
+            return 0.0;
+        }
+        return 0.0;
+    }
+
+    private double parseWeightData(String data) {
+        try {
+            String numericPart = data.substring(1, 8);
+            return Integer.parseInt(numericPart);
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+
+        return 0;
     }
 }

@@ -23,6 +23,7 @@ public class ControllerService {
         connection.setPort(port);
         connection.connect();
         isConnected = true;
+        scalePort.openPort();
     }
 
     public void openGate1() throws ModbusException {
@@ -88,7 +89,7 @@ public class ControllerService {
 
     public boolean checkConnection(String ipAddress) throws IOException {
         InetAddress address = InetAddress.getByName(ipAddress);
-        return address.isReachable(2000);
+        return address.isReachable(1500);
     }
 
     private void writeCoil(Integer coil, boolean state) throws ModbusException {
@@ -122,6 +123,7 @@ public class ControllerService {
         if (connection != null && connection.isConnected()) {
             connection.close();
             isConnected = false;
+            scalePort.closePort();
         }
     }
 }
