@@ -2,99 +2,57 @@ package uz.tenzorsoft.scaleapplication.service;
 
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
-import com.fazecast.jSerialComm.SerialPort;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.io.OutputStream;
+
+import javax.print.*;
 
 @Service
 public class PrintCheck {
 
-    private static final byte[] INIT_PRINTER = {0x1B, 0x40};
-    private static final byte[] CUT_PAPER = {0x1D, 'V', 1};
+    public static void printReceipt(TruckResponse response) {
+        // Define your receipt content
+        StringBuilder receipt = new StringBuilder();
+        String escInit = "\u001B\u0040"; // Initialize ESC/POS command
 
-    public void printReceipt(TruckResponse response) {
-        SerialPort serialPort = findThermalPrinterPort();
-        if (serialPort == null) {
-            System.out.println("Printer not found.");
-            return;
-        }
+        receipt.append(escInit);
+        receipt.append("       Truck Receipt       \n\n");
+        receipt.append("Truck Number: ").append(response.getTruckNumber()).append("\n");
+        receipt.append("Entered Weight: ").append(response.getEnteredWeight()).append(" kg\n");
+        receipt.append("Exited Weight: ").append(response.getExitedWeight()).append(" kg\n");
+        double netWeight = Math.abs(response.getEnteredWeight() - response.getExitedWeight());
+        receipt.append("Net Weight: ").append(netWeight).append(" kg\n");
+        receipt.append("Operator: ").append(response.getExitConfirmedBy()).append("\n\n");
 
-        try {
-            if (!serialPort.openPort()) {
-                System.out.println("Failed to open the port.");
-                return;
-            }
+        // Convert the receipt to bytes (to be sent to the printer)
+        byte[] receiptBytes = receipt.toString().getBytes();
 
-            configureSerialPort(serialPort);
+        // Set the printer to use (USB port 'usb001')
+        PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
+        PrintService selectedPrinter = null;
 
-            String receiptContent = buildReceiptContent(response);
-            sendToPrinter(serialPort, receiptContent);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (serialPort.isOpen()) {
-                serialPort.closePort();
-            }
-        }
-    }
-
-    private void configureSerialPort(SerialPort serialPort) {
-        serialPort.setBaudRate(9600);
-        serialPort.setNumDataBits(8);
-        serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
-        serialPort.setParity(SerialPort.NO_PARITY);
-        serialPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
-    }
-
-    private SerialPort findThermalPrinterPort() {
-        SerialPort[] ports = SerialPort.getCommPorts();
-        for (SerialPort port : ports) {
-            if (port.getSystemPortName().toLowerCase().contains("usb") || port.getSystemPortName().toLowerCase().contains("com")) {
-                return port;
+        for (PrintService printer : printServices) {
+            if (printer.getName().contains("XP-T80Q")) { // Match the printer name
+                selectedPrinter = printer;
+                break;
             }
         }
-        return null;
-    }
 
-    private void sendToPrinter(SerialPort serialPort, String receiptContent) throws Exception {
-        try (OutputStream outputStream = serialPort.getOutputStream()) {
-            outputStream.write(INIT_PRINTER);
-            outputStream.write(receiptContent.getBytes(StandardCharsets.UTF_8));
-            outputStream.write(CUT_PAPER);
-            outputStream.flush();
-            System.out.println("Receipt printed successfully.");
+        if (selectedPrinter != null) {
+            try {
+                // Create a print job
+                DocPrintJob printJob = selectedPrinter.createPrintJob();
+
+                // Create a Doc object with the receipt bytes
+                Doc doc = new SimpleDoc(receiptBytes, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
+
+                // Print the receipt
+                printJob.print(doc, null);
+            } catch (PrintException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("Printer not found!");
         }
     }
 
-    private String buildReceiptContent(TruckResponse response) {
-        String truckNumber = response.getTruckNumber();
-        LocalDateTime enteredAt = response.getEnteredAt();
-        LocalDateTime exitedAt = response.getExitedAt();
-        Double enteredWeight = response.getEnteredWeight() != null ? response.getEnteredWeight() : 0.0;
-        Double exitedWeight = response.getExitedWeight() != null ? response.getExitedWeight() : 0.0;
-        String operatorNumber = response.getExitConfirmedBy();
 
-        double netto = Math.abs(enteredWeight - exitedWeight);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        String formattedEnteredAt = enteredAt != null ? enteredAt.format(formatter) : "N/A";
-        String formattedExitedAt = exitedAt != null ? exitedAt.format(formatter) : "N/A";
-
-        return String.format(
-                "       Sirdayo       \n" +
-                        "№ авто: %s\n" +
-                        "Прибыл: %s\n" +
-                        "Убыл: %s\n" +
-                        "Вес (кг): %.0f\n" +
-                        "Тара (кг): %.0f\n" +
-                        "БРУТТО (кг): %.0f\n" +
-                        "НЕТТО (кг): %.0f\n" +
-                        "Оператор: %s\n",
-                truckNumber, formattedEnteredAt, formattedExitedAt,
-                enteredWeight, exitedWeight, enteredWeight, netto, operatorNumber
-        );
-    }
 }
