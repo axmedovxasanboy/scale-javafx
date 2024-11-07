@@ -1,10 +1,13 @@
 package uz.tenzorsoft.scaleapplication.service;
 
+import org.springframework.stereotype.Service;
+
 import javax.print.*;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.Copies;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+
 
 public class POSPrinter {
     private String printerName;

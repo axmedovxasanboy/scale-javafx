@@ -58,9 +58,10 @@ public class ConnectionsController {
                     sensor1.setImage(sensor1Connection ? greenLight : redLight);
                     sensor2.setImage(sensor2Connection ? greenLight : redLight);
                     sensor3.setImage(sensor3Connection ? greenLight : redLight);
-                    gate1.setImage(gate1Connection ? greenLight : redLight);
-//                gate2.setImage(gate2Connection ? greenLight : redLight);
-                    gate2.setImage(Math.random() > 0.5 ? greenLight : redLight);
+//                    gate1.setImage(gate1Connection ? greenLight : redLight);
+                gate1.setImage(gate1Connection ? greenLight : redLight);
+                gate2.setImage(gate2Connection ? greenLight : redLight);
+//                    gate2.setImage(Math.random() > 0.5 ? greenLight : redLight);
 
 
                     Thread.sleep(500);

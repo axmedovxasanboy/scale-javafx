@@ -56,6 +56,7 @@ public class CameraController {
 
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
+        System.out.println("Request is processing " + cameraId);
         if (request instanceof MultipartHttpServletRequest multipartRequest) {
             System.out.println("Camera id: " + cameraId);
 
@@ -74,27 +75,35 @@ public class CameraController {
                 }
 
                 try {
-                    if (fileName.equals("anpr.xml")) {
-                        truckNumber = extractNumberFromXmlFile(file);
-                        Pattern pattern = Pattern.compile(regexPattern);
-                        Matcher matcher = pattern.matcher(truckNumber);
-                        if (!matcher.find()) {
-                            showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
-                            log.warn("Truck number does not match: {}", truckNumber);
-                            truckNumber = "";
-                            return ResponseEntity.ok("NOT_MATCH");
+                    try {
+                        if (fileName.equals("anpr.xml")) {
+                            truckNumber = extractNumberFromXmlFile(file);
+                            Pattern pattern = Pattern.compile(regexPattern);
+                            Matcher matcher = pattern.matcher(truckNumber);
+                            if (!matcher.find()) {
+                                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+                                log.warn("Truck number does not match: {}", truckNumber);
+                                truckNumber = "";
+                                return ResponseEntity.ok("NOT_MATCH");
+                            }
                         }
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
-                    if (fileName.equals("detectionPicture.jpg")) {
-                        AttachResponse attachResponse = attachService.saveToSystem(file);
-                        if (attachResponse == null) {
-                            log.warn("See logs for error cause. Unable to save file: {}", fileName);
-                            return ResponseEntity.ok("Unable to save file");
+                    try {
+                        if (fileName.equals("detectionPicture.jpg")) {
+                            AttachResponse attachResponse = attachService.saveToSystem(file);
+                            if (attachResponse == null) {
+                                log.warn("See logs for error cause. Unable to save file: {}", fileName);
+                                return ResponseEntity.ok("Unable to save file");
+                            }
+                            if (cameraId == 1)
+                                currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.ENTRANCE_PHOTO));
+                            else if (cameraId == 2)
+                                currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.EXIT_PHOTO));
                         }
-                        if (cameraId == 1)
-                            currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.ENTRANCE_PHOTO));
-                        else if (cameraId == 2)
-                            currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.EXIT_PHOTO));
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                 } catch (Exception e) {
                     log.warn("File processing failed: {}", fileName);
