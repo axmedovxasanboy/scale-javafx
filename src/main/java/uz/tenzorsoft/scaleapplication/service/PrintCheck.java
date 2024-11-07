@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.io.OutputStream;
 
-
 @Service
 public class PrintCheck {
 
@@ -16,47 +15,57 @@ public class PrintCheck {
     private static final byte[] CUT_PAPER = {0x1D, 'V', 1};
 
     public void printReceipt(TruckResponse response) {
-        try {
-            SerialPort serialPort = findThermalPrinterPort();
-            if (serialPort == null) {
-                System.out.println("Printer not found.");
-                return;
-            }
+        SerialPort serialPort = findThermalPrinterPort();
+        if (serialPort == null) {
+            System.out.println("Printer not found.");
+            return;
+        }
 
+        try {
             if (!serialPort.openPort()) {
                 System.out.println("Failed to open the port.");
                 return;
             }
 
-            serialPort.setBaudRate(9600);
-            serialPort.setNumDataBits(8);
-            serialPort.setNumStopBits(1);
-            serialPort.setParity(SerialPort.NO_PARITY);
-            serialPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
-
-            String receipt = buildReceiptContent(response);
-
-            try (OutputStream outputStream = serialPort.getOutputStream()) {
-                outputStream.write(INIT_PRINTER);
-                outputStream.write(receipt.getBytes(StandardCharsets.UTF_8));
-                outputStream.write(CUT_PAPER);
-                outputStream.flush();
-                System.out.println("Receipt printed successfully.");
-            }
+            configureSerialPort(serialPort);
+            String receiptContent = buildReceiptContent(response);
+            sendToPrinter(serialPort, receiptContent);
 
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (serialPort.isOpen()) {
+                serialPort.closePort();
+            }
         }
+    }
+
+    private void configureSerialPort(SerialPort serialPort) {
+        serialPort.setBaudRate(9600);
+        serialPort.setNumDataBits(8);
+        serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
+        serialPort.setParity(SerialPort.NO_PARITY);
+        serialPort.setFlowControl(SerialPort.FLOW_CONTROL_DISABLED);
     }
 
     private SerialPort findThermalPrinterPort() {
         SerialPort[] ports = SerialPort.getCommPorts();
         for (SerialPort port : ports) {
-            if (port.getSystemPortName().toLowerCase().contains("ttyusb") || port.getSystemPortName().toLowerCase().contains("com")) {
+            if (port.getSystemPortName().toLowerCase().contains("usb") || port.getSystemPortName().toLowerCase().contains("com")) {
                 return port;
             }
         }
         return null;
+    }
+
+    private void sendToPrinter(SerialPort serialPort, String receiptContent) throws Exception {
+        try (OutputStream outputStream = serialPort.getOutputStream()) {
+            outputStream.write(INIT_PRINTER);
+            outputStream.write(receiptContent.getBytes(StandardCharsets.UTF_8));
+            outputStream.write(CUT_PAPER);
+            outputStream.flush();
+            System.out.println("Receipt printed successfully.");
+        }
     }
 
     private String buildReceiptContent(TruckResponse response) {
@@ -74,8 +83,7 @@ public class PrintCheck {
         String formattedExitedAt = exitedAt != null ? exitedAt.format(formatter) : "N/A";
 
         return String.format(
-                new String(INIT_PRINTER) +
-                        "       Sirdayo       \n" +
+                "       Sirdayo       \n" +
                         "№ авто: %s\n" +
                         "Прибыл: %s\n" +
                         "Убыл: %s\n" +
@@ -83,8 +91,7 @@ public class PrintCheck {
                         "Тара (кг): %.0f\n" +
                         "БРУТТО (кг): %.0f\n" +
                         "НЕТТО (кг): %.0f\n" +
-                        "Оператор: %s\n" +
-                        new String(CUT_PAPER),
+                        "Оператор: %s\n",
                 truckNumber, formattedEnteredAt, formattedExitedAt,
                 enteredWeight, exitedWeight, enteredWeight, netto, operatorNumber
         );
