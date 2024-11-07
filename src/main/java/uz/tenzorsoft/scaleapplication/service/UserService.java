@@ -77,5 +77,11 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
         if (phoneNumber == null || phoneNumber.isEmpty()) return null;
         return userRepository.findByPhoneNumber(phoneNumber).orElse(null);
     }
+
+    public void create(String phoneNumber, String password) {
+        UserEntity user = new UserEntity(phoneNumber, password, phoneNumber);
+        userRepository.save(user);
+        Instances.currentUser = user;
+    }
 }
 

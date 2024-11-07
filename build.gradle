@@ -54,7 +54,7 @@ tasks.named('test') {
 }
 
 application {
-    mainClass = 'uz.tenzorsoft.firstjavafx.JavaFXSpringApp' // Update with your main class name
+    mainClass = 'uz.tenzorsoft.scaleapplication.ScaleApplication' // Update with your main class name
 }
 
 // Configure JavaFX modules

@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -14,6 +15,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class ScaleApplication extends Application {
     private ConfigurableApplicationContext context;
     private Parent rootNode;
+
+    public static void main(String[] args) {
+        Application.launch(ScaleApplication.class, args);
+    }
 
     @Override
     public void init() throws Exception {
