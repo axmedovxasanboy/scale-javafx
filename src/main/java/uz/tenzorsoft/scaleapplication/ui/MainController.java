@@ -17,10 +17,8 @@ import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
-import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.PrintCheck;
+import uz.tenzorsoft.scaleapplication.service.POSPrinter;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
@@ -28,7 +26,6 @@ import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,13 +46,45 @@ public class MainController {
     private final TableController tableController;
     private final ExecutorService executors;
     private final UserService userService;
-    private final PrintCheck printCheck;
 
     @FXML
     private Pane scaleAutomationPane;
 
     @FXML
     private Button connectButton;
+
+    public static void showAlert(Alert.AlertType alertType, String headerText, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(headerText);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public static short showCargoScaleConfirmationDialog(double weight) {
+        AtomicReference<Short> resp = new AtomicReference<>((short) 0);
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Truck total weight", ButtonType.APPLY, ButtonType.CANCEL);
+        confirmDialog.initStyle(StageStyle.UTILITY);
+
+        confirmDialog.setHeaderText(null);
+        confirmDialog.setTitle("Truck weigh is" + weight + "\nDo you accept?");
+        Button applyButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.APPLY);
+        applyButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
+        applyButton.setCursor(Cursor.HAND);
+
+        Button cancelButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+        cancelButton.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
+        cancelButton.setCursor(Cursor.HAND);
+
+        confirmDialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.APPLY) {
+                resp.set((short) 1);
+            } else {
+                resp.set((short) 0);
+            }
+        });
+        return resp.get();
+    }
 
     public void load() {
         loadMainMenu();
@@ -64,12 +93,11 @@ public class MainController {
         truckScalingController.start();
         tableController.loadData();
 
-        printCheck.printReceipt(new TruckResponse(
-                1L, "01A777AA", null,
-                TruckAction.ENTRANCE, LocalDateTime.now(), 100.0,
-                "user", TruckAction.EXIT, LocalDateTime.now(),
-                150.0, "user1"
-        ));
+        // Example of calling the printReceipt method
+        POSPrinter posPrinter = new POSPrinter("POS-80");  // Replace "POS-80" with your printer's exact name
+        String receiptText = "Receipt Content\nItem 1: $10.00\nItem 2: $20.00\nTotal: $30.00\nThank you!";
+        posPrinter.printReceipt(receiptText);
+
 
     }
 
@@ -115,39 +143,6 @@ public class MainController {
             buttonController.connect();
             connectButton.setText("Disconnect from controller");
         }
-    }
-
-    public static void showAlert(Alert.AlertType alertType, String headerText, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(headerText);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public static short showCargoScaleConfirmationDialog(double weight) {
-        AtomicReference<Short> resp = new AtomicReference<>((short) 0);
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Truck total weight", ButtonType.APPLY, ButtonType.CANCEL);
-        confirmDialog.initStyle(StageStyle.UTILITY);
-
-        confirmDialog.setHeaderText(null);
-        confirmDialog.setTitle("Truck weigh is" + weight + "\nDo you accept?");
-        Button applyButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.APPLY);
-        applyButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-        applyButton.setCursor(Cursor.HAND);
-
-        Button cancelButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-        cancelButton.setCursor(Cursor.HAND);
-
-        confirmDialog.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.APPLY) {
-                resp.set((short) 1);
-            } else {
-                resp.set((short) 0);
-            }
-        });
-        return resp.get();
     }
 
 
