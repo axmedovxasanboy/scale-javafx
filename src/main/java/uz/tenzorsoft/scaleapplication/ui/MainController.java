@@ -17,21 +17,14 @@ import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.SendDataService;
+import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 

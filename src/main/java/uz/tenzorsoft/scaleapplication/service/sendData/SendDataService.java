@@ -1,4 +1,4 @@
-package uz.tenzorsoft.scaleapplication.service;
+package uz.tenzorsoft.scaleapplication.service.sendData;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.response.*;
+import uz.tenzorsoft.scaleapplication.service.AttachService;
+import uz.tenzorsoft.scaleapplication.service.CargoService;
+import uz.tenzorsoft.scaleapplication.service.TruckService;
+import uz.tenzorsoft.scaleapplication.service.UserService;
 
 import java.util.List;
 
@@ -32,7 +36,7 @@ public class SendDataService {
             return;
         }
 
-        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
+        new AllDataResponse();
         RestTemplate restTemplate = new RestTemplate();
         LocalAndServerIds body = restTemplate.postForObject(
                 "https://api-scale.mycoal.uz/remote/localAndServerIds",

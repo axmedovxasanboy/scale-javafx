@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 
 import java.util.List;
 
@@ -13,8 +17,8 @@ import java.util.List;
 @Setter
 @Getter
 public class AllDataResponse {
-    private List<TableViewData> actionDto;
+    private List<ActionResponse> actionDto;
     private List<UserResponse> userDto;
-    private List<CargoResponse> weighingDto;
-    private List<AttachResponse> attachmentDto;
+    private List<WeighingResponse> weighingDto;
+    private List<AttachmentResponse> attachmentDto;
 }

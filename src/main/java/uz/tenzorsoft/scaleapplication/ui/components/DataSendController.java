@@ -3,7 +3,7 @@ package uz.tenzorsoft.scaleapplication.ui.components;
 import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.service.SendDataService;
+import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 
 import java.util.concurrent.ExecutorService;
 
