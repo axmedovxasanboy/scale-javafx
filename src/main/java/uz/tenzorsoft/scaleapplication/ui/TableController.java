@@ -107,7 +107,7 @@ public class TableController {
 
                     Thread.sleep(60000);
                 } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });

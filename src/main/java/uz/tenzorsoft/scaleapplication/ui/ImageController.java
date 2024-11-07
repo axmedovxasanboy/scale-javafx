@@ -72,7 +72,7 @@ public class ImageController {
                 images.get(i).setImage(image);
                 setupImageClick(images.get(i), image);
             } catch (FileNotFoundException e) {
-                System.err.println(e.getMessage());
+
             }
         }
     }
