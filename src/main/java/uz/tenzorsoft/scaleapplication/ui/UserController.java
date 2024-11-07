@@ -82,10 +82,11 @@ public class UserController {
         dialog.setResizable(false);
         dialog.setTitle("Parolni almashtirish");
 
-        // Step 1: Phone Number Input Field
+        // Step 1: Phone Number Input Field (auto-filled and non-editable)
         Label phoneLabel = new Label("Telefon nomerini kiriting:");
         TextField phoneInput = new TextField();
-        phoneInput.setPromptText("Telefon nomer");
+        phoneInput.setText("123-456-7890");  // Auto-filled phone number (replace with dynamic data if needed)
+        phoneInput.setEditable(false);  // Make it non-editable
         phoneInput.setPrefWidth(200);  // Adjusted width
         phoneInput.setMaxWidth(250);   // Set max width to prevent it from getting too wide
 
@@ -170,33 +171,42 @@ public class UserController {
 
         // Step 3: Confirm Password Button Action
         confirmPasswordButton.setOnAction(e -> {
-            String newPassword = newPasswordInput.getText();
-            String confirmPassword = confirmPasswordInput.getText();
+            String newPassword = newPasswordInput.getText().trim();  // Trim whitespace
+            String confirmPassword = confirmPasswordInput.getText().trim();  // Trim whitespace
 
-            // Validate that password fields are not empty
-            if (newPassword.isEmpty() || confirmPassword.isEmpty()) {
-                new Alert(Alert.AlertType.ERROR, "Parol maydoni bo'sh bo'lmasligi kerak.", ButtonType.OK).showAndWait();
+            // Check if any password field is empty
+            if (newPassword.isEmpty()) {
+                new Alert(Alert.AlertType.ERROR, "Yangi parol maydoni bo'sh bo'lmasligi kerak.", ButtonType.OK).showAndWait();
                 return;
             }
 
+            if (confirmPassword.isEmpty()) {
+                new Alert(Alert.AlertType.ERROR, "Parolni qayta kiriting maydoni bo'sh bo'lmasligi kerak.", ButtonType.OK).showAndWait();
+                return;
+            }
+
+            // Validate that the passwords match
             if (newPassword.equals(confirmPassword)) {
                 // Update password in the backend (store it in DB)
                 System.out.println("Password successfully changed!");
                 dialog.close();
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Parol bir-biriga to'g'ri kelmadi.", ButtonType.OK);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Parollar bir-biriga to'g'ri kelmadi.", ButtonType.OK);
                 alert.showAndWait();
             }
         });
+
 
         // Show the dialog
         dialog.showAndWait();
     }
 
     private void setupButtonPressEffect(Button button, String normalColor, String pressedColor) {
-        button.setOnMousePressed(event -> button.setStyle("-fx-background-color: " + pressedColor + "; -fx-border-color: black; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
+        button.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"); // Add cursor change here
 
-        button.setOnMouseReleased(event -> button.setStyle("-fx-background-color: " + normalColor + "; -fx-border-color: black; -fx-text-fill: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
+        button.setOnMousePressed(event -> button.setStyle("-fx-background-color: " + pressedColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
+
+        button.setOnMouseReleased(event -> button.setStyle("-fx-background-color: " + normalColor + "; -fx-text-fill: white; -fx-border-radius: 7; -fx-background-radius: 10; -fx-cursor: hand;"));
     }
 
     private void saveSmsCodeToDatabase(String smsCode) {
