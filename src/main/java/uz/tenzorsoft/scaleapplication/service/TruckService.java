@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -16,12 +17,12 @@ import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.MyCoalData;
+import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
+import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
 
     private final TruckRepository truckRepository;
+    private final TruckActionRepository truckActionRepository;
+    private final TruckPhotoRepository truckPhotoRepository;
     private final UserService userService;
     @Lazy
     @Autowired
@@ -43,6 +46,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return data;
     }
 
+    @Transactional
     public TruckEntity save(TruckResponse truck) {
         TruckEntity truckEntity = truckRepository.findTruckWithEntranceNoExit(truck.getTruckNumber()).orElse(new TruckEntity());
 
@@ -51,7 +55,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     truck.getExitedWeight(), TruckAction.EXIT, userService.findByPhoneNumber(truck.getExitConfirmedBy())
             );
             truckEntity.getTruckActions().add(truckAction);
-            return save(truckEntity);
+            return truckRepository.save(truckEntity);
         }
 
         List<TruckActionEntity> truckActions = new ArrayList<>();
@@ -62,19 +66,34 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 TruckAction.EXIT, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()))
         );
 
+        truckActionRepository.saveAll(truckActions);
+
         List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
+//        truck.getAttaches().forEach(attach -> {
+//            truckPhotos.add(new TruckPhotosEntity(
+//                    attachService.findById(attach.getId()), attach.getStatus()
+//            ));
+//        });
+
+        Set<Long> attachIds = new HashSet<>();
+        System.out.println("truck.getAttaches().size() = " + truck.getAttaches().size());
         truck.getAttaches().forEach(attach -> {
-            truckPhotos.add(new TruckPhotosEntity(
-                    attachService.findById(attach.getId()), attach.getStatus()
-            ));
+            if (!attachIds.contains(attach.getId())) { // Check for uniqueness
+                System.out.println("attach.getId() = " + attach.getId());
+                truckPhotos.add(truckPhotoRepository.save(new TruckPhotosEntity(
+                        attachService.findById(attach.getId()), attach.getStatus()
+                )));
+                attachIds.add(attach.getId()); // Add to the set to track uniqueness
+            }
         });
+        System.out.println("saved truck photo");
 
 
         truckEntity.setTruckNumber(truck.getTruckNumber());
         truckEntity.setTruckPhotos(truckPhotos);
         truckEntity.setTruckActions(truckActions);
-        return save(truckEntity);
+        return truckRepository.save(truckEntity);
     }
 
     public List<ActionResponse> getNotSentData() {
@@ -144,14 +163,22 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setEnteredDate(getDate(action.getCreatedAt()));
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight());
-                    data.setEnteredOnDuty(action.getOnDuty().getUsername());
+                    if (action.getOnDuty() != null) {
+                        data.setEnteredOnDuty(action.getOnDuty().getUsername());
+                    } else {
+                        data.setEnteredOnDuty("Unknown"); // Or handle this case differently as needed
+                    }
                 }
                 case MANUAL_EXIT, EXIT -> {
                     data.setExitedTruckNumber(entity.getTruckNumber());
                     data.setExitedDate(getDate(action.getCreatedAt()));
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight());
-                    data.setExitedOnDuty(action.getOnDuty().getUsername());
+                    if (action.getOnDuty() != null) {
+                        data.setExitedOnDuty(action.getOnDuty().getUsername());
+                    } else {
+                        data.setExitedOnDuty("Unknown"); // Or handle this case differently as needed
+                    }
                 }
             }
         }

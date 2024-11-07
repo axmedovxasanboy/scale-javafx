@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class TruckEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<TruckActionEntity> truckActions;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    private List<TruckPhotosEntity> truckPhotos;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
 }

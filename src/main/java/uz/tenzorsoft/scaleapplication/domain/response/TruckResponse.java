@@ -4,6 +4,7 @@ import lombok.*;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -15,7 +16,7 @@ public class TruckResponse {
     private Long id;
     private String truckNumber;
 
-    private List<AttachIdWithStatus> attaches;
+    private List<AttachIdWithStatus> attaches = new ArrayList<>();
     private TruckAction enteredStatus;
     private LocalDateTime enteredAt;
     private Double enteredWeight;

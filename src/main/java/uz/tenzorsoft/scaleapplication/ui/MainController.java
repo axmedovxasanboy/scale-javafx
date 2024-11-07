@@ -93,12 +93,6 @@ public class MainController {
         truckScalingController.start();
         tableController.loadData();
 
-        // Example of calling the printReceipt method
-        POSPrinter posPrinter = new POSPrinter("Printer POS-80");  // Replace "POS-80" with your printer's exact name
-        String receiptText = "Receipt Content\nItem 1: $10.00\nItem 2: $20.00\nTotal: $30.00\nThank you!";
-        posPrinter.printReceipt(receiptText);
-
-
     }
 
     private void loadMainMenu() {

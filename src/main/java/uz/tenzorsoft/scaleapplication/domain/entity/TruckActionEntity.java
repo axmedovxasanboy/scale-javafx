@@ -14,11 +14,10 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 @Getter
 @Entity(name = "truck_actions")
 public class TruckActionEntity extends BaseEntity {
-    @Column(nullable = false)
-    private Double weight;
+    private Double weight=0.0;
 
     @Enumerated(EnumType.STRING)
-    private TruckAction action;
+    private TruckAction action = TruckAction.NO_ACTION;
 
     @ManyToOne
     private UserEntity onDuty;

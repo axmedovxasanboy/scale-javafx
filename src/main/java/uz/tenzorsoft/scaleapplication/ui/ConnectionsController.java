@@ -66,7 +66,7 @@ public class ConnectionsController {
 
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });

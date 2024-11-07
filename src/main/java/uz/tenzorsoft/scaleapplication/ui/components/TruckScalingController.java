@@ -68,9 +68,9 @@ public class TruckScalingController {
                             System.out.println("weigh = " + helper);
 
                             if (weigh != helper) weigh = helper;
-                            else if (weigh == helper) {
+                            else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
-                                isScaled = weigh == helper;
+                                isScaled = true;
                             }
 
                             if (isScaled && !isCargoPhotoTaken) {
@@ -139,7 +139,7 @@ public class TruckScalingController {
                             System.out.println("helper = " + helper);
 
                             if (weigh != helper) weigh = helper;
-                            else if (weigh == helper) {
+                            else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
                             }
@@ -178,6 +178,7 @@ public class TruckScalingController {
                         isTruckEntered = true;
                         isTruckExited = false;
                         currentTruck = new TruckResponse();
+                        System.out.println("Gate 2 is opening");
                         buttonController.openGate2();
                     }
 
@@ -212,7 +213,7 @@ public class TruckScalingController {
 
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+
                 }
             }
         });

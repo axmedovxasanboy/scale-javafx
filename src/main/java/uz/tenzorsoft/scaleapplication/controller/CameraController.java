@@ -59,15 +59,16 @@ public class CameraController {
         System.out.println("Request is processing " + cameraId);
         if (request instanceof MultipartHttpServletRequest multipartRequest) {
             System.out.println("Camera id: " + cameraId);
+            System.out.println("multipartRequest.getFileMap().size() = " + multipartRequest.getFileMap().size());
 
-            if (multipartRequest.getFileMap().size() < 4 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
+            if (multipartRequest.getFileMap().size() < 2 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
             for (Map.Entry<String, MultipartFile> entry : multipartRequest.getFileMap().entrySet()) {
                 String fileName = entry.getKey();
                 MultipartFile file = entry.getValue();
-
-                log.info("Processing file: {}", fileName);
+                System.out.println("fileName = " + fileName);
+                System.out.println("File processing");
 
                 if (file.isEmpty()) {
                     log.warn("File is empty: {}", fileName);
@@ -78,46 +79,63 @@ public class CameraController {
                     try {
                         if (fileName.equals("anpr.xml")) {
                             truckNumber = extractNumberFromXmlFile(file);
+                            System.out.println("truckNumber = " + truckNumber);
                             Pattern pattern = Pattern.compile(regexPattern);
                             Matcher matcher = pattern.matcher(truckNumber);
                             if (!matcher.find()) {
                                 showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
                                 log.warn("Truck number does not match: {}", truckNumber);
+                                System.out.println("Truck number does not match: " + truckNumber);
                                 truckNumber = "";
                                 return ResponseEntity.ok("NOT_MATCH");
                             }
                         }
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
                         if (fileName.equals("detectionPicture.jpg")) {
+
                             AttachResponse attachResponse = attachService.saveToSystem(file);
                             if (attachResponse == null) {
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
                                 return ResponseEntity.ok("Unable to save file");
                             }
-                            if (cameraId == 1)
+                            if (cameraId == 1) {
+                                System.out.println("saving image " + cameraId);
                                 currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.ENTRANCE_PHOTO));
-                            else if (cameraId == 2)
+                            } else if (cameraId == 2) {
+                                System.out.println("saving image 2");
                                 currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.EXIT_PHOTO));
+                            }
                         }
                     } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                        System.out.println("Image Exception " + e.getMessage());
                     }
                 } catch (Exception e) {
                     log.warn("File processing failed: {}", fileName);
                     log.error(e.getMessage(), e);
+                    System.out.println(e.getMessage());
                     return ResponseEntity.status(500).body("Failed to save file: " + file.getOriginalFilename());
                 }
             }
-
-            truckService.save(currentTruck);
+            currentTruck.setTruckNumber(truckNumber);
+            System.out.println(currentTruck);
+            try {
+                truckService.save(currentTruck);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
             if (cameraId == 1) tableController.addLastRecord();
 
-            if (cameraId == 1) buttonController.openGate1(0);
-            else if (cameraId == 2) buttonController.openGate2(7);
+            if (cameraId == 1) {
+                System.out.println("Opening gate 1");
+                buttonController.openGate1(0);
+            } else if (cameraId == 2) {
+                System.out.println("Opening gate 2");
+                buttonController.openGate2(7);
+            }
 
             return ResponseEntity.ok("Files uploaded and saved successfully.");
         }

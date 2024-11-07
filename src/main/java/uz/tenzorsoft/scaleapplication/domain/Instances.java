@@ -1,12 +1,14 @@
 package uz.tenzorsoft.scaleapplication.domain;
 
+import lombok.Synchronized;
+import org.hibernate.annotations.Synchronize;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 
 public class Instances<T> {
-    public static UserEntity currentUser = null;
-    public static TruckResponse currentTruck = null;
+    public static UserEntity currentUser = new UserEntity();
+    public static TruckResponse currentTruck = new TruckResponse();
 
     public static String truckNumber = "";
 
