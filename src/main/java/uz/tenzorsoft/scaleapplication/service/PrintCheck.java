@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 
 import javax.print.*;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class PrintCheck {
@@ -22,18 +23,24 @@ public class PrintCheck {
         receipt.append("Net Weight: ").append(netWeight).append(" kg\n");
         receipt.append("Operator: ").append(response.getExitConfirmedBy()).append("\n\n");
 
-        // Convert the receipt to bytes (to be sent to the printer)
-        byte[] receiptBytes = receipt.toString().getBytes();
+        // Convert the receipt to bytes (to be sent to the printer) with UTF-8 encoding
+        byte[] receiptBytes = receipt.toString().getBytes(StandardCharsets.UTF_8);
 
-        // Set the printer to use (USB port 'usb001')
+        // Check for available printers and find the target printer
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
         PrintService selectedPrinter = null;
 
         for (PrintService printer : printServices) {
-            if (printer.getName().contains("XP-T80Q")) { // Match the printer name
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println();
+            System.out.println("Available printer: " + printer.getName()); // List available printers
+            if (printer.getName().equalsIgnoreCase("XP-T80Q")) { // Match the printer name exactly
                 selectedPrinter = printer;
                 break;
             }
+
         }
 
         if (selectedPrinter != null) {
@@ -46,13 +53,13 @@ public class PrintCheck {
 
                 // Print the receipt
                 printJob.print(doc, null);
+                System.out.println("Print job sent to printer: " + selectedPrinter.getName());
             } catch (PrintException e) {
+                System.err.println("Failed to print: " + e.getMessage());
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Printer not found!");
+            System.out.println("Printer 'XP-T80Q' not found! Make sure the printer name matches exactly.");
         }
     }
-
-
 }
