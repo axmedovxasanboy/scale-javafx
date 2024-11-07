@@ -7,6 +7,7 @@ import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
 import uz.tenzorsoft.scaleapplication.domain.request.UserRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.UserResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserSendResponse;
 import uz.tenzorsoft.scaleapplication.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -31,22 +32,21 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
         return entityToResponse(user);
     }
 
-    public List<UserResponse> getNotSentData() {
-        List<UserResponse> result = new ArrayList<>();
+    public List<UserSendResponse> getNotSentData() {
+        List<UserSendResponse> result = new ArrayList<>();
         List<UserEntity> notSentData = userRepository.findByIsSent(false);
         for (UserEntity user : notSentData) {
-            UserResponse response = new UserResponse(
-                    user.getUsername(), user.getPassword(), user.getPhoneNumber()
+            UserSendResponse response = new UserSendResponse(
+                    user.getPhoneNumber(), user.getUsername(), user.getPassword()
             );
             response.setId(user.getId());
-            response.setCreatedAt(user.getCreatedAt());
             response.setIdOnServer(user.getIdOnServer());
             result.add(response);
         }
         return result;
     }
 
-    public void dataSent(List<UserResponse> notSentData, Map<Long, Long> userMap) {
+    public void dataSent(List<UserSendResponse> notSentData, Map<Long, Long> userMap) {
         if (userMap == null || userMap.isEmpty()) {
             return;
         }

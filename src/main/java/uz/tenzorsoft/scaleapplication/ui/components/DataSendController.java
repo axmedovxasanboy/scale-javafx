@@ -23,7 +23,7 @@ public class DataSendController {
                     sendDataService.sendNotSentData();
                     Thread.sleep(2000);
                 } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    System.err.println(e.getMessage());
                 }
             }
         });

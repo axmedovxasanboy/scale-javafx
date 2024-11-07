@@ -13,10 +13,12 @@ import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,15 +60,20 @@ public class ImageController {
 
     public void showImages(TableViewData data) {
         TruckEntity truck = truckService.findById(data.getId());
-        if(truck == null) {
+        if (truck == null) {
             showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
             return;
         }
         for (int i = 0; i < images.size(); i++) {
-            String imagePath = truck.getTruckPhotos().get(i).getTruckPhoto().getPath();
-            Image image = new Image(imagePath, true); // Set background loading to true for smoother UI
-            images.get(i).setImage(image);
-            setupImageClick(images.get(i), image);
+            try {
+                String imagePath = truck.getTruckPhotos().get(i).getTruckPhoto().getPath();
+                InputStream inputStream = new FileInputStream(imagePath);
+                Image image = new Image(inputStream); // Set background loading to true for smoother UI
+                images.get(i).setImage(image);
+                setupImageClick(images.get(i), image);
+            } catch (FileNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 

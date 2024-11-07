@@ -8,6 +8,7 @@ import org.springframework.cglib.core.Local;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ActionResponse extends BaseResponse {
 
-    private Long attachIds;
+    private List<Long> attachIds;
 
     private String truckNumber;
     private TruckAction enteredStatus;

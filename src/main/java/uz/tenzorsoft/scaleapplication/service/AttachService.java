@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
 import uz.tenzorsoft.scaleapplication.repository.AttachRepository;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +24,8 @@ import java.util.*;
 public class AttachService implements BaseService<AttachEntity, AttachResponse, Object> {
     private final AttachRepository attachRepository;
     private final String attachUploadFolder = System.getProperty("user.dir") + "/uploads/";
+    private final TruckService truckService;
+    private final TruckPhotoService truckPhotoService;
 
     public AttachResponse saveToSystem(MultipartFile file) {
         try {
@@ -77,7 +83,6 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     }
 
 
-
     public String getYmDString() {
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
@@ -99,22 +104,46 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         return attachRepository.findById(attachId).orElse(null);
     }
 
-    public List<AttachResponse> getNotSentData() {
-        List<AttachResponse> result = new ArrayList<>();
+    public List<AttachmentResponse> getNotSentData() {
+        List<AttachmentResponse> result = new ArrayList<>();
         List<AttachEntity> notSentData = attachRepository.findByIsSent(false);
         for (AttachEntity attach : notSentData) {
-            if (attach.getType().equals("xml")) continue;
-            try {
-                result.add(entityToResponse(attach));
-            } catch (RuntimeException e) {
-                e.printStackTrace();
-                System.out.println("Error occurred with attach id: " + attach.getId());
-            }
+
+            TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(attach));
+
+            AttachmentResponse response = new AttachmentResponse(
+                    truck == null ? null : truck.getId(), attach.getOriginalName(),
+                    attach.getSize(), attach.getType(), attach.getContentType(), attach.getPath(), null,
+                    truckPhotoService.findAttachStatus(attach), attach.getCreatedAt(), getImageBytes(attach.getPath())
+            );
+            response.setId(attach.getId());
+            response.setIdOnServer(attach.getIdOnServer());
+            result.add(response);
+
         }
         return result;
     }
 
-    public void dataSent(List<AttachResponse> notSentData, Map<Long, Long> attachMap) {
+    private byte[] getImageBytes(String path) {
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (IOException e) {
+            return new byte[]{};
+        }
+//
+//        try {
+//            BufferedImage image = ImageIO.read(new File(path));
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//            ImageIO.write(image, "jpg", outputStream);
+//            return outputStream.toByteArray();
+//        } catch (IOException e) {
+//            return new byte[]{};
+//        }
+
+
+    }
+
+    public void dataSent(List<AttachmentResponse> notSentData, Map<Long, Long> attachMap) {
         if (attachMap == null || attachMap.isEmpty()) {
             return;
         }
@@ -141,4 +170,4 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     }
 
 
-    }
+}

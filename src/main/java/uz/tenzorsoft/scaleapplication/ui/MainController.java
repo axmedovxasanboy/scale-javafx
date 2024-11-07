@@ -17,14 +17,18 @@ import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
+import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
+import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -45,6 +49,7 @@ public class MainController {
     private final TableController tableController;
     private final ExecutorService executors;
     private final UserService userService;
+    private final PrintCheck printCheck;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -58,6 +63,13 @@ public class MainController {
         dataSendController.sendNotSentData();
         truckScalingController.start();
         tableController.loadData();
+
+        printCheck.printReceipt(new TruckResponse(
+                1L, "01A777AA", null,
+                TruckAction.ENTRANCE, LocalDateTime.now(), 100.0,
+                "user", TruckAction.EXIT, LocalDateTime.now(),
+                150.0, "user1"
+        ));
 
     }
 
