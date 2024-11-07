@@ -11,11 +11,13 @@ import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserSendResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.MyCoalData;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.CargoService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
@@ -42,9 +44,8 @@ public class SendDataService {
         }
 
         AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
-        RestTemplate restTemplate = new RestTemplate();
         LocalAndServerIds body = restTemplate.postForObject(
-                "http://192.168.0.134:9090/remote/localAndServerIds",
+                "https://api-scale.mycoal.uz/remote/localAndServerIds",
                 allDataResponse, LocalAndServerIds.class
         );
         if (body == null) {
@@ -82,4 +83,17 @@ public class SendDataService {
         }
     }
 
+    public void sendDataToMyCoal() {
+        List<MyCoalData> request  = truckService.getMyCoalData();
+
+
+        HttpStatusCode statusCode = restTemplate.postForEntity(
+                "", request, Void.class
+        ).getStatusCode();
+
+        if (statusCode.isError()) {
+            System.err.println("Error with status code: " + statusCode);
+        }
+
+    }
 }

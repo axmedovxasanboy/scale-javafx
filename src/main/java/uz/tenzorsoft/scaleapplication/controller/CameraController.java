@@ -57,6 +57,7 @@ public class CameraController {
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
         if (request instanceof MultipartHttpServletRequest multipartRequest) {
+            System.out.println("Camera id: " + cameraId);
 
             if (multipartRequest.getFileMap().size() < 4 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
                 return ResponseEntity.ok("NOT_MATCH");

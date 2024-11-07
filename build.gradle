@@ -25,7 +25,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     implementation 'org.openjfx:javafx-controls:17.0.6'
     implementation 'org.openjfx:javafx-fxml:17.0.6'
@@ -49,6 +48,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation 'com.fazecast:jSerialComm:2.9.0'
+
+    implementation 'com.power4j.kit:esc-pos-printing:1.0.2'
 }
 
 tasks.named('test') {

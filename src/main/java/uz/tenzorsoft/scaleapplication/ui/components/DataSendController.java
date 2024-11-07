@@ -21,13 +21,12 @@ public class DataSendController {
             while (true) {
                 try {
                     sendDataService.sendNotSentData();
+                    sendDataService.sendDataToMyCoal();
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
                 }
             }
         });
-
-
     }
 }

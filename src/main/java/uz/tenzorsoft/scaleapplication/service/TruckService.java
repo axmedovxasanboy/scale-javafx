@@ -15,6 +15,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.MyCoalData;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 
 import java.time.LocalDateTime;
@@ -189,5 +190,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public TruckEntity findByTruckPhoto(TruckPhotosEntity truckPhotos) {
         return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
+    }
+
+    public List<MyCoalData> getMyCoalData() {
+        return null;
     }
 }

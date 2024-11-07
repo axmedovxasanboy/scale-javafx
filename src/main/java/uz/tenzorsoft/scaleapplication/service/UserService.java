@@ -1,7 +1,6 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
@@ -19,7 +18,6 @@ import java.util.Map;
 public class UserService implements BaseService<UserEntity, UserResponse, UserRequest> {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
 
     public UserResponse validateUser(String phoneNumber, String password) {
