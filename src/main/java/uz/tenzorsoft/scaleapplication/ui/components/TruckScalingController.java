@@ -90,7 +90,12 @@ public class TruckScalingController {
                             log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                             currentTruck.setEnteredAt(LocalDateTime.now());
                             currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                            TruckEntity truck = truckService.saveCurrentTruck(currentTruck, false);
+                            TruckEntity truck = null;
+                            try {
+                                truck = truckService.saveCurrentTruck(currentTruck, false);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             tableController.updateTableRow(truck);
                             isTruckEntered = true;
                             currentTruck = new TruckResponse();
@@ -169,9 +174,22 @@ public class TruckScalingController {
                             System.out.println("currentUser.getPhoneNumber() = " + currentUser.getPhoneNumber());
                             isTruckExited = true;
                             currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
-                            TruckEntity truck = truckService.saveCurrentTruck(currentTruck, true);
-                            cargoService.saveCargo(truck);
-                            printCheck.printReceipt(currentTruck);
+                            TruckEntity truck = null;
+                            try {
+                                truck = truckService.saveCurrentTruck(currentTruck, true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                cargoService.saveCargo(truck);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                printCheck.printReceipt(currentTruck);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             tableController.updateTableRow(truck);
 
                             currentTruck = new TruckResponse();
@@ -220,7 +238,7 @@ public class TruckScalingController {
                     Thread.sleep(500);
 
                 } catch (Exception ignored) {
-
+ignored.printStackTrace();
                 }
             }
         });

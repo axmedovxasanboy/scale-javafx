@@ -94,7 +94,7 @@ public class MainController {
         dataSendController.sendNotSentData();
         truckScalingController.start();
         tableController.loadData();
-        testController.start();
+//        testController.start();
         printCheck.listAvailablePrinters();
 
     }

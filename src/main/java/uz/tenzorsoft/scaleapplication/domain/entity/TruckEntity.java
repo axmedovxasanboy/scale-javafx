@@ -20,7 +20,8 @@ public class TruckEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     private List<TruckActionEntity> truckActions;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.MERGE, orphanRemoval = true)
+    @JoinColumn(name = "truck_photo_id", unique = true)
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
     private Boolean isFinished = false;

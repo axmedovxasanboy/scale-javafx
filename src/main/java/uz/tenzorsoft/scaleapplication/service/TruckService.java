@@ -222,7 +222,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             truckEntity.setIsFinished(false);
             truckRepository.save(truckEntity);
         } else {
-            TruckEntity truck = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
+            TruckEntity truck = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
             if (truck == null)
                 throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
@@ -239,10 +239,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     @Transactional
     public TruckEntity saveCurrentTruck(TruckResponse currentTruck, boolean isFinished) {
-        TruckEntity truck = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
-                .orElseThrow(() ->
-                        new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber())
-                );
+        TruckEntity truck = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
 
         List<AttachIdWithStatus> attaches = currentTruck.getAttaches();
         List<Long> attachIds = new ArrayList<>(attaches.stream().map(AttachIdWithStatus::getId).toList());
@@ -259,14 +256,18 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
         for (AttachIdWithStatus attach : attaches) {
-            truckPhotos.add(truckPhotoRepository.save(
-                    new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
-            ));
+            try {
+                truckPhotos.add(truckPhotoRepository.save(
+                        new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+                ));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         truck.getTruckPhotos().addAll(truckPhotos);
         truck.setIsFinished(isFinished);
         truckRepository.save(truck);
-        return null;
+        return truck;
     }
 
     @Override
