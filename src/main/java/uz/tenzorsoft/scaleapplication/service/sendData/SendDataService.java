@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.AllDataResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.LocalAndServerIds;
 import uz.tenzorsoft.scaleapplication.domain.response.StatusResponse;
@@ -17,7 +18,6 @@ import uz.tenzorsoft.scaleapplication.service.CargoService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
@@ -85,6 +85,29 @@ public class SendDataService {
 
     public void sendDataToMyCoal() {
         List<MyCoalData> request  = truckService.getMyCoalData();
+
+        List<TruckEntity> trucks = truckService.findAll();
+
+        for (TruckEntity truckEntity : trucks) {
+            MyCoalData myCoalData = new MyCoalData();
+
+            myCoalData.setId(truckEntity.getId());
+            myCoalData.setNp(0L);
+            myCoalData.setTarozi_id(1L);
+            myCoalData.setRfid("");
+            myCoalData.setAvto_number(truckEntity.getTruckNumber());
+            myCoalData.setFul_name("");
+            myCoalData.setTex_pass_number("");
+            myCoalData.setOrg_name_buyer("");
+            myCoalData.setOrg_name_seller("");
+            myCoalData.setProduct(null);
+            myCoalData.setCheck(null);
+            myCoalData.setAccord(null);
+            myCoalData.setDoverennost(null);
+            myCoalData.setHeft(null);
+
+            request.add(myCoalData);
+        }
 
 
         HttpStatusCode statusCode = restTemplate.postForEntity(
