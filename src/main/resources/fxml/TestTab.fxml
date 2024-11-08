@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<Tab xmlns="http://javafx.com/javafx" closable="false" text="Test"
+     xmlns:fx="http://javafx.com/fxml"
+     fx:controller="uz.tenzorsoft.scaleapplication.ui.TestController">
+
+  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+    <children>
+      <Pane fx:id="testSwitchPane" layoutX="594.0" layoutY="24.0" prefHeight="54.0" prefWidth="206.0">
+        <children>
+          <Label fx:id="testLabel" layoutX="124.0" layoutY="11.0" prefHeight="32.0" prefWidth="42.0" text="Test">
+            <font>
+              <Font size="20.0"/>
+            </font>
+          </Label>
+        </children>
+      </Pane>
+      <Pane fx:id="sensor1Pane" layoutX="279.0" layoutY="283.0" prefHeight="223.0" prefWidth="788.0">
+        <children>
+          <Pane layoutX="56.0" layoutY="14.0" prefHeight="46.0" prefWidth="148.0">
+            <children>
+              <Label fx:id="sensor1Label" prefHeight="46.0" prefWidth="92.0" text="Sensor 1">
+                <font>
+                  <Font size="20.0"/>
+                </font>
+              </Label>
+            </children>
+          </Pane>
+          <Pane fx:id="sensor2Pane" layoutX="337.0" layoutY="14.0" prefHeight="46.0" prefWidth="153.0">
+            <children>
+              <Label fx:id="sensor2Label" prefHeight="46.0" prefWidth="92.0" text="Sensor 2">
+                <font>
+                  <Font size="20.0"/>
+                </font>
+              </Label>
+            </children>
+          </Pane>
+          <Pane fx:id="sensor3Pane" layoutX="603.0" layoutY="14.0" prefHeight="46.0" prefWidth="151.0">
+            <children>
+              <Label fx:id="sensor3Label" prefHeight="46.0" prefWidth="92.0" text="Sensor 3">
+                <font>
+                  <Font size="20.0"/>
+                </font>
+              </Label>
+            </children>
+          </Pane>
+          <TextField fx:id="weighInputField" layoutX="339.0" layoutY="148.0"/>
+          <Label layoutX="228.0" layoutY="137.0" prefHeight="46.0" prefWidth="92.0" text="Weigh:">
+            <font>
+              <Font size="20.0"/>
+            </font>
+          </Label>
+          <Button onAction="#setWeigh" layoutX="509.0" layoutY="148.0" mnemonicParsing="false" text="Button"/>
+        </children>
+      </Pane>
+    </children>
+  </AnchorPane>
+
+</Tab>

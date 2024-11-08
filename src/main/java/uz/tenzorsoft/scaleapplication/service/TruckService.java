@@ -1,6 +1,5 @@
 package uz.tenzorsoft.scaleapplication.service;
 
-import com.fasterxml.jackson.annotation.JacksonInject;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +8,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.entity.*;
+import uz.tenzorsoft.scaleapplication.domain.entity.BaseEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
@@ -196,6 +198,79 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return truckRepository.save(truck);
     }
 
+    public TruckEntity findById(Long id) {
+        return truckRepository.findById(id).orElse(null);
+    }
+
+    public TruckEntity findByTruckPhoto(TruckPhotosEntity truckPhotos) {
+        return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
+    }
+
+    public List<MyCoalData> getMyCoalData() {
+        return null;
+    }
+
+    public void saveTruck(TruckResponse currentTruck, Integer id) {
+        if (id == 1) {
+            TruckEntity truckEntity = new TruckEntity();
+            truckEntity.setTruckNumber(currentTruck.getTruckNumber());
+            List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+            for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
+                truckPhotos.add(truckPhotoRepository.save(
+                        new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+                ));
+            }
+            truckEntity.setTruckPhotos(truckPhotos);
+            truckEntity.setFinished(false);
+            truckRepository.save(truckEntity);
+        } else {
+            TruckEntity truck = truckRepository.findByTruckNumberAndActive(currentTruck.getTruckNumber(), false).orElse(null);
+            if (truck == null)
+                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
+            List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+            for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
+                truckPhotos.add(truckPhotoRepository.save(
+                        new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+                ));
+            }
+            truck.getTruckPhotos().addAll(truckPhotos);
+
+            truckRepository.save(truck);
+        }
+    }
+
+    @Transactional
+    public TruckEntity saveCurrentTruck(TruckResponse currentTruck, boolean isFinished) {
+        TruckEntity truck = truckRepository.findByTruckNumberAndActive(currentTruck.getTruckNumber(), false)
+                .orElseThrow(() ->
+                        new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber())
+                );
+
+        List<AttachIdWithStatus> attaches = currentTruck.getAttaches();
+        List<Long> attachIds = new ArrayList<>(attaches.stream().map(AttachIdWithStatus::getId).toList());
+        List<Long> truckAttachIds = truck.getTruckPhotos().stream().map(
+                photo -> photo.getTruckPhoto().getId()
+        ).toList();
+
+        attachIds.removeAll(truckAttachIds);
+
+        for (Long id : attachIds) {
+            attaches.removeIf(attach -> attach.getId().equals(id));
+        }
+
+        List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+
+        for (AttachIdWithStatus attach : attaches) {
+            truckPhotos.add(truckPhotoRepository.save(
+                    new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+            ));
+        }
+        truck.getTruckPhotos().addAll(truckPhotos);
+        truck.setFinished(isFinished);
+        truckRepository.save(truck);
+        return null;
+    }
+
     @Override
     public TruckResponse entityToResponse(TruckEntity entity) {
         return null;
@@ -206,77 +281,4 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return null;
     }
 
-    public TruckEntity findById(Long id) {
-        return truckRepository.findById(id).orElse(null);
-    }
-
-//    public TruckEntity findTruckByAttachId(AttachEntity attach) {
-//        return truckRepository.find(attach).orElse(null);
-//    }
-
-    public TruckEntity findByTruckPhoto(TruckPhotosEntity truckPhotos) {
-        return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
-    }
-
-    public List<MyCoalData> getMyCoalData() {
-        return null;
-    }
-
-    public TruckEntity saveCurrentTruck(TruckResponse currentTruck) {
-
-        List<TruckActionEntity> truckActions = new ArrayList<>();
-        List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
-
-        switch (currentTruck.getEnteredStatus()) {
-            case ENTRANCE, MANUAL_ENTRANCE -> {
-
-            }
-        }
-
-        new TruckEntity(
-                currentTruck.getTruckNumber(), truckActions, truckPhotos
-        );
-
-        return null;
-    }
-
-    public TruckEntity saveEnteredTruck(TruckResponse currentTruck) {
-        List<TruckActionEntity> truckActions = new ArrayList<>();
-        truckActions.add(new TruckActionEntity(
-                currentTruck.getEnteredWeight(), currentTruck.getEnteredStatus(), Instances.currentUser
-        ));
-
-        truckActionRepository.saveAll(truckActions);
-
-        List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
-        for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
-            truckPhotos.add(new TruckPhotosEntity(
-                    attachService.findById(attach.getId()), attach.getStatus()
-            ));
-        }
-        truckPhotoRepository.saveAll(truckPhotos);
-
-        return truckRepository.save(new TruckEntity(currentTruck.getTruckNumber(), truckActions, truckPhotos));
-    }
-
-    public TruckEntity saveExitedTruck(TruckResponse currentTruck) {
-        List<TruckEntity> truckEntityList = truckRepository.findByTruckNumberOrderByCreatedAtDesc(currentTruck.getTruckNumber());
-        TruckEntity truckEntity = truckEntityList.get(0);
-        truckEntity.getTruckActions().add(
-                truckActionRepository.save(
-                        new TruckActionEntity(currentTruck.getExitedWeight(), currentTruck.getExitedStatus(), Instances.currentUser)
-                )
-        );
-
-        for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
-            if (!truckEntity.getTruckPhotos().stream().map(BaseEntity::getId).toList().contains(attach.getId())) {
-                truckEntity.getTruckPhotos().add(
-                        truckPhotoRepository.save(new TruckPhotosEntity(
-                                attachService.findById(attach.getId()), attach.getStatus()
-                        ))
-                );
-            }
-        }
-        return truckRepository.save(truckEntity);
-    }
 }

@@ -123,6 +123,9 @@ public class ButtonController {
 
     public double getTruckWeigh() {
         try {
+            scalePort.closePort();
+            scalePort.openPort();
+
             scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
             scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
 
@@ -132,7 +135,7 @@ public class ButtonController {
                 String data = new String(readBuffer, 0, bytesRead).trim();
 
                 try {
-                    System.out.println("Полученные данные: " + new String(data.getBytes(), "UTF-8"));
+                    System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }

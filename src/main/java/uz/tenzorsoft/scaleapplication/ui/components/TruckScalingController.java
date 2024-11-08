@@ -21,7 +21,6 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.CAMERA_2;
@@ -47,7 +46,7 @@ public class TruckScalingController {
     private boolean isCargoConfirmationDialogOpened = false;
     private boolean isTruckExited = false;
     private double weigh = 0.0;
-    private Timer timer = new Timer();
+    private final Timer timer = new Timer();
 
     public void start() {
         executors.execute(() -> {
@@ -86,8 +85,8 @@ public class TruckScalingController {
                             currentTruck.setEnteredWeight(weigh);
                             log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                             currentTruck.setEnteredAt(LocalDateTime.now());
-                            currentTruck.setEntranceConfirmedBy(currentUser.getUsername());
-                            TruckEntity truck = truckService.save(currentTruck);
+                            currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
+                            TruckEntity truck = truckService.saveCurrentTruck(currentTruck, false);
                             tableController.updateTableRow(truck);
                             isTruckEntered = true;
                             currentTruck = new TruckResponse();
@@ -165,10 +164,10 @@ public class TruckScalingController {
                             currentTruck.setExitedAt(LocalDateTime.now());
                             System.out.println("currentUser.getPhoneNumber() = " + currentUser.getPhoneNumber());
                             isTruckExited = true;
-                            currentTruck.setExitConfirmedBy(currentUser.getUsername());
-                            cargoService.saveCargo(currentTruck);
+                            currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
+                            TruckEntity truck = truckService.saveCurrentTruck(currentTruck, true);
+                            cargoService.saveCargo(truck);
                             printCheck.printReceipt(currentTruck);
-                            TruckEntity truck = truckService.save(currentTruck); //
                             tableController.updateTableRow(truck);
 
                             currentTruck = new TruckResponse();
@@ -216,14 +215,7 @@ public class TruckScalingController {
 
                     Thread.sleep(500);
 
-                TruckEntity enteredTruck = truckService.saveEnteredTruck(currentTruck); // TODO error
-                tableController.updateTableRow(enteredTruck);
-                cargoService.saveCargo(currentTruck);
-                printCheck.printReceipt(currentTruck);
-                TruckEntity exitedTruck = truckService.saveExitedTruck(currentTruck);
-                tableController.updateTableRow(exitedTruck);
-
-                } catch (Exception e) {
+                } catch (Exception ignored) {
 
                 }
             }

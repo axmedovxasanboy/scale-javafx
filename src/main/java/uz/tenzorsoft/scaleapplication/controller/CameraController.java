@@ -56,8 +56,8 @@ public class CameraController {
 
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
-        System.out.println("Request is processing " + cameraId);
         if (request instanceof MultipartHttpServletRequest multipartRequest) {
+            System.out.println("Request is processing " + cameraId);
             System.out.println("Camera id: " + cameraId);
             System.out.println("multipartRequest.getFileMap().size() = " + multipartRequest.getFileMap().size());
 
@@ -120,9 +120,8 @@ public class CameraController {
                 }
             }
             currentTruck.setTruckNumber(truckNumber);
-            System.out.println(currentTruck);
             try {
-                truckService.save(currentTruck);
+                truckService.saveTruck(currentTruck, cameraId);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }

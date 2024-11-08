@@ -4,14 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
-
-import javax.swing.text.html.Option;
-import java.util.List;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +35,7 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
-
-
+    Optional<TruckEntity> findByTruckNumberAndActive(String truckNumber, Boolean active);
 
 
 }

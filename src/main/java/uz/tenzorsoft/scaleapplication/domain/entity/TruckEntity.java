@@ -23,4 +23,6 @@ public class TruckEntity extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
+    private boolean isFinished = false;
+
 }
