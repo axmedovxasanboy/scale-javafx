@@ -20,16 +20,18 @@ public class PrintCheck {
             return;
         }
 
-        String receipt = buildReceiptContent(response); // Get the formatted receipt content
+        String receipt = buildReceiptContent(response);
 
         try (InputStream inputStream = new ByteArrayInputStream(receipt.getBytes(StandardCharsets.ISO_8859_1))) {
-            // Use ISO-8859-1 encoding for compatibility with many thermal printers
-            DocPrintJob printJob = printer.createPrintJob(); // Create a print job
-            Doc doc = new SimpleDoc(inputStream, DocFlavor.INPUT_STREAM.AUTOSENSE, null); // Create document
+            DocPrintJob printJob = printer.createPrintJob();
+            Doc doc = new SimpleDoc(inputStream, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
 
             // Print the receipt
-            printJob.print(doc, null); // Print the document
-            System.out.println("Receipt printed successfully.");
+            printJob.print(doc, null);
+
+            // Send the cut command after printing
+            sendCutCommand(printer);
+            System.out.println("Receipt printed and paper cut successfully.");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +41,7 @@ public class PrintCheck {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
         for (PrintService printService : printServices) {
             if (printService.getName().equalsIgnoreCase(printerName)) {
-                return printService; // Return the matching printer
+                return printService;
             }
         }
         return null;
@@ -56,19 +58,14 @@ public class PrintCheck {
         double netto = Math.abs(enteredWeight - exitedWeight);
         String operatorNumber = response.getExitConfirmedBy();
 
-
-
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         String formattedEnteredAt = enteredAt != null ? enteredAt.format(formatter) : "N/A";
         String formattedExitedAt = exitedAt != null ? exitedAt.format(formatter) : "N/A";
 
         StringBuilder receiptContent = new StringBuilder();
-
-        receiptContent.append("       Sirdayo       \n")
-                .append("--------------------------\n");
-
-        // Truck Data
-        receiptContent.append("Moshina raqami: ").append(truckNumber).append("\n")
+        receiptContent.append("       Sirdayo  Baxt      \n")
+                .append("--------------------------\n")
+                .append("Moshina raqami: ").append(truckNumber).append("\n")
                 .append("Kirgan vaqti: ").append(formattedEnteredAt).append("\n")
                 .append("Vazni (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
                 .append("Chiqgan vaqti: ").append(formattedExitedAt).append("\n")
@@ -76,24 +73,33 @@ public class PrintCheck {
                 .append("Tare (kg): ").append(String.format("%.0f", tara)).append("\n")
                 .append("GROSS (kg): ").append(String.format("%.0f", brutto)).append("\n")
                 .append("NETTO (kg): ").append(String.format("%.0f", netto)).append("\n")
-                .append("Operator: ").append(operatorNumber).append("\n");
+                .append("Operator: ").append(operatorNumber).append("\n")
+                .append("--------------------------\n")
+                .append("   Thank you for visiting!   \n\n\n\n\n\n\n\n\n\n\n");
 
-        // Ending the receipt with a "Thank you" note
-        receiptContent.append("--------------------------\n")
-                .append("   Thank you for visiting!   \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        return receiptContent.toString();
+    }
 
-        return receiptContent.toString(); // Return the formatted receipt content
+    private void sendCutCommand(PrintService printer) {
+        try {
+            // ESC/POS command to cut paper
+            byte[] cutCommand = new byte[]{0x1D, 0x56, 0x42, 0x00};
+            DocPrintJob printJob = printer.createPrintJob();
+            Doc doc = new SimpleDoc(cutCommand, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
+            printJob.print(doc, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void listAvailablePrinters() {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);
-
         if (printServices.length == 0) {
             System.out.println("No printers found.");
         } else {
             System.out.println("Available Printers:");
             for (PrintService printer : printServices) {
-                System.out.println(printer.getName()); // List all available printers
+                System.out.println(printer.getName());
             }
         }
     }
