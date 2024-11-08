@@ -18,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.POSPrinter;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.service.UserService;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
@@ -52,6 +51,9 @@ public class MainController {
 
     @FXML
     private Button connectButton;
+
+    @FXML
+    private Button testConnectionButton;
 
     public static void showAlert(Alert.AlertType alertType, String headerText, String message) {
         Alert alert = new Alert(alertType);
@@ -137,6 +139,17 @@ public class MainController {
             buttonController.connect();
             connectButton.setText("Disconnect from controller");
         }
+    }
+
+    @FXML
+    private void testConnection() {
+        if (isConnected){
+            buttonController.connect();
+            testConnectionButton.setText("Test connection");
+
+        }
+
+
     }
 
 

@@ -43,12 +43,16 @@ public class ButtonController {
     private Button button5;
 
     @FXML
+    private Button testButton;
+
+    @FXML
     public void initialize() {
         setupButtonPressEffect(button1, "#4CAF50");
         setupButtonPressEffect(button2, "#4CAF50");
         setupButtonPressEffect(button3, "#C5C900");
         setupButtonPressEffect(button4, "#D32F2F");
         setupButtonPressEffect(button5, "#D32F2F");
+        setupButtonPressEffect(testButton, "#D32F2F");
     }
 
     private void setupButtonPressEffect(Button button, String pressedColor) {
@@ -111,6 +115,15 @@ public class ButtonController {
     public void connect() {
         try {
             controllerService.connect();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+
+    }
+
+    public void setTestButton() {
+        try {
+            controllerService.testConnect();
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }

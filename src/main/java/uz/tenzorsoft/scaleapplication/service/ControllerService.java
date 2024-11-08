@@ -17,13 +17,27 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 @RequiredArgsConstructor
 public class ControllerService {
 
+
+
     public void connect() throws Exception {
-        address = InetAddress.getByName(CONTROLLER_IP);
-        connection = new TCPMasterConnection(address);
-        connection.setPort(port);
-        connection.connect();
+
+            address = InetAddress.getByName(CONTROLLER_IP);
+            connection = new TCPMasterConnection(address);
+            connection.setPort(port);
+            connection.connect();
+            isConnected = true;
+            scalePort.openPort();
+
+            isConnected=true;
+
+    }
+    public void testConnect() throws Exception {
+//        address = InetAddress.getByName(CONTROLLER_IP);
+//        connection = new TCPMasterConnection(address);
+//        connection.setPort(port);
+//        connection.connect();
         isConnected = true;
-        scalePort.openPort();
+//        scalePort.openPort();
     }
 
     public void openGate1() throws ModbusException {
