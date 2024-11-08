@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
@@ -249,9 +250,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 photo -> photo.getTruckPhoto().getId()
         ).toList();
 
-        attachIds.removeAll(truckAttachIds);
+        List<TruckActionEntity> truckActions = new ArrayList<>();
 
-        for (Long id : attachIds) {
+        for (Long id : truckAttachIds) {
             attaches.removeIf(attach -> attach.getId().equals(id));
         }
 
@@ -266,7 +267,17 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 e.printStackTrace();
             }
         }
+
+
+        truckActions.add(new TruckActionEntity(
+                currentTruck.getEnteredWeight(), currentTruck.getEnteredStatus(), Instances.currentUser
+        ));
+        truckActions.add(new TruckActionEntity(
+                currentTruck.getExitedWeight(), currentTruck.getExitedStatus(), Instances.currentUser
+        ));
+
         truck.getTruckPhotos().addAll(truckPhotos);
+        truck.getTruckActions().addAll(truckActions);
         truck.setIsFinished(isFinished);
         truckRepository.save(truck);
         return truck;
