@@ -48,12 +48,15 @@ public class PrintCheck {
     private String buildReceiptContent(TruckResponse response) {
         String truckNumber = response.getTruckNumber();
         LocalDateTime enteredAt = response.getEnteredAt();
-        LocalDateTime exitedAt = response.getExitedAt();
         Double enteredWeight = response.getEnteredWeight() != null ? response.getEnteredWeight() : 0.0;
+        LocalDateTime exitedAt = response.getExitedAt();
         Double exitedWeight = response.getExitedWeight() != null ? response.getExitedWeight() : 0.0;
+        double tara = Math.min(enteredWeight, exitedWeight);
+        double brutto = Math.max(enteredWeight, exitedWeight);
+        double netto = Math.abs(enteredWeight - exitedWeight);
         String operatorNumber = response.getExitConfirmedBy();
 
-        double netto = Math.abs(enteredWeight - exitedWeight);
+
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         String formattedEnteredAt = enteredAt != null ? enteredAt.format(formatter) : "N/A";
@@ -65,18 +68,19 @@ public class PrintCheck {
                 .append("--------------------------\n");
 
         // Truck Data
-        receiptContent.append("Truck No: ").append(truckNumber).append("\n")
-                .append("Arrived: ").append(formattedEnteredAt).append("\n")
-                .append("Departed: ").append(formattedExitedAt).append("\n")
-                .append("Weight (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
-                .append("Tare (kg): ").append(String.format("%.0f", exitedWeight)).append("\n")
-                .append("GROSS (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
+        receiptContent.append("Moshina raqami: ").append(truckNumber).append("\n")
+                .append("Kirgan vaqti: ").append(formattedEnteredAt).append("\n")
+                .append("Vazni (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
+                .append("Chiqgan vaqti: ").append(formattedExitedAt).append("\n")
+                .append("Vazni (kg): ").append(String.format("%.0f", exitedWeight)).append("\n")
+                .append("Tare (kg): ").append(String.format("%.0f", tara)).append("\n")
+                .append("GROSS (kg): ").append(String.format("%.0f", brutto)).append("\n")
                 .append("NETTO (kg): ").append(String.format("%.0f", netto)).append("\n")
                 .append("Operator: ").append(operatorNumber).append("\n");
 
         // Ending the receipt with a "Thank you" note
         receiptContent.append("--------------------------\n")
-                .append("   Thank you for visiting!   \n\n\n\n\n\n\n\n\n\n\n\n");
+                .append("   Thank you for visiting!   \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 
         return receiptContent.toString(); // Return the formatted receipt content
     }
