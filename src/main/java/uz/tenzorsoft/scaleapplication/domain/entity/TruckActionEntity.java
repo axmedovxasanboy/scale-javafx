@@ -14,7 +14,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 @Getter
 @Entity(name = "truck_actions")
 public class TruckActionEntity extends BaseEntity {
-    private Double weight=0.0;
+    private Double weight = 0.0;
 
     @Enumerated(EnumType.STRING)
     private TruckAction action = TruckAction.NO_ACTION;

@@ -17,6 +17,7 @@ public class CargoEntity extends BaseEntity {
     private Double netWeight;
     private CargoStatus cargoStatus;
     private Long scaleId;
+    private String scaleName;
 
     @OneToOne
     private TruckEntity truck;

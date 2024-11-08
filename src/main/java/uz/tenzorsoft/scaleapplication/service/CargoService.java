@@ -111,4 +111,8 @@ public class CargoService {
             cargoRepository.save(entity);
         });
     }
+
+    public CargoEntity findByTruckId(Long id) {
+        return cargoRepository.findByTruckId(id).orElse(null);
+    }
 }
