@@ -96,7 +96,7 @@ public class TruckScalingController {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            tableController.updateTableRow(truck);
+                            tableController.updateTableRow(currentTruck);
                             isTruckEntered = true;
                             currentTruck = new TruckResponse();
                         }
@@ -190,7 +190,7 @@ public class TruckScalingController {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            tableController.updateTableRow(truck);
+                            tableController.updateTableRow(currentTruck);
 
                             currentTruck = new TruckResponse();
                         }
@@ -238,7 +238,7 @@ public class TruckScalingController {
                     Thread.sleep(500);
 
                 } catch (Exception ignored) {
-ignored.printStackTrace();
+                    ignored.printStackTrace();
                 }
             }
         });

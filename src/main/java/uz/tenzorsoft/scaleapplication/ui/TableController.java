@@ -172,4 +172,19 @@ public class TableController {
         }
     }
 
+    public void updateTableRow(TruckResponse truckResponse) {
+        ObservableList<TableViewData> items = tableData.getItems();
+        int index = -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId().equals(truckResponse.getId())) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            TableViewData record = truckService.getTableViewData(truckResponse);
+            items.set(index, record);
+        }
+    }
+
 }

@@ -185,10 +185,12 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public String getTime(LocalDateTime dateTime) {
+        if(dateTime == null) return null;
         return dateTime.getHour() + ":" + dateTime.getMinute();
     }
 
     public String getDate(LocalDateTime dateTime) {
+        if(dateTime == null) return null;
         return dateTime.getDayOfMonth() + "." + dateTime.getMonth().getValue() + "." + dateTime.getYear();
     }
 
@@ -280,4 +282,12 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return null;
     }
 
+    public TableViewData getTableViewData(TruckResponse truckResponse) {
+        return new TableViewData(
+                truckResponse.getId(), truckResponse.getTruckNumber(),
+                getDate(truckResponse.getEnteredAt()), getTime(truckResponse.getEnteredAt()), truckResponse.getEnteredWeight(),
+                truckResponse.getEntranceConfirmedBy(), truckResponse.getTruckNumber(), getDate(truckResponse.getExitedAt()),
+                getTime(truckResponse.getExitedAt()), truckResponse.getExitedWeight(), truckResponse.getExitConfirmedBy()
+        );
+    }
 }

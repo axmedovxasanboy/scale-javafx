@@ -170,4 +170,11 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     }
 
 
+    public AttachResponse getTestingImages() {
+        String pathFolder = getYmDString(); // 2022/04/23
+        File folder = new File(attachUploadFolder + pathFolder); // attaches/2022/04/23
+
+        if (!folder.exists()) folder.mkdirs();
+        return null;
+    }
 }
