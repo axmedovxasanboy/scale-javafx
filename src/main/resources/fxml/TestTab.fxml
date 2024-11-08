@@ -21,39 +21,41 @@
         </children>
       </Pane>
 
-      <!-- Row for Gate 1, Gate 2, and Truck Position -->
-      <HBox layoutX="594.0" layoutY="88.0" spacing="20" alignment="CENTER">
+      <!-- Centered Gate switches and Truck Position with adjusted spacing -->
+      <HBox layoutX="450.0" layoutY="88.0" spacing="50.0" alignment="CENTER">
+        <children>
+          <!-- Gate 1 -->
+          <HBox spacing="10.0" alignment="CENTER">
+            <Label text="Gate 1">
+              <font>
+                <Font size="18.0"/>
+              </font>
+            </Label>
+            <ToggleSwitch fx:id="gate1Switch" onMouseClicked="#setGate1StatusSwitch"/>
+          </HBox>
 
-        <!-- Gate 1 -->
-        <VBox alignment="CENTER" spacing="5">
-          <Label text="Gate 1">
-            <font>
-              <Font size="18.0"/>
-            </font>
-          </Label>
-          <ToggleSwitch fx:id="gate1Switch" onMouseClicked="#setGate1StatusSwitch"/>
-        </VBox>
+          <!-- Gate 2 -->
+          <HBox spacing="10.0" alignment="CENTER">
+            <Label text="Gate 2">
+              <font>
+                <Font size="18.0"/>
+              </font>
+            </Label>
+            <ToggleSwitch fx:id="gate2Switch" onMouseClicked="#setGate2StatusSwitch"/>
+          </HBox>
 
-        <!-- Gate 2 -->
-        <VBox alignment="CENTER" spacing="5">
-          <Label text="Gate 2">
-            <font>
-              <Font size="18.0"/>
-            </font>
-          </Label>
-          <ToggleSwitch fx:id="gate2Switch" onMouseClicked="#setGate2StatusSwitch"/>
-        </VBox>
-
-        <!-- Truck Position (Auto-filled) -->
-        <VBox alignment="CENTER" spacing="5">
-          <Label text="Truck Position">
-            <font>
-              <Font size="18.0"/>
-            </font>
-          </Label>
-          <TextField fx:id="truckPositionField" editable="false" prefWidth="100.0"/>
-        </VBox>
+          <!-- Truck Position -->
+          <HBox spacing="10.0" alignment="CENTER">
+            <Label text="Truck Position">
+              <font>
+                <Font size="18.0"/>
+              </font>
+            </Label>
+            <TextField fx:id="truckPositionField" editable="false" prefWidth="80.0"/>
+          </HBox>
+        </children>
       </HBox>
+
 
 
       <Pane fx:id="sensor1Pane" layoutX="279.0" layoutY="283.0" prefHeight="223.0" prefWidth="788.0">

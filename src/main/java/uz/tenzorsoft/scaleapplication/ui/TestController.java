@@ -35,12 +35,55 @@ public class TestController {
     @FXML
     private TextField truckPositionField;
 
-    public void updateTruckPosition(String position) {
-        truckPositionField.setText(position); // Automatically fill truck position here
+    @FXML
+    public void initialize() {
+        // Initialize Truck Position field as non-editable
+        truckPositionField.setEditable(false);
+
+        // Add listener to "Test" switch
+        testStatusSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            isTesting = newValue;
+            updateToggleSwitchesState();
+            updateTruckPosition(); // Update truck position if needed
+        });
+
+        updateToggleSwitchesState(); // Set initial state for switches
+        updateTruckPosition();       // Set initial truck position
+    }
+
+    private void updateToggleSwitchesState() {
+        boolean enableSwitches = isTesting;
+
+        // Enable or disable switches and fields based on "Test" switch state
+        sensor1Switch.setDisable(!enableSwitches);
+        sensor2Switch.setDisable(!enableSwitches);
+        sensor3Switch.setDisable(!enableSwitches);
+        gate1Switch.setDisable(!enableSwitches);
+        gate2Switch.setDisable(!enableSwitches);
+        weighInputField.setDisable(!enableSwitches);
+
+        // Reset other switches if "Test" is off
+        if (!isTesting) {
+            sensor1Switch.setSelected(false);
+            sensor2Switch.setSelected(false);
+            sensor3Switch.setSelected(false);
+            gate1Switch.setSelected(false);
+            gate2Switch.setSelected(false);
+            truckPositionField.setText(""); // Clear truck position
+        }
     }
 
     public void setWeigh() {
         double weigh = Double.parseDouble(weighInputField.getText());
+    }
+
+    private void updateTruckPosition() {
+        if (isTesting) {
+            // Example of setting truck position - this could be based on some condition
+            truckPositionField.setText("Position 1");  // Example: dynamically set position
+        } else {
+            truckPositionField.setText("");
+        }
     }
 
     public void setTestingStatusLabel() {
