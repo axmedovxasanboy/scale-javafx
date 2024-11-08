@@ -1,19 +1,15 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
-import com.ghgande.j2mod.modbus.ModbusException;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 
 @Component
@@ -41,15 +37,16 @@ public class ConnectionsController {
         executors.execute(() -> {
             while (true) {
                 try {
-                    gate1Connection = controllerService.checkConnection(COIL_CLOSE_GATE_1);
-                    gate2Connection = controllerService.checkConnection(COIL_CLOSE_GATE_2);
-                    sensor1Connection = controllerService.checkConnection(COIL_SENSOR_1);
-                    sensor2Connection = controllerService.checkConnection(COIL_SENSOR_2);
-                    sensor3Connection = controllerService.checkConnection(COIL_SENSOR_3);
+                    if (!isTesting) {
+                        gate1Connection = controllerService.checkConnection(COIL_CLOSE_GATE_1);
+                        gate2Connection = controllerService.checkConnection(COIL_CLOSE_GATE_2);
+                        sensor1Connection = controllerService.checkConnection(COIL_SENSOR_1);
+                        sensor2Connection = controllerService.checkConnection(COIL_SENSOR_2);
+                        sensor3Connection = controllerService.checkConnection(COIL_SENSOR_3);
+                    }
                     camera1Connection = controllerService.checkConnection(CAMERA_1);
                     camera2Connection = controllerService.checkConnection(CAMERA_2);
                     camera3Connection = controllerService.checkConnection(CAMERA_3);
-                    isConnectedToInternet = controllerService.checkConnection(GOOGLE_DNS);
 
                     controller.setImage(isConnected ? greenLight : redLight);
                     camera1.setImage(camera1Connection ? greenLight : redLight);
@@ -59,10 +56,11 @@ public class ConnectionsController {
                     sensor2.setImage(sensor2Connection ? greenLight : redLight);
                     sensor3.setImage(sensor3Connection ? greenLight : redLight);
 //                    gate1.setImage(gate1Connection ? greenLight : redLight);
-                gate1.setImage(gate1Connection ? greenLight : redLight);
-                gate2.setImage(gate2Connection ? greenLight : redLight);
+                    gate1.setImage(gate1Connection ? greenLight : redLight);
+                    gate2.setImage(gate2Connection ? greenLight : redLight);
 //                    gate2.setImage(Math.random() > 0.5 ? greenLight : redLight);
 
+                    isConnectedToInternet = controllerService.checkConnection(GOOGLE_DNS);
 
                     Thread.sleep(500);
                 } catch (Exception e) {

@@ -35,7 +35,7 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
-    Optional<TruckEntity> findByTruckNumberAndActive(String truckNumber, Boolean active);
+    Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, Boolean finished);
 
 
 }

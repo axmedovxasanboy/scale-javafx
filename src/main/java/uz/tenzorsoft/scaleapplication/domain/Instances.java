@@ -12,6 +12,7 @@ public class Instances<T> {
 
     public static String truckNumber = "";
 
+    public static boolean isTesting = false;
     public static boolean isConnectedToInternet = false;
     public static boolean isConnected = false;
     public static boolean gate1Connection = false;

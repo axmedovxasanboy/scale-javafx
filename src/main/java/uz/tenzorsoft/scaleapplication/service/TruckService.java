@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
-import uz.tenzorsoft.scaleapplication.domain.entity.BaseEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
@@ -221,10 +219,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 ));
             }
             truckEntity.setTruckPhotos(truckPhotos);
-            truckEntity.setFinished(false);
+            truckEntity.setIsFinished(false);
             truckRepository.save(truckEntity);
         } else {
-            TruckEntity truck = truckRepository.findByTruckNumberAndActive(currentTruck.getTruckNumber(), false).orElse(null);
+            TruckEntity truck = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
             if (truck == null)
                 throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
@@ -241,7 +239,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     @Transactional
     public TruckEntity saveCurrentTruck(TruckResponse currentTruck, boolean isFinished) {
-        TruckEntity truck = truckRepository.findByTruckNumberAndActive(currentTruck.getTruckNumber(), false)
+        TruckEntity truck = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
                 .orElseThrow(() ->
                         new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber())
                 );
@@ -266,7 +264,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             ));
         }
         truck.getTruckPhotos().addAll(truckPhotos);
-        truck.setFinished(isFinished);
+        truck.setIsFinished(isFinished);
         truckRepository.save(truck);
         return null;
     }

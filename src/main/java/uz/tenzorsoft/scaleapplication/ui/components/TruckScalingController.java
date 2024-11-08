@@ -1,6 +1,8 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
@@ -30,6 +32,8 @@ import static uz.tenzorsoft.scaleapplication.ui.MainController.showCargoScaleCon
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Setter
+@Getter
 public class TruckScalingController {
     private final ButtonController buttonController;
     private final CameraViewController cameraViewController;

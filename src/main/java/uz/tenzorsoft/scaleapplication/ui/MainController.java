@@ -47,6 +47,7 @@ public class MainController {
     private final ExecutorService executors;
     private final UserService userService;
     private final PrintCheck printCheck;
+    private final TestController testController;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -93,6 +94,7 @@ public class MainController {
         dataSendController.sendNotSentData();
         truckScalingController.start();
         tableController.loadData();
+        testController.start();
         printCheck.listAvailablePrinters();
 
     }
@@ -104,6 +106,9 @@ public class MainController {
 
             ToggleSwitch toggleSwitch = new ToggleSwitch("");
             toggleSwitch.setSelected(true);
+            toggleSwitch.setOnMouseClicked(event -> {
+                isScaleControlOn = toggleSwitch.isSelected();
+            });
 
             Label label = new Label("Massani avtomatik tarzda olish");
             label.setOnMouseClicked(event -> {
