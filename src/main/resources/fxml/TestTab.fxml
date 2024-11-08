@@ -20,6 +20,42 @@
           <ToggleSwitch fx:id="testStatusSwitch" layoutX="50.0" layoutY="11.0" onMouseClicked="#setTestingStatusSwitch"/>
         </children>
       </Pane>
+
+      <!-- Row for Gate 1, Gate 2, and Truck Position -->
+      <HBox layoutX="594.0" layoutY="88.0" spacing="20" alignment="CENTER">
+
+        <!-- Gate 1 -->
+        <VBox alignment="CENTER" spacing="5">
+          <Label text="Gate 1">
+            <font>
+              <Font size="18.0"/>
+            </font>
+          </Label>
+          <ToggleSwitch fx:id="gate1Switch" onMouseClicked="#setGate1StatusSwitch"/>
+        </VBox>
+
+        <!-- Gate 2 -->
+        <VBox alignment="CENTER" spacing="5">
+          <Label text="Gate 2">
+            <font>
+              <Font size="18.0"/>
+            </font>
+          </Label>
+          <ToggleSwitch fx:id="gate2Switch" onMouseClicked="#setGate2StatusSwitch"/>
+        </VBox>
+
+        <!-- Truck Position (Auto-filled) -->
+        <VBox alignment="CENTER" spacing="5">
+          <Label text="Truck Position">
+            <font>
+              <Font size="18.0"/>
+            </font>
+          </Label>
+          <TextField fx:id="truckPositionField" editable="false" prefWidth="100.0"/>
+        </VBox>
+      </HBox>
+
+
       <Pane fx:id="sensor1Pane" layoutX="279.0" layoutY="283.0" prefHeight="223.0" prefWidth="788.0">
         <children>
           <Pane layoutX="56.0" layoutY="14.0" prefHeight="46.0" prefWidth="148.0">

@@ -17,6 +17,7 @@ import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 public class TestController {
 
     private final ExecutorService executors;
+
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
 
@@ -25,9 +26,18 @@ public class TestController {
 
     @FXML
     private ToggleSwitch sensor1Switch, sensor2Switch, sensor3Switch, testStatusSwitch;
+    @FXML
+    private ToggleSwitch gate1Switch, gate2Switch;  // Added gate switches
 
     @FXML
     private TextField weighInputField;
+
+    @FXML
+    private TextField truckPositionField;
+
+    public void updateTruckPosition(String position) {
+        truckPositionField.setText(position); // Automatically fill truck position here
+    }
 
     public void setWeigh() {
         double weigh = Double.parseDouble(weighInputField.getText());
@@ -75,43 +85,69 @@ public class TestController {
         sensor3Connection = sensor3Switch.isSelected();
     }
 
+    // Gate switch status handlers
+    public void setGate1StatusSwitch() {
+        if (isTesting) {
+            // Only change state if testing is on
+            gate1Connection = gate1Switch.isSelected();
+        }
+    }
+
+    public void setGate2StatusSwitch() {
+        if (isTesting) {
+            // Only change state if testing is on
+            gate2Connection = gate2Switch.isSelected();
+        }
+    }
+
     public void start() {
         executors.execute(() -> {
             while (true) {
                 try {
                     if (!isTesting) {
+                        // Disable all switches when testing is off
                         sensor1Switch.setSelected(false);
-                        sensor1Connection = sensor1Switch.isSelected();
+                        sensor1Connection = false;
                         sensor2Switch.setSelected(false);
-                        sensor2Connection = sensor2Switch.isSelected();
+                        sensor2Connection = false;
                         sensor3Switch.setSelected(false);
-                        sensor3Connection = sensor3Switch.isSelected();
+                        sensor3Connection = false;
+                        gate1Switch.setSelected(false);
+                        gate1Connection = false;
+                        gate2Switch.setSelected(false);
+                        gate2Connection = false;
                         testStatusSwitch.setSelected(false);
-                        isTesting = false;
+
+                        // Disable input field and switches
                         weighInputField.setDisable(true);
                         sensor1Switch.setDisable(true);
                         sensor2Switch.setDisable(true);
                         sensor3Switch.setDisable(true);
+                        gate1Switch.setDisable(true);  // Disable Gate 1
+                        gate2Switch.setDisable(true);  // Disable Gate 2
                     } else {
+                        // Enable switches when testing is on
                         sensor1Connection = sensor1Switch.isSelected();
                         sensor2Connection = sensor2Switch.isSelected();
                         sensor3Connection = sensor3Switch.isSelected();
+                        gate1Connection = gate1Switch.isSelected();
+                        gate2Connection = gate2Switch.isSelected();
                         testStatusSwitch.setSelected(true);
+
+                        // Enable input field and switches
                         weighInputField.setDisable(false);
                         sensor1Switch.setDisable(false);
                         sensor2Switch.setDisable(false);
                         sensor3Switch.setDisable(false);
-                        isTesting = true;
+                        gate1Switch.setDisable(false);  // Enable Gate 1
+                        gate2Switch.setDisable(false);  // Enable Gate 2
                     }
 
                     Thread.sleep(1000);
 
                 } catch (Exception ignored) {
-
                 }
             }
         });
     }
-
-
 }

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
@@ -120,6 +121,41 @@ public class TableController {
         if (record == null) return;
         tableData.getItems().add(record);
     }
+
+    public void addLastRecord(TruckResponse truckResponse) {
+        if (truckResponse == null) return;
+
+        TableViewData record = convertToTableViewData(truckResponse);
+        if (record != null) {
+            tableData.getItems().add(record);
+        }
+    }
+
+    private TableViewData convertToTableViewData(TruckResponse truckResponse) {
+        TableViewData data = new TableViewData();
+
+        data.setId(truckResponse.getId());
+        data.setEnteredTruckNumber(truckResponse.getTruckNumber());
+
+        // Map entrance details
+        if (truckResponse.getEnteredAt() != null) {
+            data.setEnteredDate(truckResponse.getEnteredAt().toLocalDate().toString());
+            data.setEnteredTime(truckResponse.getEnteredAt().toLocalTime().toString());
+        }
+        data.setEnteredWeight(truckResponse.getEnteredWeight());
+        data.setEnteredOnDuty(truckResponse.getEntranceConfirmedBy());
+
+        // Map exit details
+        if (truckResponse.getExitedAt() != null) {
+            data.setExitedDate(truckResponse.getExitedAt().toLocalDate().toString());
+            data.setExitedTime(truckResponse.getExitedAt().toLocalTime().toString());
+        }
+        data.setExitedWeight(truckResponse.getExitedWeight());
+        data.setExitedOnDuty(truckResponse.getExitConfirmedBy());
+
+        return data;
+    }
+
 
     public void updateTableRow(TruckEntity truckEntity) {
         ObservableList<TableViewData> items = tableData.getItems();

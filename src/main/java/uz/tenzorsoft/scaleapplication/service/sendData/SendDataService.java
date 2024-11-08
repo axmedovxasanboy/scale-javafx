@@ -111,7 +111,7 @@ public class SendDataService {
 
 
         HttpStatusCode statusCode = restTemplate.postForEntity(
-                "", request, Void.class
+                "https://api.mycoal.uz/be/api/v1/scales/save-list", request, Void.class
         ).getStatusCode();
 
         if (statusCode.isError()) {
