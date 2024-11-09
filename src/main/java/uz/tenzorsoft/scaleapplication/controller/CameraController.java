@@ -21,7 +21,6 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
-import uz.tenzorsoft.scaleapplication.service.TruckPhotoService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.ButtonController;
 import uz.tenzorsoft.scaleapplication.ui.TableController;
@@ -49,7 +48,6 @@ public class CameraController {
     private final TableController tableController;
     private final ButtonController buttonController;
     private final TruckService truckService;
-    private final TruckPhotoService truckPhotoService;
 
     @Value("${number.pattern.regexp}")
     private String regexPattern;
@@ -91,6 +89,7 @@ public class CameraController {
                             }
                             if (!truckService.checkEntranceAvailable(truckNumber)) {
                                 System.err.println("Entrance available after 3 minutes");
+                                showAlert(Alert.AlertType.ERROR, "Entrance not available", "Entrance not available");
                                 return ResponseEntity.ok("Entrance exception");
                             }
 
