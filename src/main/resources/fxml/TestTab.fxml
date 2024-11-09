@@ -21,6 +21,35 @@
         </children>
       </Pane>
 
+
+      <!-- Add Truck Number fields and Buttons for Camera 1 and Camera 2 -->
+      <VBox layoutX="450.0" layoutY="160.0" spacing="20.0" alignment="CENTER">
+        <children>
+          <!-- Camera 1 -->
+          <HBox spacing="10.0" alignment="CENTER">
+            <Label text="Truck Number (Camera 1)">
+              <font>
+                <Font size="18.0"/>
+              </font>
+            </Label>
+            <TextField fx:id="truckNumberFieldCamera1" prefWidth="120.0"/>
+            <Button text="From Camera 1" onAction="#getTruckNumberFromCamera1"/>
+          </HBox>
+
+          <!-- Camera 2 -->
+          <HBox spacing="10.0" alignment="CENTER">
+            <Label text="Truck Number (Camera 2)">
+              <font>
+                <Font size="18.0"/>
+              </font>
+            </Label>
+            <TextField fx:id="truckNumberFieldCamera2" prefWidth="120.0"/>
+            <Button text="From Camera 2" onAction="#getTruckNumberFromCamera2"/>
+          </HBox>
+        </children>
+      </VBox>
+
+
       <!-- Centered Gate switches and Truck Position with adjusted spacing -->
       <HBox layoutX="450.0" layoutY="88.0" spacing="50.0" alignment="CENTER">
         <children>

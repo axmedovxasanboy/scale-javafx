@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.currentUser;
 
@@ -85,7 +86,7 @@ public class UserController {
         // Step 1: Phone Number Input Field (auto-filled and non-editable)
         Label phoneLabel = new Label("Telefon nomerini kiriting:");
         TextField phoneInput = new TextField();
-        phoneInput.setText("123-456-7890");  // Auto-filled phone number (replace with dynamic data if needed)
+        phoneInput.setText(currentUser.getPhoneNumber());  // Auto-filled phone number (replace with dynamic data if needed)
         phoneInput.setEditable(false);  // Make it non-editable
         phoneInput.setPrefWidth(200);  // Adjusted width
         phoneInput.setMaxWidth(250);   // Set max width to prevent it from getting too wide

@@ -171,10 +171,13 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
 
 
     public AttachResponse getTestingImages() {
-        String pathFolder = getYmDString(); // 2022/04/23
-        File folder = new File(attachUploadFolder + pathFolder); // attaches/2022/04/23
+        AttachEntity attachEntity = attachRepository.findByFileName("no-image").orElse(null);
+        if (attachEntity != null) return entityToResponse(attachEntity);
 
-        if (!folder.exists()) folder.mkdirs();
-        return null;
+        File file = new File("/images/no-pic-allowed.jpg");
+        return entityToResponse(attachRepository.save(new AttachEntity(
+                "no image", "no-image", 1024L,
+                "jpg", "image/jpeg", file.getAbsolutePath()
+        )));
     }
 }
