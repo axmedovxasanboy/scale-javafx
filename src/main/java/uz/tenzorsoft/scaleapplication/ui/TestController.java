@@ -142,8 +142,12 @@ public class TestController {
                 return;
             }
             TruckEntity entity = truckService.findNotFinishedTruck(truckNumber);
-            if(entity == null) {
+            if (entity == null) {
                 showAlert(Alert.AlertType.WARNING, "Not found", "Truck number does not found from database: " + truckNumber);
+                return;
+            }
+            if (!truckService.checkEntranceAvailable(truckNumber)) {
+                showAlert(Alert.AlertType.WARNING, "Entrance not available", "Entrance not available: " + truckNumber);
                 return;
             }
             Long attachId = attachService.findTestingImg().getId();
@@ -163,6 +167,10 @@ public class TestController {
             showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
             return;
         }
+        if (!truckService.checkEntranceAvailable(truckNumber)) {
+            showAlert(Alert.AlertType.WARNING, "Entrance not available", "Entrance not available: " + truckNumber);
+            return;
+        }
         Long attachId = attachService.findTestingImg().getId();
         currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.ENTRANCE_PHOTO));
         currentTruck.setTruckNumber(truckNumber);
@@ -174,7 +182,7 @@ public class TestController {
     }
 
     public void setWeigh() {
-        if ((truckPosition == 2 || truckPosition == 5)  && !truckScalingController.isScaled()) {
+        if ((truckPosition == 2 || truckPosition == 5) && !truckScalingController.isScaled()) {
             truckScalingController.setWeigh(Double.parseDouble(weighInputField.getText()));
             truckScalingController.setScaled(true);
         }

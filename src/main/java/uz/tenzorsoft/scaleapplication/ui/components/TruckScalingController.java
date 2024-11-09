@@ -143,7 +143,7 @@ public class TruckScalingController {
                                 weigh = 0.0;
                             }
                         }
-                    }, 3000);
+                    }, 10000);
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,7 +242,6 @@ public class TruckScalingController {
                         public void run() {
                             if (isTruckExited) {
                                 isScaled = false;
-                                truckPosition = 0;
                                 buttonController.closeGate1();
                                 isTruckExited = false;
                                 isCargoPhotoTaken = false;
@@ -253,7 +252,7 @@ public class TruckScalingController {
                                 weigh = 0.0;
                             }
                         }
-                    }, 3000);
+                    }, 10000);
                 }
 
             } catch (Exception ignored) {

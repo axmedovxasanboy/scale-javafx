@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,5 +40,10 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberAndIsFinishedOrderByCreatedAt(String truckNumber, Boolean finished);
 
+    Optional<TruckEntity> findByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinished(String truckNumber, LocalDateTime localDateTime, boolean isFinished);
+
+    boolean existsByTruckNumber(String truckNumber);
+
+    boolean existsByTruckNumberAndIsFinished(String truckNumber, Boolean isFinished);
 
 }

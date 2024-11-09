@@ -24,7 +24,7 @@ public class DataSendController {
                     sendDataService.sendDataToMyCoal();
                     Thread.sleep(2000);
                 } catch (Exception e) {
-
+//                    System.err.println(e.getMessage());
                 }
             }
         });

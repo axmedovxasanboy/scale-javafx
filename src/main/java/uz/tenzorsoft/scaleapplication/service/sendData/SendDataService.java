@@ -1,9 +1,7 @@
 package uz.tenzorsoft.scaleapplication.service.sendData;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
@@ -21,6 +19,9 @@ import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.*;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 import uz.tenzorsoft.scaleapplication.service.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,7 +107,9 @@ public class SendDataService {
 
         List<TruckEntity> trucks = truckService.findNotSentDataToMyCoal();
 
-        if (trucks.isEmpty()) {return;}
+        if (trucks.isEmpty()) {
+            return;
+        }
 
         for (TruckEntity truckEntity : trucks) {
             CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
@@ -129,20 +132,19 @@ public class SendDataService {
 
             myCoalData.setId(truckEntity.getId());
             myCoalData.setNp(0L);
-            myCoalData.setTarozi_id(1L);
-            myCoalData.setRfid("");
+            myCoalData.setTarozi_id(5L);
+//            myCoalData.setRfid("");
             myCoalData.setAvto_number(truckEntity.getTruckNumber());
-            myCoalData.setFul_name("");
-            myCoalData.setTex_pass_number("");
-            myCoalData.setOrg_name_buyer("");
+//            myCoalData.setFul_name("");
+//            myCoalData.setTex_pass_number("");
+//            myCoalData.setOrg_name_buyer("");
             myCoalData.setOrg_name_seller(cargo == null ? "" : cargo.getScaleName());
             myCoalData.setProduct(new ProductResponse());
             myCoalData.setCheck(new CheckResponse(
-                    enteredWeigh.getCreatedAt() != null ? enteredWeigh.getCreatedAt().toString() : "",
-                    exitedWeigh.getCreatedAt() != null ? exitedWeigh.getCreatedAt().toString() : ""
+                    getLocalDateTime(enteredWeigh), getLocalDateTime(exitedWeigh)
             ));
-            myCoalData.setAccord(new AccordResponse());
-            myCoalData.setDoverennost(new Doverennost());
+            myCoalData.setAccord(new AccordResponse(null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
+            myCoalData.setDoverennost(new Doverennost(null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
             myCoalData.setHeft(new Heft(
                     Math.max(exitedWeigh.getWeight(), enteredWeigh.getWeight()),
                     Math.min(exitedWeigh.getWeight(), enteredWeigh.getWeight()),
@@ -154,36 +156,34 @@ public class SendDataService {
         }
 
 
-//        HttpStatusCode statusCode = restTemplate.postForEntity(
-//                "https://api.mycoal.uz/be/api/v1/scales/save-list", request, Void.class
-//        ).getStatusCode();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<?> entity = new HttpEntity<>(request);
+        HttpEntity<List<MyCoalData>> entity = new HttpEntity<>(request, headers);
 
-        HttpStatusCode statusCode = restTemplate.exchange(
-                "https://api.mycoal.uz/be/api/v1/scales/save-list",
-                HttpMethod.POST,
-                entity, Void.class
-        ).getStatusCode();
+        Object body = restTemplate.exchange("https://api.mycoal.uz/be/api/v1/scales/save-list", HttpMethod.POST, entity, Object.class).getBody();
 
 
-        if (statusCode.isError()) {
-            System.err.println("Error with status code: " + statusCode);
+        if(body == null){
+            return;
         }
-        if (statusCode.is2xxSuccessful()) {
-
-            for (TruckEntity truck : trucks) {
-                for (TruckActionEntity actionEntity : truck.getTruckActions()) {
-                    actionEntity.setIsSentToMyCoal(true);
-                    truckActionService.save(actionEntity);
-                }
-                truck.setIsSentToMyCoal(true);
-                truckService.save(truck);
-
+        for (TruckEntity truck : trucks) {
+            for (TruckActionEntity actionEntity : truck.getTruckActions()) {
+                actionEntity.setIsSentToMyCoal(true);
+                truckActionService.save(actionEntity);
             }
+            truck.setIsSentToMyCoal(true);
+            truckService.save(truck);
 
-            System.out.println("Successfully sent data to MyCoal\nstatus code " + statusCode);
         }
 
+        System.out.println("My Coal Data body = " + body);
+
+    }
+
+    private static String getLocalDateTime(TruckActionEntity enteredWeigh) {
+        LocalDateTime createdAt = enteredWeigh.getCreatedAt();
+        if (createdAt == null) createdAt = LocalDateTime.now();
+        return createdAt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
     }
 }

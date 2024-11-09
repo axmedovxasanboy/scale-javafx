@@ -89,6 +89,11 @@ public class CameraController {
                                 truckNumber = "";
                                 return ResponseEntity.ok("NOT_MATCH");
                             }
+                            if (!truckService.checkEntranceAvailable(truckNumber)) {
+                                System.err.println("Entrance available after 3 minutes");
+                                return ResponseEntity.ok("Entrance exception");
+                            }
+
                         }
                     } catch (Exception e) {
                         System.out.println("ANPR Exception" + e.getMessage());

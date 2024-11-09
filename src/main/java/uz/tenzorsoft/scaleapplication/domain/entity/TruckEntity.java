@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class TruckEntity extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+    private LocalDateTime nextEntranceTime;
 
     private Boolean isFinished = false;
     private Boolean isSentToMyCoal = false;

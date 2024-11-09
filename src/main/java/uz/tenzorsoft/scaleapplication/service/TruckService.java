@@ -19,7 +19,6 @@ import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
-import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.MyCoalData;
 import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
@@ -333,6 +332,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
+        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(3));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -345,6 +345,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
+        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(3));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -354,5 +355,14 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public List<TruckEntity> findNotSentDataToMyCoal() {
         return truckRepository.findByIsSentToMyCoalAndIsFinished(false, true);
+    }
+
+    public boolean checkEntranceAvailable(String truckNumber) {
+        if (!truckRepository.existsByTruckNumber(truckNumber)) {
+            return true;
+        }
+
+        return truckRepository.findByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinished(truckNumber, LocalDateTime.now(), false)
+                .orElse(null) != null;
     }
 }
