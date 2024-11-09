@@ -42,7 +42,7 @@
                 <Pane id="scaleAutomationPane" fx:id="scaleAutomationPane" layoutX="1013.0" layoutY="373.0" prefHeight="35.0" prefWidth="222.0">
 
                 </Pane>
-                <Button fx:id="connectButton" layoutX="1199.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#connectToController" styleClass="connect-button" stylesheets="@../static/button.css" text="Connect to controller">
+                <Button fx:id="connectButton" layoutX="1199.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#connectToController" styleClass="connect-button" stylesheets="@../static/button.css" text="Connect">
                   <cursor>
                     <Cursor fx:constant="HAND" />
                   </cursor>

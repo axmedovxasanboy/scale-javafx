@@ -1,6 +1,9 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +27,6 @@ public class TruckEntity extends BaseEntity {
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
 
     private Boolean isFinished = false;
+    private Boolean isSentToMyCoal = false;
 
 }

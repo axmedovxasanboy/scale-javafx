@@ -33,7 +33,7 @@
               </font>
             </Label>
             <TextField fx:id="truckNumberFieldCamera1" prefWidth="120.0"/>
-            <Button text="From Camera 1" onAction="#getTruckNumberFromCamera1"/>
+            <Button fx:id="camera1Button" text="From Camera 1" onAction="#getTruckNumberFromCamera1"/>
           </HBox>
 
           <!-- Camera 2 -->
@@ -44,7 +44,7 @@
               </font>
             </Label>
             <TextField fx:id="truckNumberFieldCamera2" prefWidth="120.0"/>
-            <Button text="From Camera 2" onAction="#getTruckNumberFromCamera2"/>
+            <Button fx:id="camera2Button" text="From Camera 2" onAction="#getTruckNumberFromCamera2"/>
           </HBox>
         </children>
       </VBox>
@@ -128,7 +128,7 @@
               <Font size="20.0"/>
             </font>
           </Label>
-          <Button onAction="#setWeigh" layoutX="509.0" layoutY="148.0" mnemonicParsing="false" text="Button"/>
+          <Button fx:id="weighButton" onAction="#setWeigh" layoutX="509.0" layoutY="148.0" mnemonicParsing="false" text="Button"/>
         </children>
       </Pane>
     </children>

@@ -20,6 +20,7 @@ public class ControllerService {
     public void connect() throws Exception {
         address = InetAddress.getByName(CONTROLLER_IP);
         connection = new TCPMasterConnection(address);
+        connection.setTimeout(3000);
         connection.setPort(port);
         connection.connect();
         isConnected = true;

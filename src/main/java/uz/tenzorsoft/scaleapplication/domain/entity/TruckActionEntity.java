@@ -21,5 +21,6 @@ public class TruckActionEntity extends BaseEntity {
 
     @ManyToOne
     private UserEntity onDuty;
+    private Boolean isSentToMyCoal = false;
 
 }

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface AttachRepository extends JpaRepository<AttachEntity, Long> {
-    List<AttachEntity> findByIsSent(boolean isSent);
+    List<AttachEntity> findByIsSentToCloud(boolean isSent);
 
     Optional<AttachEntity> findByFileName(String fileName);
 }

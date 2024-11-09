@@ -51,7 +51,7 @@ public class CameraController {
     private final TruckService truckService;
     private final TruckPhotoService truckPhotoService;
 
-    @Value("${number.regex.pattern}")
+    @Value("${number.pattern.regexp}")
     private String regexPattern;
 
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

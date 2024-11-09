@@ -6,7 +6,6 @@ import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
-import uz.tenzorsoft.scaleapplication.domain.response.CargoResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
@@ -14,8 +13,6 @@ import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static uz.tenzorsoft.scaleapplication.domain.Instances.truckNumber;
 
 @Service
 @RequiredArgsConstructor
@@ -84,7 +81,7 @@ public class CargoService {
 
     public List<WeighingResponse> getNotSentData() {
         List<WeighingResponse> result = new ArrayList<>();
-        List<CargoEntity> notSentData = cargoRepository.findByIsSent(false);
+        List<CargoEntity> notSentData = cargoRepository.findByIsSentToCloud(false);
         for (CargoEntity cargo : notSentData) {
 
             WeighingResponse response = new WeighingResponse(
@@ -106,7 +103,7 @@ public class CargoService {
         }
         notSentData.forEach(cargo -> {
             CargoEntity entity = cargoRepository.findById(cargo.getId()).orElseThrow(() -> new RuntimeException(cargo.getId() + " is not found from database"));
-            entity.setIsSent(true);
+            entity.setIsSentToCloud(true);
             entity.setIdOnServer(cargoMap.get(entity.getId()));
             cargoRepository.save(entity);
         });

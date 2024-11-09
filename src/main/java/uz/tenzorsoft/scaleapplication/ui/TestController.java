@@ -1,23 +1,39 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
+import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
+import uz.tenzorsoft.scaleapplication.service.AttachService;
+import uz.tenzorsoft.scaleapplication.service.TruckService;
+import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
+import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor
 public class TestController {
 
     private final ExecutorService executors;
+    private final AttachService attachService;
+    private final TruckScalingController truckScalingController;
+    private final TruckService truckService;
+    private final TableController tableController;
 
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
@@ -41,6 +57,11 @@ public class TestController {
     @FXML
     private TextField truckNumberFieldCamera2;
 
+    @FXML
+    private Button camera1Button, camera2Button, weighButton;
+
+    @Value("${number.pattern.regexp}")
+    private String regexPattern;
 
     @FXML
     public void initialize() {
@@ -54,6 +75,15 @@ public class TestController {
             updateToggleSwitchesState();
             updateTruckPosition();
         });
+        gate1Switch.setDisable(true); // Disable Gate 1
+        gate2Switch.setDisable(true); // Disable Gate 2
+        truckNumberFieldCamera1.setDisable(true);
+        truckNumberFieldCamera2.setDisable(true);
+        truckPositionField.setDisable(true);
+        camera1Button.setDisable(true);
+        camera2Button.setDisable(true);
+        weighButton.setDisable(true);
+
 
         // Initialize the toggle states
         updateToggleSwitchesState();
@@ -70,16 +100,18 @@ public class TestController {
         sensor3Switch.setDisable(!enableSensors);
         weighInputField.setDisable(!enableSensors);
 
-        // Gate switches should be enabled manually but remain disabled if testing is off
-        gate1Switch.setDisable(!isTesting);
-        gate2Switch.setDisable(!isTesting);
-
         // Set switch state depending on test mode
         if (isTesting) {
             // Turn on sensors automatically if "Test" is on
             sensor1Switch.setSelected(true);
             sensor2Switch.setSelected(true);
             sensor3Switch.setSelected(true);
+            truckNumberFieldCamera1.setDisable(false);
+            truckNumberFieldCamera2.setDisable(false);
+            truckPositionField.setDisable(false);
+            camera1Button.setDisable(false);
+            camera2Button.setDisable(false);
+            weighButton.setDisable(false);
         } else {
             // Turn off all switches if "Test" is off
             sensor1Switch.setSelected(false);
@@ -103,26 +135,54 @@ public class TestController {
     public void getTruckNumberFromCamera2() {
         String truckNumber = truckNumberFieldCamera2.getText();
         if (!truckNumber.isEmpty()) {
-            // Save the truck number to the database
-            saveTruckNumberToDatabase(truckNumber, "Camera 2");
-            truckNumberFieldCamera2.clear(); // Clear the text field after saving
+            Pattern pattern = Pattern.compile(regexPattern);
+            Matcher matcher = pattern.matcher(truckNumber);
+            if (!matcher.find()) {
+                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+                return;
+            }
+            TruckEntity entity = truckService.findNotFinishedTruck(truckNumber);
+            if(entity == null) {
+                showAlert(Alert.AlertType.WARNING, "Not found", "Truck number does not found from database: " + truckNumber);
+                return;
+            }
+            Long attachId = attachService.findTestingImg().getId();
+            currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.EXIT_PHOTO));
+            currentTruck.setTruckNumber(truckNumber);
+            truckService.saveTruckAttaches(currentTruck, attachId);
+            gate2Switch.setSelected(true);
+            truckPosition = 7;
+            truckNumberFieldCamera2.clear();
         }
     }
 
     private void saveTruckNumberToDatabase(String truckNumber, String cameraSource) {
-        // Implement the database save logic here (this might involve calling a service or repository)
+        Pattern pattern = Pattern.compile(regexPattern);
+        Matcher matcher = pattern.matcher(truckNumber);
+        if (!matcher.find()) {
+            showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+            return;
+        }
+        Long attachId = attachService.findTestingImg().getId();
+        currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.ENTRANCE_PHOTO));
+        currentTruck.setTruckNumber(truckNumber);
+        truckService.saveTruckAttaches(currentTruck, attachId);
+        gate1Switch.setSelected(true);
+        truckPosition = 0;
+        tableController.addLastRecord();
         System.out.println("Saving truck number: " + truckNumber + " from " + cameraSource);
-        // Example of saving to the database
-        // truckService.saveTruckNumber(truckNumber, cameraSource);
     }
 
     public void setWeigh() {
-        double weigh = Double.parseDouble(weighInputField.getText());
+        if ((truckPosition == 2 || truckPosition == 5)  && !truckScalingController.isScaled()) {
+            truckScalingController.setWeigh(Double.parseDouble(weighInputField.getText()));
+            truckScalingController.setScaled(true);
+        }
     }
 
     private void updateTruckPosition() {
         if (isTesting) {
-            truckPositionField.setText(String.valueOf(0)); // Example static position
+            truckPositionField.setText("" + truckPosition); // Example static position
         } else {
             truckPositionField.setText("");
         }
@@ -191,42 +251,13 @@ public class TestController {
         executors.execute(() -> {
             while (true) {
                 try {
-                    if (!isTesting) {
-                        // Disable and reset all switches when testing is off
-                        sensor1Switch.setSelected(false);
-                        sensor1Connection = false;
-                        sensor2Switch.setSelected(false);
-                        sensor2Connection = false;
-                        sensor3Switch.setSelected(false);
-                        sensor3Connection = false;
-                        gate1Switch.setSelected(false);
-                        gate1Connection = false;
-                        gate2Switch.setSelected(false);
-                        gate2Connection = false;
-                        testStatusSwitch.setSelected(false);
-
-                        weighInputField.setDisable(true);
-                        sensor1Switch.setDisable(true);
-                        sensor2Switch.setDisable(true);
-                        sensor3Switch.setDisable(true);
-                        gate1Switch.setDisable(true); // Disable Gate 1
-                        gate2Switch.setDisable(true); // Disable Gate 2
-                    } else {
-                        // Keep sensor and weigh fields enabled during testing
+                    if (isTesting) {
+                        truckPositionField.setText("" + truckPosition);
                         sensor1Connection = sensor1Switch.isSelected();
                         sensor2Connection = sensor2Switch.isSelected();
                         sensor3Connection = sensor3Switch.isSelected();
-                        testStatusSwitch.setSelected(true);
-                        truckPositionField.setText("" + truckPosition);
-
-                        weighInputField.setDisable(false);
-                        sensor1Switch.setDisable(false);
-                        sensor2Switch.setDisable(false);
-                        sensor3Switch.setDisable(false);
-
-                        // Gates should remain enabled for manual control
-                        gate1Switch.setDisable(false); // Enable Gate 1 for manual control
-                        gate2Switch.setDisable(false); // Enable Gate 2 for manual control
+                        gate1Connection = gate1Switch.isSelected();
+                        gate2Connection = gate2Switch.isSelected();
                     }
 
                     Thread.sleep(1000);

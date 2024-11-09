@@ -47,11 +47,15 @@ public class TruckScalingController {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private boolean isTruckEntered = false;
     private boolean isOnScale = false;
+    @Setter
+    @Getter
     private boolean isScaled = false;
+    @Setter
+    @Getter
+    private double weigh = 0.0;
     private boolean isCargoPhotoTaken = false;
     private boolean isCargoConfirmationDialogOpened = false;
     private boolean isTruckExited = false;
-    private double weigh = 0.0;
     private final Timer timer = new Timer();
 
     public void start() {
@@ -76,7 +80,7 @@ public class TruckScalingController {
                     double helper = buttonController.getTruckWeigh();
                     System.out.println("weigh = " + helper);
 
-                    if (weigh != helper) weigh = helper;
+                    if (weigh != helper && !isTesting) weigh = helper;
                     else if (weigh == helper && helper != 0) {
                         log.info("Truck weigh: {}", weigh);
                         isScaled = true;
@@ -85,7 +89,7 @@ public class TruckScalingController {
                     if (isScaled && !isCargoPhotoTaken) {
                         AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                         currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
-                        truckService.saveTruckAttaches(currentTruck.getTruckNumber(), response.getId());
+                        truckService.saveTruckAttaches(currentTruck, response.getId());
                         isCargoPhotoTaken = true;
                         System.out.println("Opening gate 2");
                         buttonController.openGate2(); // Open Gate 2
@@ -102,7 +106,7 @@ public class TruckScalingController {
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
-                            tableController.updateTableRow(currentTruck);
+                            tableController.updateTableRow(truckService.getCurrentTruckEntity());
                             isTruckEntered = true;
                             currentTruck = new TruckResponse();
                         }else{
@@ -159,7 +163,7 @@ public class TruckScalingController {
                     double helper = buttonController.getTruckWeigh();
                     System.out.println("helper = " + helper);
 
-                    if (weigh != helper) weigh = helper;
+                    if (weigh != helper && !isTesting) weigh = helper;
                     else if (weigh == helper && helper != 0) {
                         log.info("Truck weigh: {}", weigh);
                         isScaled = true;
@@ -173,11 +177,10 @@ public class TruckScalingController {
                         System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                     }
 
-                    if (isScaled && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
+                    if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
                         AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                         currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
-                        truckService.saveTruckAttaches(currentTruck.getTruckNumber(), response.getId());
-                        weigh = helper;
+                        truckService.saveTruckAttaches(currentTruck, response.getId());
                         isCargoPhotoTaken = true;
                         currentTruck.setExitedWeight(weigh);
                         log.info("Truck weigh: {}", currentTruck.getExitedWeight());
@@ -202,7 +205,7 @@ public class TruckScalingController {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        tableController.updateTableRow(currentTruck);
+                        tableController.updateTableRow(truckService.getCurrentTruckEntity());
 
                         currentTruck = new TruckResponse();
                     }

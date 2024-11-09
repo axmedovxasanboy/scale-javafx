@@ -12,6 +12,7 @@ import uz.tenzorsoft.scaleapplication.service.ControllerService;
 
 import java.io.UnsupportedEncodingException;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
@@ -62,7 +63,7 @@ public class ButtonController {
 
     public void openGate1() {
         try {
-            controllerService.openGate1();
+            if(!isTesting) controllerService.openGate1();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -70,7 +71,7 @@ public class ButtonController {
 
     public void openGate1(int truckPosition) {
         try {
-            controllerService.openGate1(truckPosition);
+            if(!isTesting) controllerService.openGate1(truckPosition);
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -78,7 +79,7 @@ public class ButtonController {
 
     public void closeGate1() {
         try {
-            controllerService.closeGate1();
+            if(!isTesting) controllerService.closeGate1();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -86,7 +87,7 @@ public class ButtonController {
 
     public void openGate2() {
         try {
-            controllerService.openGate2();
+            if(!isTesting) controllerService.openGate2();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -102,7 +103,7 @@ public class ButtonController {
 
     public void closeGate2() {
         try {
-            controllerService.closeGate2();
+            if(!isTesting) controllerService.closeGate2();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }

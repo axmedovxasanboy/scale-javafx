@@ -1,6 +1,8 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
 @Entity(name = "cargos")
 public class CargoEntity extends BaseEntity {
     private Double netWeight;
+    @Enumerated(EnumType.STRING)
     private CargoStatus cargoStatus;
     private Long scaleId;
     private String scaleName;

@@ -106,7 +106,7 @@ public class TableController {
                     }
                     tableData.setItems(FXCollections.observableArrayList(data));
 
-                    Thread.sleep(60000);
+                    Thread.sleep(60000 * 5);
                 } catch (Exception e) {
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
@@ -158,6 +158,7 @@ public class TableController {
 
 
     public void updateTableRow(TruckEntity truckEntity) {
+        if (truckEntity == null) return;
         ObservableList<TableViewData> items = tableData.getItems();
         int index = -1;
         for (int i = 0; i < items.size(); i++) {

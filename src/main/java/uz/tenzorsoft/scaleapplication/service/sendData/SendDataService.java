@@ -19,10 +19,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserSendResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.*;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
-import uz.tenzorsoft.scaleapplication.service.AttachService;
-import uz.tenzorsoft.scaleapplication.service.CargoService;
-import uz.tenzorsoft.scaleapplication.service.TruckService;
-import uz.tenzorsoft.scaleapplication.service.UserService;
+import uz.tenzorsoft.scaleapplication.service.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +36,7 @@ public class SendDataService {
     private final CargoService cargoService;
     private final AttachService attachService;
     private final CargoRepository cargoRepository;
+    private final TruckActionService truckActionService;
 
     public void sendNotSentData() {
 
@@ -51,7 +49,7 @@ public class SendDataService {
             return;
         }
 
-        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
+        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, null);
         LocalAndServerIds body = restTemplate.postForObject(
                 "https://api-scale.mycoal.uz/remote/localAndServerIds",
                 allDataResponse, LocalAndServerIds.class
@@ -62,6 +60,18 @@ public class SendDataService {
         truckService.dataSent(notSentTruckData, body.getAction());
         userService.dataSent(notSentUserData, body.getUser());
         cargoService.dataSent(notSentWeighingData, body.getWeighing());
+
+        notSentAttachmentData = attachService.getNotSentData();
+        allDataResponse = new AllDataResponse(null, null, null, notSentAttachmentData);
+        body = restTemplate.postForObject(
+                "https://api-scale.mycoal.uz/remote/localAndServerIds",
+                allDataResponse, LocalAndServerIds.class
+        );
+
+        if (body == null) {
+            return;
+        }
+
         attachService.dataSent(notSentAttachmentData, body.getAttach());
 
         System.out.println(body);
@@ -94,7 +104,7 @@ public class SendDataService {
     public void sendDataToMyCoal() {
         List<MyCoalData> request = new ArrayList<>();
 
-        List<TruckEntity> trucks = truckService.findAll();
+        List<TruckEntity> trucks = truckService.findNotSentDataToMyCoal();
 
         if (trucks.isEmpty()) {return;}
 
@@ -161,6 +171,17 @@ public class SendDataService {
             System.err.println("Error with status code: " + statusCode);
         }
         if (statusCode.is2xxSuccessful()) {
+
+            for (TruckEntity truck : trucks) {
+                for (TruckActionEntity actionEntity : truck.getTruckActions()) {
+                    actionEntity.setIsSentToMyCoal(true);
+                    truckActionService.save(actionEntity);
+                }
+                truck.setIsSentToMyCoal(true);
+                truckService.save(truck);
+
+            }
+
             System.out.println("Successfully sent data to MyCoal\nstatus code " + statusCode);
         }
 

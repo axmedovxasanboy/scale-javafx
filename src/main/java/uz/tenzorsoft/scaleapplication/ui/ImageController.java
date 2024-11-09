@@ -59,20 +59,25 @@ public class ImageController {
     }
 
     public void showImages(TableViewData data) {
+        Image defaultImage = new Image("/images/no-image.jpg");
         TruckEntity truck = truckService.findById(data.getId());
         if (truck == null) {
             showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
             return;
         }
-        for (int i = 0; i < images.size(); i++) {
+        for (ImageView image : images) {
+            image.setImage(defaultImage);
+        }
+        for (int i = 0; i < truck.getTruckPhotos().size(); i++) {
             try {
-                String imagePath = truck.getTruckPhotos().get(i).getTruckPhoto().getPath();
-                InputStream inputStream = new FileInputStream(imagePath);
-                Image image = new Image(inputStream); // Set background loading to true for smoother UI
+                InputStream inputStream = new FileInputStream(truck.getTruckPhotos().get(i).getTruckPhoto().getPath());
+                Image image = new Image(inputStream);
+                if (i > images.size() - 1) break;
+
                 images.get(i).setImage(image);
                 setupImageClick(images.get(i), image);
-            } catch (FileNotFoundException e) {
 
+            } catch (Exception e) {
             }
         }
     }

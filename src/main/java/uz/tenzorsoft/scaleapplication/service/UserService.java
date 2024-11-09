@@ -34,7 +34,7 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
 
     public List<UserSendResponse> getNotSentData() {
         List<UserSendResponse> result = new ArrayList<>();
-        List<UserEntity> notSentData = userRepository.findByIsSent(false);
+        List<UserEntity> notSentData = userRepository.findByIsSentToCloud(false);
         for (UserEntity user : notSentData) {
             UserSendResponse response = new UserSendResponse(
                     user.getPhoneNumber(), user.getUsername(), user.getPassword()
@@ -52,7 +52,7 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
         }
         notSentData.forEach(user -> {
             UserEntity entity = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException(user.getId() + " is not found from database"));
-            entity.setIsSent(true);
+            entity.setIsSentToCloud(true);
             entity.setIdOnServer(userMap.get(entity.getId()));
             userRepository.save(entity);
         });

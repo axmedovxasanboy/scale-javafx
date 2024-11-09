@@ -59,7 +59,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         if (truckEntity.getId() != null) {
             TruckActionEntity truckAction = new TruckActionEntity(
-                    truck.getExitedWeight(), TruckAction.EXIT, userService.findByPhoneNumber(truck.getExitConfirmedBy())
+                    truck.getExitedWeight(), TruckAction.EXIT, userService.findByPhoneNumber(truck.getExitConfirmedBy()), false
             );
             truckEntity.getTruckActions().add(truckAction);
             return truckRepository.save(truckEntity);
@@ -67,10 +67,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         List<TruckActionEntity> truckActions = new ArrayList<>();
         truckActions.add(new TruckActionEntity(truck.getEnteredWeight(),
-                TruckAction.ENTRANCE, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()))
+                TruckAction.ENTRANCE, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
         );
         truckActions.add(new TruckActionEntity(truck.getExitedWeight(),
-                TruckAction.EXIT, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()))
+                TruckAction.EXIT, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
         );
 
         truckActionRepository.saveAll(truckActions);
@@ -105,7 +105,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public List<ActionResponse> getNotSentData() {
         List<ActionResponse> result = new ArrayList<>();
-        List<TruckEntity> notSentData = truckRepository.findByIsSent(false);
+        List<TruckEntity> notSentData = truckRepository.findByIsSentToCloud(false);
         for (TruckEntity truck : notSentData) {
             ActionResponse actionResponse = new ActionResponse();
             List<Long> attachIds = truck.getTruckPhotos().stream().map(
@@ -131,6 +131,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 }
             }
             actionResponse.setIdOnServer(truck.getIdOnServer());
+            result.add(actionResponse);
         }
         return result;
     }
@@ -141,7 +142,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         }
         notSentData.forEach(truck -> {
             TruckEntity entity = truckRepository.findById(truck.getId()).orElseThrow(() -> new RuntimeException(truck.getId() + " is not found from database"));
-            entity.setIsSent(true);
+            entity.setIsSentToCloud(true);
             entity.setIdOnServer(truckMap.get(entity.getId()));
             truckRepository.save(entity);
         });
@@ -150,7 +151,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     public TableViewData findLastRecord() {
         TruckEntity truck = truckRepository.findTopByOrderByIdDesc().orElse(null);
         if (truck == null) {
-            System.err.println("Unable to find");
+            System.err.println("Unable to find last record");
             return null;
         }
         return entityToTableViewData(truck);
@@ -171,7 +172,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight());
                     if (action.getOnDuty() != null) {
-                        data.setEnteredOnDuty(action.getOnDuty().getUsername());
+                        data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
                     } else {
                         data.setEnteredOnDuty("Unknown"); // Or handle this case differently as needed
                     }
@@ -182,7 +183,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight());
                     if (action.getOnDuty() != null) {
-                        data.setExitedOnDuty(action.getOnDuty().getUsername());
+                        data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
                     } else {
                         data.setExitedOnDuty("Unknown"); // Or handle this case differently as needed
                     }
@@ -214,10 +215,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
     }
 
-    public List<MyCoalData> getMyCoalData() {
-        return null;
-    }
-
     public void saveTruck(TruckResponse currentTruck, Integer id) {
         if (id == 1) {
             currentTruckEntity = new TruckEntity();
@@ -232,7 +229,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             currentTruckEntity.setIsFinished(false);
             truckRepository.save(currentTruckEntity);
         } else {
-           currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
+            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
             if (currentTruckEntity == null)
                 throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
@@ -285,14 +282,13 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //        truck.getTruckActions().addAll(truckActions);
 
         currentTruckEntity.setIsFinished(isFinished);
-        TruckEntity save = null;
+        currentTruckEntity.setIsSentToCloud(false);
         try {
-            save = truckRepository.save(currentTruckEntity);
+            currentTruckEntity = truckRepository.save(currentTruckEntity);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-        return save;
-
+        return currentTruckEntity;
     }
 
     @Override
@@ -314,11 +310,17 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         );
     }
 
-    public void saveTruckAttaches(String truckNumber, Long id) {
+    @Transactional
+    public void saveTruckAttaches(TruckResponse currentTruck, Long id) {
+        currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
+                .orElse(new TruckEntity());
+        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
         List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
-        truckPhotos.add(new TruckPhotosEntity(
+        TruckPhotosEntity photo = new TruckPhotosEntity(
                 attachService.findById(id), AttachStatus.ENTRANCE_CARGO_PHOTO
-        ));
+        );
+        truckPhotoRepository.save(photo);
+        truckPhotos.add(photo);
         currentTruckEntity = truckRepository.save(currentTruckEntity);
     }
 
@@ -330,6 +332,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
+        currentTruckEntity.setIsSentToCloud(false);
         truckRepository.save(currentTruckEntity);
     }
 
@@ -341,6 +344,15 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
+        currentTruckEntity.setIsSentToCloud(false);
         truckRepository.save(currentTruckEntity);
+    }
+
+    public TruckEntity findNotFinishedTruck(String truckNumber) {
+        return truckRepository.findByTruckNumberAndIsFinished(truckNumber, false).orElse(null);
+    }
+
+    public List<TruckEntity> findNotSentDataToMyCoal() {
+        return truckRepository.findByIsSentToMyCoalAndIsFinished(false, true);
     }
 }

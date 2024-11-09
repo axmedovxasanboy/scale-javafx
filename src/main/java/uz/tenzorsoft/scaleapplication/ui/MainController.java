@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -96,7 +97,37 @@ public class MainController {
         tableController.loadData();
         testController.start();
         printCheck.listAvailablePrinters();
+        buttonController.connect();
+        if (isConnected) {
+            buttonController.closeGate1();
+            buttonController.closeGate2();
+        }
+        controlConnectButton();
+        System.out.println("All tasks are submitted!");
 
+    }
+
+    private void controlConnectButton() {
+        executors.execute(() -> {
+            while (true) {
+                try {
+                    Platform.runLater(() -> {
+                        if (!isConnected) {
+                            connectButton.setText("Connect");
+                            connectButton.getStyleClass().removeAll("connect-button-disconnected");
+                            connectButton.getStyleClass().add("connect-button");
+                        } else {
+                            connectButton.setText("Disconnect");
+                            connectButton.getStyleClass().removeAll("connect-button");
+                            connectButton.getStyleClass().add("connect-button-disconnected");
+                        }
+                    });
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
+                }
+            }
+        });
     }
 
     private void loadMainMenu() {
@@ -139,10 +170,8 @@ public class MainController {
     private void connectToController() {
         if (isConnected) {
             buttonController.disconnect();
-            connectButton.setText("Connect to controller");
         } else {
             buttonController.connect();
-            connectButton.setText("Disconnect from controller");
         }
     }
 

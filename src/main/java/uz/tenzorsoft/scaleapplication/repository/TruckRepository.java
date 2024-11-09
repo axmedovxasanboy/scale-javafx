@@ -13,7 +13,8 @@ import java.util.Optional;
 @Repository
 public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
-    List<TruckEntity> findByIsSent(boolean isSent);
+    List<TruckEntity> findByIsSentToCloud(boolean isSent);
+    List<TruckEntity> findByIsSentToMyCoalAndIsFinished(boolean isSent, boolean isFinished);
 
     Optional<TruckEntity> findTopByOrderByIdDesc();
 
@@ -32,6 +33,7 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     Optional<TruckEntity> findByTruckPhotosContains(TruckPhotosEntity truckPhotos);
 
+    Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, Boolean isFinished);
 
     List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
