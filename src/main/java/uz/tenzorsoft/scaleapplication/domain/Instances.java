@@ -24,7 +24,7 @@ public class Instances<T> {
     public static boolean sensor2Connection = false;
     public static boolean sensor3Connection = false;
     public static boolean isWaiting = false;
-    public static boolean isScaleControlOn = false;
+    public static boolean isScaleControlOn = true;
     public static short cargoConfirmationStatus = -1;
 
 

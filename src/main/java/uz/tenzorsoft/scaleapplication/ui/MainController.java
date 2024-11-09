@@ -7,10 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -27,6 +24,8 @@ import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -64,30 +63,32 @@ public class MainController {
         alert.showAndWait();
     }
 
-    public static short showCargoScaleConfirmationDialog(double weight) {
-        AtomicReference<Short> resp = new AtomicReference<>((short) 0);
-        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION, "Truck total weight", ButtonType.APPLY, ButtonType.CANCEL);
-        confirmDialog.initStyle(StageStyle.UTILITY);
+    public static short showCargoScaleConfirmationDialog(double mass) {
+        CompletableFuture<Short> futureResult = new CompletableFuture<>();
 
-        confirmDialog.setHeaderText(null);
-        confirmDialog.setTitle("Truck weigh is" + weight + "\nDo you accept?");
-        Button applyButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.APPLY);
-        applyButton.setStyle("-fx-background-color: green; -fx-text-fill: white;");
-        applyButton.setCursor(Cursor.HAND);
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Massani tasdiqlash");
+            alert.setHeaderText(null);
+            alert.initStyle(StageStyle.UTILITY);
 
-        Button cancelButton = (Button) confirmDialog.getDialogPane().lookupButton(ButtonType.CANCEL);
-        cancelButton.setStyle("-fx-background-color: gray; -fx-text-fill: white;");
-        cancelButton.setCursor(Cursor.HAND);
+            // Display mass (non-editable)
+            Label massLabel = new Label("Massa: " + mass + " kg");
+            alert.getDialogPane().setContent(massLabel);
 
-        confirmDialog.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.APPLY) {
-                resp.set((short) 1);
-            } else {
-                resp.set((short) 0);
-            }
+            // Customizing buttons
+            ButtonType confirmButton = new ButtonType("Tasdiqlash", ButtonBar.ButtonData.OK_DONE);
+            ButtonType cancelButton = new ButtonType("Bekor qilish", ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(confirmButton, cancelButton);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            futureResult.complete(result.isPresent() && result.get() == confirmButton ? (short) 1 : (short) 0);
         });
-        return resp.get();
+
+        // Waits until the dialog result is available
+        return futureResult.join();
     }
+
 
     public void load() {
         loadMainMenu();

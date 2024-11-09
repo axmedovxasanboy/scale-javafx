@@ -1,5 +1,10 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.stage.StageStyle;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -19,6 +24,7 @@ import uz.tenzorsoft.scaleapplication.ui.CameraViewController;
 import uz.tenzorsoft.scaleapplication.ui.TableController;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -168,12 +174,12 @@ public class TruckScalingController {
                         log.info("Truck weigh: {}", weigh);
                         isScaled = true;
                     }
-                    if (!isScaleControlOn) cargoConfirmationStatus = 1;
-                    else cargoConfirmationStatus = -1;
+                    if (!isScaleControlOn) cargoConfirmationStatus = -1;
+                    else cargoConfirmationStatus = 1;
 
-                    if (!isCargoConfirmationDialogOpened && isScaled && isScaleControlOn) {
+                    if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn) {
                         isCargoConfirmationDialogOpened = true;
-                        cargoConfirmationStatus = showCargoScaleConfirmationDialog(helper);
+                        cargoConfirmationStatus = showCargoScaleConfirmationDialog(weigh);
                         System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                     }
 
