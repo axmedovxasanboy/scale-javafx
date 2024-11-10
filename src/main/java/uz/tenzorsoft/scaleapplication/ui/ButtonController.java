@@ -8,19 +8,29 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
+import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
+import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
+import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.UnsupportedEncodingException;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.currentTruck;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
-import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
+import static uz.tenzorsoft.scaleapplication.ui.MainController.*;
 
 @Component
 @RequiredArgsConstructor
 public class ButtonController {
 
     private final ControllerService controllerService;
+    private final TruckService truckService;
+    private final AttachService attachService;
+    private final CameraViewController cameraViewController;
 
     @FXML
     private ImageView gate1;
@@ -63,7 +73,7 @@ public class ButtonController {
 
     public void openGate1() {
         try {
-            if(!isTesting) controllerService.openGate1();
+            if (!isTesting) controllerService.openGate1();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -71,15 +81,41 @@ public class ButtonController {
 
     public void openGate1(int truckPosition) {
         try {
-            if(!isTesting) controllerService.openGate1(truckPosition);
+            if (!isTesting) controllerService.openGate1(truckPosition);
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 
+    public void openGate1Manually() {
+        String truckNumber = showNumberInsertDialog();
+        if (truckService.isValidTruckNumber(truckNumber)) {
+            if (truckService.checkEntranceAvailable(truckNumber)) {
+                AttachResponse response = cameraViewController.takePicture(CAMERA_1);
+                currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.MANUAL_ENTRANCE_PHOTO));
+                currentTruck.setTruckNumber(truckNumber);
+                currentTruck.setEnteredStatus(TruckAction.MANUAL_ENTRANCE);
+                openGate1(0);
+            }
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", truckNumber + " is invalid");
+        }
+    }
+
+    public void openGate2Manually() {
+        String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
+        if (truckService.checkEntranceAvailable(truckNumber)) {
+            AttachResponse response = cameraViewController.takePicture(CAMERA_3);
+            currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.MANUAL_EXIT_PHOTO));
+            currentTruck.setTruckNumber(truckNumber);
+            currentTruck.setEnteredStatus(TruckAction.MANUAL_EXIT);
+            openGate2(7);
+        }
+    }
+
     public void closeGate1() {
         try {
-            if(!isTesting) controllerService.closeGate1();
+            if (!isTesting) controllerService.closeGate1();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -87,7 +123,7 @@ public class ButtonController {
 
     public void openGate2() {
         try {
-            if(!isTesting) controllerService.openGate2();
+            if (!isTesting) controllerService.openGate2();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -103,7 +139,7 @@ public class ButtonController {
 
     public void closeGate2() {
         try {
-            if(!isTesting) controllerService.closeGate2();
+            if (!isTesting) controllerService.closeGate2();
         } catch (ModbusException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }

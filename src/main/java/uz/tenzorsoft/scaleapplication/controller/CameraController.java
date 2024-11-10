@@ -18,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
@@ -49,9 +50,6 @@ public class CameraController {
     private final ButtonController buttonController;
     private final TruckService truckService;
 
-    @Value("${number.pattern.regexp}")
-    private String regexPattern;
-
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
         if (request instanceof MultipartHttpServletRequest multipartRequest) {
@@ -78,12 +76,9 @@ public class CameraController {
                         if (fileName.equals("anpr.xml")) {
                             truckNumber = extractNumberFromXmlFile(file);
                             System.out.println("truckNumber = " + truckNumber);
-                            Pattern pattern = Pattern.compile(regexPattern);
-                            Matcher matcher = pattern.matcher(truckNumber);
-                            if (!matcher.find()) {
-                                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+                            if (!truckService.isValidTruckNumber(truckNumber)) {
                                 log.warn("Truck number does not match: {}", truckNumber);
-                                System.out.println("Truck number does not match: " + truckNumber);
+                                showAlert(Alert.AlertType.ERROR, "Error", "Truck number does not match");
                                 truckNumber = "";
                                 return ResponseEntity.ok("NOT_MATCH");
                             }
@@ -124,6 +119,7 @@ public class CameraController {
                 }
             }
             currentTruck.setTruckNumber(truckNumber);
+            currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
             try {
                 truckService.saveTruck(currentTruck, cameraId);
             } catch (Exception e) {

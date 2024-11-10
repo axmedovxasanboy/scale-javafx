@@ -1,10 +1,5 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.stage.StageStyle;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -24,7 +19,6 @@ import uz.tenzorsoft.scaleapplication.ui.CameraViewController;
 import uz.tenzorsoft.scaleapplication.ui.TableController;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
@@ -76,13 +70,14 @@ public class TruckScalingController {
                 }
 
                 if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
-                    currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
                     truckPosition = 2;
                     buttonController.closeGate1();
                     System.out.println("truckPosition = " + truckPosition);
                 }
 
-                if ((!sensor2Connection || isOnScale) && truckPosition == 2 && currentTruck.getEnteredStatus() == TruckAction.ENTRANCE) {
+                if ((!sensor2Connection || isOnScale) && truckPosition == 2 &&
+                        (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
+                                currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
                     double helper = buttonController.getTruckWeigh();
                     System.out.println("weigh = " + helper);
 
@@ -115,7 +110,7 @@ public class TruckScalingController {
                             tableController.updateTableRow(truckService.getCurrentTruckEntity());
                             isTruckEntered = true;
                             currentTruck = new TruckResponse();
-                        }else{
+                        } else {
                             isScaled = false;
                         }
                     }
@@ -165,7 +160,9 @@ public class TruckScalingController {
                     System.out.println("truckPosition = " + truckPosition);
                 }
 
-                if ((!sensor2Connection || isOnScale) && truckPosition == 5 && currentTruck.getExitedStatus() == TruckAction.EXIT) {
+                if ((!sensor2Connection || isOnScale) && truckPosition == 5 &&
+                        (currentTruck.getExitedStatus() == TruckAction.EXIT ||
+                                currentTruck.getExitedStatus() == TruckAction.MANUAL_EXIT)) {
                     double helper = buttonController.getTruckWeigh();
                     System.out.println("helper = " + helper);
 

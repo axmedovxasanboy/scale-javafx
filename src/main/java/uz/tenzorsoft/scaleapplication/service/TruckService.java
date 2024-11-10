@@ -1,12 +1,15 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import jakarta.transaction.Transactional;
+import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
@@ -25,6 +28,11 @@ import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.truckNumber;
+import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +50,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     @Lazy
     @Autowired
     private AttachService attachService;
+
+    @Value("${number.pattern.regexp}")
+    private String regexPattern;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -358,11 +369,22 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public boolean checkEntranceAvailable(String truckNumber) {
+        if(truckNumber == null) return false;
         if (!truckRepository.existsByTruckNumber(truckNumber)) {
             return true;
         }
 
         return truckRepository.findByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinished(truckNumber, LocalDateTime.now(), false)
                 .orElse(null) != null;
+    }
+
+    public boolean isValidTruckNumber(String truckNumber){
+        Pattern pattern = Pattern.compile(regexPattern);
+        Matcher matcher = pattern.matcher(truckNumber);
+        return matcher.find();
+    }
+
+    public List<String> getNotFinishedTrucks() {
+        return truckRepository.findByIsFinished(false).stream().map(TruckEntity::getTruckNumber).toList();
     }
 }
