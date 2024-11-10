@@ -14,7 +14,7 @@ import java.util.List;
 @ToString
 public class TruckResponse {
     private Long id;
-    private String truckNumber;
+    private String  truckNumber;
 
     private List<AttachIdWithStatus> attaches = new ArrayList<>();
     private TruckAction enteredStatus;
