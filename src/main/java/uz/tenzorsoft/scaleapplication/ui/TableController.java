@@ -3,7 +3,6 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -20,8 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor
@@ -67,6 +64,18 @@ public class TableController {
     @FXML
     private TableColumn<TableViewData, String> exitedOnDuty;
 
+    @FXML
+    private TableColumn<TableViewData, String> minWeight;
+
+    @FXML
+    private TableColumn<TableViewData, String> maxWeight;
+
+    @FXML
+    private TableColumn<TableViewData, String> pickupWeight;
+
+    @FXML
+    private TableColumn<TableViewData, String> dropWeight;
+
 
     @FXML
     public void initialize() {
@@ -82,6 +91,11 @@ public class TableController {
         exitedTime.setCellValueFactory(new PropertyValueFactory<>("ExitedTime"));
         exitedWeight.setCellValueFactory(new PropertyValueFactory<>("ExitedWeight"));
         exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
+
+        minWeight.setCellValueFactory(new PropertyValueFactory<>("MinWeight"));
+        maxWeight.setCellValueFactory(new PropertyValueFactory<>("MaxWeight"));
+        pickupWeight.setCellValueFactory(new PropertyValueFactory<>("PickupWeight"));
+        dropWeight.setCellValueFactory(new PropertyValueFactory<>("DropWeight"));
 
         tableData.setRowFactory(tv -> {
             TableRow<TableViewData> row = new TableRow<>();
@@ -122,41 +136,6 @@ public class TableController {
         tableData.getItems().add(record);
     }
 
-    public void addLastRecord(TruckResponse truckResponse) {
-        if (truckResponse == null) return;
-
-        TableViewData record = convertToTableViewData(truckResponse);
-        if (record != null) {
-            tableData.getItems().add(record);
-        }
-    }
-
-    private TableViewData convertToTableViewData(TruckResponse truckResponse) {
-        TableViewData data = new TableViewData();
-
-        data.setId(truckResponse.getId());
-        data.setEnteredTruckNumber(truckResponse.getTruckNumber());
-
-        // Map entrance details
-        if (truckResponse.getEnteredAt() != null) {
-            data.setEnteredDate(truckResponse.getEnteredAt().toLocalDate().toString());
-            data.setEnteredTime(truckResponse.getEnteredAt().toLocalTime().toString());
-        }
-        data.setEnteredWeight(truckResponse.getEnteredWeight());
-        data.setEnteredOnDuty(truckResponse.getEntranceConfirmedBy());
-
-        // Map exit details
-        if (truckResponse.getExitedAt() != null) {
-            data.setExitedDate(truckResponse.getExitedAt().toLocalDate().toString());
-            data.setExitedTime(truckResponse.getExitedAt().toLocalTime().toString());
-        }
-        data.setExitedWeight(truckResponse.getExitedWeight());
-        data.setExitedOnDuty(truckResponse.getExitConfirmedBy());
-
-        return data;
-    }
-
-
     public void updateTableRow(TruckEntity truckEntity) {
         if (truckEntity == null) return;
         ObservableList<TableViewData> items = tableData.getItems();
@@ -169,21 +148,6 @@ public class TableController {
         }
         if (index != -1) {
             TableViewData record = truckService.entityToTableViewData(truckEntity);
-            items.set(index, record);
-        }
-    }
-
-    public void updateTableRow(TruckResponse truckResponse) {
-        ObservableList<TableViewData> items = tableData.getItems();
-        int index = -1;
-        for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).getId().equals(truckResponse.getId())) {
-                index = i;
-                break;
-            }
-        }
-        if (index != -1) {
-            TableViewData record = truckService.getTableViewData(truckResponse);
             items.set(index, record);
         }
     }

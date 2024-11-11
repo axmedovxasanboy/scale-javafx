@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
@@ -50,6 +51,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private String regexPattern;
     @Value("${number.pattern.regexp.standard}")
     private String regexStandard;
+    @Autowired
+    private CargoService cargoService;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -171,6 +174,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     public TableViewData entityToTableViewData(TruckEntity entity) {
         TableViewData data = new TableViewData();
         data.setId(entity.getId());
+        double enteredWeight = 0.0;
+        double exitedWeight = 0.0;
         for (TruckActionEntity action : entity.getTruckActions()) {
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
@@ -178,6 +183,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setEnteredDate(getDate(action.getCreatedAt()));
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight());
+                    enteredWeight = action.getWeight();
                     if (action.getOnDuty() != null) {
                         data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
                     } else {
@@ -189,6 +195,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setExitedDate(getDate(action.getCreatedAt()));
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight());
+                    exitedWeight = action.getWeight();
                     if (action.getOnDuty() != null) {
                         data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
                     } else {
@@ -197,6 +204,14 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 }
             }
         }
+        CargoEntity cargo = cargoService.findByTruckId(entity.getId());
+        if (cargo == null) return data;
+        switch (cargo.getCargoStatus()) {
+            case PICKUP -> data.setPickupWeight(String.valueOf(cargo.getNetWeight()));
+            case DROP -> data.setDropWeight(String.valueOf(cargo.getNetWeight()));
+        }
+        data.setMinWeight(String.valueOf(Math.min(enteredWeight, exitedWeight)));
+        data.setMaxWeight(String.valueOf(Math.max(enteredWeight, exitedWeight)));
         return data;
     }
 
@@ -274,11 +289,17 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public TableViewData getTableViewData(TruckResponse truckResponse) {
+        Double enteredWeight = truckResponse.getEnteredWeight();
+        Double exitedWeight = truckResponse.getExitedWeight();
         return new TableViewData(
                 truckResponse.getId(), truckResponse.getTruckNumber(),
-                getDate(truckResponse.getEnteredAt()), getTime(truckResponse.getEnteredAt()), truckResponse.getEnteredWeight(),
+                getDate(truckResponse.getEnteredAt()), getTime(truckResponse.getEnteredAt()), enteredWeight,
                 truckResponse.getEntranceConfirmedBy(), truckResponse.getTruckNumber(), getDate(truckResponse.getExitedAt()),
-                getTime(truckResponse.getExitedAt()), truckResponse.getExitedWeight(), truckResponse.getExitConfirmedBy()
+                getTime(truckResponse.getExitedAt()), exitedWeight, truckResponse.getExitConfirmedBy(),
+                String.valueOf(Math.min(enteredWeight, exitedWeight)),
+                String.valueOf(Math.max(enteredWeight, exitedWeight)),
+                enteredWeight > exitedWeight ? String.valueOf(enteredWeight - exitedWeight) : "0.0",
+                enteredWeight <= exitedWeight ? String.valueOf(exitedWeight - enteredWeight) : "0.0"
         );
     }
 

@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
-
-import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,5 +21,9 @@ public class TableViewData {
     private String exitedTime;
     private Double exitedWeight;
     private String exitedOnDuty;
+    private String minWeight;
+    private String maxWeight;
+    private String pickupWeight = "0.0";
+    private String dropWeight = "0.0";
 
 }

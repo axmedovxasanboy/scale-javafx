@@ -3,6 +3,7 @@ package uz.tenzorsoft.scaleapplication.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 
@@ -12,16 +13,22 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TableService {
 
+    private final CargoService cargoService;
+
     public TableViewData entityToTableData(TruckEntity truckEntity) {
         TableViewData data = new TableViewData();
         data.setId(truckEntity.getId());
+        double enteredWeight = 0.0;
+        double exitedWeight = 0.0;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
+
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
                     data.setEnteredTruckNumber(truckEntity.getTruckNumber());
                     data.setEnteredDate(getDate(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight());
+                    enteredWeight = action.getWeight();
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
                 }
@@ -29,11 +36,20 @@ public class TableService {
                     data.setExitedTruckNumber(truckEntity.getTruckNumber());
                     data.setExitedDate(getDate(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight());
+                    exitedWeight = action.getWeight();
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
                 }
             }
         }
+        CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
+        if(cargo == null) return data;
+        switch (cargo.getCargoStatus()) {
+            case PICKUP -> data.setPickupWeight(String.valueOf(cargo.getNetWeight()));
+            case DROP -> data.setDropWeight(String.valueOf(cargo.getNetWeight()));
+        }
+        data.setMinWeight(String.valueOf(Math.min(enteredWeight, exitedWeight)));
+        data.setMaxWeight(String.valueOf(Math.max(enteredWeight, exitedWeight)));
         return data;
     }
 
