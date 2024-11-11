@@ -4,22 +4,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
-import javax.swing.text.html.Option;
-import java.util.List;
-
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
-    List<TruckEntity> findByIsSent(boolean isSent);
+    List<TruckEntity> findByIsSentToCloud(boolean isSent);
+    List<TruckEntity> findByIsSentToMyCoalAndIsFinished(boolean isSent, boolean isFinished);
 
     Optional<TruckEntity> findTopByOrderByIdDesc();
 
@@ -36,12 +32,20 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
             ")")
     Optional<TruckEntity> findTruckWithEntranceNoExit(@Param("truckNumber") String truckNumber);
 
-
-
     Optional<TruckEntity> findByTruckPhotosContains(TruckPhotosEntity truckPhotos);
 
+    Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, Boolean isFinished);
 
+    List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
+    List<TruckEntity> findByTruckNumberAndIsFinishedOrderByCreatedAt(String truckNumber, Boolean finished);
 
+    Optional<TruckEntity> findByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinished(String truckNumber, LocalDateTime localDateTime, boolean isFinished);
+
+    boolean existsByTruckNumber(String truckNumber);
+
+    boolean existsByTruckNumberAndIsFinished(String truckNumber, Boolean isFinished);
+
+    List<TruckEntity> findByIsFinished(Boolean isFinished);
 
 }

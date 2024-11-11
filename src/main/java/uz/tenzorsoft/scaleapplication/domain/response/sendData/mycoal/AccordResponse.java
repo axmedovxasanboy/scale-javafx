@@ -13,5 +13,5 @@ import java.time.LocalDateTime;
 @Getter
 public class AccordResponse {
     private String number;
-    private LocalDateTime date;
+    private String date;
 }

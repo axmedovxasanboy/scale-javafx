@@ -1,11 +1,15 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +22,13 @@ public class TruckEntity extends BaseEntity {
     private String truckNumber;
 
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
-    private List<TruckActionEntity> truckActions;
+    private List<TruckActionEntity> truckActions = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
+    private LocalDateTime nextEntranceTime;
+
+    private Boolean isFinished = false;
+    private Boolean isSentToMyCoal = false;
 
 }

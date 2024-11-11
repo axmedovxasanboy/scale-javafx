@@ -1,67 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
-    <children>
-        <fx:include source="MenuBar.fxml"/>
-        <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1395.0">
-            <tabs>
-                <Tab closable="false" text="Bosh sahifa">
-                    <content>
-                        <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                                    minWidth="-Infinity"
-                                    prefHeight="670.0" prefWidth="1374.0">
-                            <children>
-                                <ScrollPane layoutX="9.0" layoutY="44.0" prefWidth="921.0">
-                                    <content>
-                                        <fx:include source="TableView.fxml"/>
-                                    </content>
-                                </ScrollPane>
-                                <Pane layoutX="85.0" prefHeight="54.0" prefWidth="733.0">
-                                    <children>
-                                        <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER"
-                                               layoutX="175.0" layoutY="10.0"
-                                               prefHeight="35.0" prefWidth="383.0" style="-fx-background-color: white;"
-                                               text="Tarozi monitoringi boshqaruv paneli">
-                                            <font>
-                                                <Font size="17.0"/>
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </Pane>
-                                <fx:include source="GridView.fxml"/>
 
-                                <fx:include source="ImageView.fxml"/>
+<AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
+  <children>
+    <fx:include source="MenuBar.fxml" />
 
-                                <fx:include source="ButtonPanel.fxml"/>
+    <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1395.0">
+      <tabs>
+        <Tab closable="false" text="Bosh sahifa">
+          <content>
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="670.0" prefWidth="1374.0">
+              <children>
+                <ScrollPane layoutX="9.0" layoutY="44.0" prefHeight="612.0" prefWidth="922.0">
+                  <content>
+                    <fx:include source="TableView.fxml" />
+                  </content>
+                </ScrollPane>
+                <Pane layoutX="85.0" prefHeight="54.0" prefWidth="733.0">
+                  <children>
+                    <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER" layoutX="175.0" layoutY="10.0" prefHeight="35.0" prefWidth="383.0" style="-fx-background-color: white;" text="Tarozi monitoringi boshqaruv paneli">
+                      <font>
+                        <Font size="17.0" />
+                      </font>
+                    </Label>
+                  </children>
+                </Pane>
+                <fx:include source="GridView.fxml" />
 
-                                <Pane id="scaleAutomationPane" fx:id="scaleAutomationPane" layoutX="1013.0"
-                                      layoutY="373.0"
-                                      prefHeight="35.0" prefWidth="222.0">
+                <fx:include source="ImageView.fxml" />
 
-                                </Pane>
-                                <Button fx:id="connectButton" layoutX="1199.0" layoutY="14.0" mnemonicParsing="false"
-                                        onMouseClicked="#connectToController" styleClass="connect-button"
-                                        stylesheets="@../static/button.css" text="Connect to controller">
-                                    <cursor>
-                                        <Cursor fx:constant="HAND"/>
-                                    </cursor>
-                                </Button>
+                <fx:include source="ButtonPanel.fxml" />
 
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
+                <Pane fx:id="scaleAutomationPane" layoutX="1013.0" layoutY="373.0" prefHeight="35.0" prefWidth="222.0">
 
-                <fx:include source="CameraView.fxml"/>
+                </Pane>
+                <Button fx:id="connectButton" layoutX="1199.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#connectToController" styleClass="connect-button" stylesheets="@../static/button.css" text="Connect">
+                  <cursor>
+                    <Cursor fx:constant="HAND" />
+                  </cursor>
+                </Button>
+              </children>
+            </AnchorPane>
+          </content>
+        </Tab>
 
-                <fx:include source="UserView.fxml"/>
-            </tabs>
-        </TabPane>
-    </children>
+        <fx:include source="CameraView.fxml" />
+
+        <fx:include source="UserView.fxml" />
+
+<!--        <fx:include source="TestTab.fxml"/>-->
+      </tabs>
+    </TabPane>
+  </children>
 </AnchorPane>

@@ -1,6 +1,9 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 
 import javax.print.*;
@@ -13,8 +16,9 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class PrintCheck {
 
-    public void printReceipt(TruckResponse response) {
-        PrintService printer = findPrinter("XP-80C (copy 1)"); // Specify your printer name here
+
+    public void printReceipt(TruckEntity response) {
+        PrintService printer = findPrinter("XP-80C (copy 2)"); // Specify your printer name here
         if (printer == null) {
             System.out.println("Printer not found.");
             return;
@@ -47,16 +51,29 @@ public class PrintCheck {
         return null;
     }
 
-    private String buildReceiptContent(TruckResponse response) {
+    private String buildReceiptContent(TruckEntity response) {
         String truckNumber = response.getTruckNumber();
-        LocalDateTime enteredAt = response.getEnteredAt();
-        Double enteredWeight = response.getEnteredWeight() != null ? response.getEnteredWeight() : 0.0;
-        LocalDateTime exitedAt = response.getExitedAt();
-        Double exitedWeight = response.getExitedWeight() != null ? response.getExitedWeight() : 0.0;
+        String operatorNumber = "N/A";
+        LocalDateTime enteredAt = null;
+        LocalDateTime exitedAt = null;
+        Double exitedWeight = 0.0;
+        Double enteredWeight = 0.0;
+
+        for (TruckActionEntity truckAction : response.getTruckActions()) {
+            if (truckAction.getAction() == TruckAction.ENTRANCE || truckAction.getAction() == TruckAction.MANUAL_ENTRANCE)
+            {
+                enteredAt = truckAction.getCreatedAt();
+                enteredWeight = truckAction.getWeight();
+            }
+            if(truckAction.getAction() == TruckAction.EXIT || truckAction.getAction() == TruckAction.MANUAL_EXIT){
+                exitedAt = truckAction.getCreatedAt();
+                exitedWeight = truckAction.getWeight();
+                operatorNumber = truckAction.getOnDuty().getPhoneNumber();
+            }
+        }
         double tara = Math.min(enteredWeight, exitedWeight);
         double brutto = Math.max(enteredWeight, exitedWeight);
         double netto = Math.abs(enteredWeight - exitedWeight);
-        String operatorNumber = response.getExitConfirmedBy();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         String formattedEnteredAt = enteredAt != null ? enteredAt.format(formatter) : "N/A";
@@ -70,15 +87,16 @@ public class PrintCheck {
                 .append("Vazni (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
                 .append("Chiqgan vaqti: ").append(formattedExitedAt).append("\n")
                 .append("Vazni (kg): ").append(String.format("%.0f", exitedWeight)).append("\n")
-                .append("Tare (kg): ").append(String.format("%.0f", tara)).append("\n")
+                .append("Tara (kg): ").append(String.format("%.0f", tara)).append("\n")
                 .append("GROSS (kg): ").append(String.format("%.0f", brutto)).append("\n")
                 .append("NETTO (kg): ").append(String.format("%.0f", netto)).append("\n")
                 .append("Operator: ").append(operatorNumber).append("\n")
                 .append("--------------------------\n")
-                .append("   Thank you for visiting!   \n\n\n\n\n\n\n\n\n\n\n");
+                .append("   Tashrifingiz uchun raxmat!   \n\n\n\n\n\n\n\n\n\n\n");
 
         return receiptContent.toString();
     }
+
 
     private void sendCutCommand(PrintService printer) {
         try {
@@ -104,3 +122,4 @@ public class PrintCheck {
         }
     }
 }
+

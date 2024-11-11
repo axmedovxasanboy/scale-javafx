@@ -9,9 +9,6 @@ import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
 import uz.tenzorsoft.scaleapplication.repository.AttachRepository;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +23,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     private final String attachUploadFolder = System.getProperty("user.dir") + "/uploads/";
     private final TruckService truckService;
     private final TruckPhotoService truckPhotoService;
+    private final String projectDirectory = System.getProperty("user.dir") + "/";
 
     public AttachResponse saveToSystem(MultipartFile file) {
         try {
@@ -106,13 +104,13 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
 
     public List<AttachmentResponse> getNotSentData() {
         List<AttachmentResponse> result = new ArrayList<>();
-        List<AttachEntity> notSentData = attachRepository.findByIsSent(false);
+        List<AttachEntity> notSentData = attachRepository.findByIsSentToCloud(false);
         for (AttachEntity attach : notSentData) {
 
             TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(attach));
 
             AttachmentResponse response = new AttachmentResponse(
-                    truck == null ? null : truck.getId(), attach.getOriginalName(),
+                    truck == null ? null : truck.getIdOnServer(), attach.getOriginalName(),
                     attach.getSize(), attach.getType(), attach.getContentType(), attach.getPath(), null,
                     truckPhotoService.findAttachStatus(attach), attach.getCreatedAt(), getImageBytes(attach.getPath())
             );
@@ -149,7 +147,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         }
         notSentData.forEach(attach -> {
             AttachEntity entity = attachRepository.findById(attach.getId()).orElseThrow(() -> new RuntimeException(attach.getId() + " is not found from database"));
-            entity.setIsSent(true);
+            entity.setIsSentToCloud(true);
             entity.setIdOnServer(attachMap.get(entity.getId()));
             attachRepository.save(entity);
         });
@@ -170,4 +168,19 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     }
 
 
+    public AttachResponse getTestingImages() {
+        File file = new File(projectDirectory + "src/main/resources/images/no-pic-allowed.jpg");
+        return entityToResponse(attachRepository.save(new AttachEntity(
+                "no image", "no-image", 1024L,
+                "jpg", "image/jpeg", file.getAbsolutePath()
+        )));
+    }
+
+    public AttachResponse findTestingImg() {
+        File file = new File(projectDirectory + "src/main/resources/images/camera1-no-image.png");
+        return entityToResponse(attachRepository.save(new AttachEntity(
+                "camera 1 image", "camera-1", 2048L,
+                "jpg", "image/jpeg", file.getAbsolutePath()
+        )));
+    }
 }

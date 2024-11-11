@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckResponse {
-    private String loading;
-    private String unloading;
+    private String loding;
+    private String unloding;
 }

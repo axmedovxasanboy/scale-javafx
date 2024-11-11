@@ -22,5 +22,5 @@ public class BaseEntity {
     private LocalDateTime createdAt;
 
     private Long idOnServer;
-    private Boolean isSent = false;
+    private Boolean isSentToCloud = false;
 }

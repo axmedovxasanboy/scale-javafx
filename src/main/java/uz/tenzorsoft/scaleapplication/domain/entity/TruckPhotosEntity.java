@@ -1,9 +1,6 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +14,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 @Entity(name = "truck_photos")
 public class TruckPhotosEntity extends BaseEntity {
 
-    @OneToOne
+    @ManyToOne
     private AttachEntity truckPhoto;
 
     @Enumerated(EnumType.STRING)

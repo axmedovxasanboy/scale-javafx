@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 
-<MenuBar prefHeight="26.0" prefWidth="134.0">
+<MenuBar xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MenuBarController">
   <menus>
     <Menu mnemonicParsing="false" text="File">
       <items>
-        <MenuItem mnemonicParsing="false" text="Close" />
+        <MenuItem mnemonicParsing="false" text="Close"/>
       </items>
     </Menu>
-    <Menu mnemonicParsing="false" text="Edit">
+    <Menu mnemonicParsing="false" text="Sozlamalar">
       <items>
-        <MenuItem mnemonicParsing="false" text="Delete" />
+        <MenuItem mnemonicParsing="false" text="Ma'lumotlar bazasi" onAction="#onDatabaseMenuSelected"/>
+        <MenuItem mnemonicParsing="false" text="Kamera" onAction="#onCameraMenuSelected"/>
+        <MenuItem mnemonicParsing="false" text="Controller" onAction="#onControllerMenuSelected"/>
+        <MenuItem mnemonicParsing="false" text="Shlagbaum" onAction="#onShlagbaumMenuSelected"/>
+        <MenuItem mnemonicParsing="false" text="Tarozi" onAction="#onTaroziMenuSelected"/>
       </items>
     </Menu>
     <Menu mnemonicParsing="false" text="Help">
       <items>
-        <MenuItem mnemonicParsing="false" text="About" />
+        <MenuItem mnemonicParsing="false" text="About"/>
       </items>
     </Menu>
   </menus>

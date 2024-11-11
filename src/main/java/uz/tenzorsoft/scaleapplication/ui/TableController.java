@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
@@ -105,7 +106,7 @@ public class TableController {
                     }
                     tableData.setItems(FXCollections.observableArrayList(data));
 
-                    Thread.sleep(60000);
+                    Thread.sleep(60000 * 5);
                 } catch (Exception e) {
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
@@ -121,7 +122,43 @@ public class TableController {
         tableData.getItems().add(record);
     }
 
+    public void addLastRecord(TruckResponse truckResponse) {
+        if (truckResponse == null) return;
+
+        TableViewData record = convertToTableViewData(truckResponse);
+        if (record != null) {
+            tableData.getItems().add(record);
+        }
+    }
+
+    private TableViewData convertToTableViewData(TruckResponse truckResponse) {
+        TableViewData data = new TableViewData();
+
+        data.setId(truckResponse.getId());
+        data.setEnteredTruckNumber(truckResponse.getTruckNumber());
+
+        // Map entrance details
+        if (truckResponse.getEnteredAt() != null) {
+            data.setEnteredDate(truckResponse.getEnteredAt().toLocalDate().toString());
+            data.setEnteredTime(truckResponse.getEnteredAt().toLocalTime().toString());
+        }
+        data.setEnteredWeight(truckResponse.getEnteredWeight());
+        data.setEnteredOnDuty(truckResponse.getEntranceConfirmedBy());
+
+        // Map exit details
+        if (truckResponse.getExitedAt() != null) {
+            data.setExitedDate(truckResponse.getExitedAt().toLocalDate().toString());
+            data.setExitedTime(truckResponse.getExitedAt().toLocalTime().toString());
+        }
+        data.setExitedWeight(truckResponse.getExitedWeight());
+        data.setExitedOnDuty(truckResponse.getExitConfirmedBy());
+
+        return data;
+    }
+
+
     public void updateTableRow(TruckEntity truckEntity) {
+        if (truckEntity == null) return;
         ObservableList<TableViewData> items = tableData.getItems();
         int index = -1;
         for (int i = 0; i < items.size(); i++) {
@@ -132,6 +169,21 @@ public class TableController {
         }
         if (index != -1) {
             TableViewData record = truckService.entityToTableViewData(truckEntity);
+            items.set(index, record);
+        }
+    }
+
+    public void updateTableRow(TruckResponse truckResponse) {
+        ObservableList<TableViewData> items = tableData.getItems();
+        int index = -1;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getId().equals(truckResponse.getId())) {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1) {
+            TableViewData record = truckService.getTableViewData(truckResponse);
             items.set(index, record);
         }
     }
