@@ -81,10 +81,12 @@ public class TruckScalingController {
                     timer.schedule((new TimerTask() {
                         @Override
                         public void run() {
-                            double helper = buttonController.getTruckWeigh();
-                            System.out.println("weigh = " + helper);
+                            double holder = buttonController.getTruckWeigh();
+                            double helper = holder != 0 ? holder : weigh;
+                            if(helper > 0.0) System.out.println("helper weigh = " + helper);
 
-                            if (weigh != helper && !isTesting) weigh = helper;
+
+                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) weigh = helper;
                             else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
@@ -171,10 +173,12 @@ public class TruckScalingController {
                     timer.schedule((new TimerTask() {
                         @Override
                         public void run() {
-                            double helper = buttonController.getTruckWeigh();
-                            System.out.println("helper = " + helper);
+                            double holder = buttonController.getTruckWeigh();
+                            double helper = holder != 0 ? holder : weigh;
+                            if(helper > 0.0) System.out.println("helper weigh = " + helper);
 
-                            if (weigh != helper && !isTesting) weigh = helper;
+
+                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) weigh = helper;
                             else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
@@ -212,7 +216,13 @@ public class TruckScalingController {
                                     e.printStackTrace();
                                 }
                                 try {
-                                    printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                    Timer timer1 = new Timer();
+                                    timer1.schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                        }
+                                    }, 500);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -235,6 +245,7 @@ public class TruckScalingController {
 
                 if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1) {
                     isTruckExited = true;
+                    System.out.println("Opening gate 1");
                     buttonController.openGate1();
                 }
 

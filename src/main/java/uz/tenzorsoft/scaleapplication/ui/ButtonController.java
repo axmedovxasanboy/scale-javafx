@@ -103,9 +103,9 @@ public class ButtonController {
                     showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
                     return;
                 }
+                currentTruck.setTruckNumber(truckNumber);
                 Long attachId = cameraViewController.takePicture(CAMERA_1).getId();
                 currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.MANUAL_ENTRANCE_PHOTO));
-                currentTruck.setTruckNumber(truckNumber);
                 currentTruck.setEnteredStatus(TruckAction.MANUAL_ENTRANCE);
                 truckService.saveTruck(currentTruck, 1);
                 tableController.addLastRecord();
@@ -137,9 +137,9 @@ public class ButtonController {
                     showAlert(Alert.AlertType.WARNING, "Not found", truckNumber + " kirishi mumkin emas");
                     return;
                 }
-                Long attachId = cameraViewController.takePicture(CAMERA_2).getId();
-                currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.MANUAL_EXIT_PHOTO));
                 currentTruck.setTruckNumber(truckNumber);
+                Long attachId = cameraViewController.takePicture(CAMERA_3).getId();
+                currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.MANUAL_EXIT_PHOTO));
                 currentTruck.setExitedStatus(TruckAction.MANUAL_EXIT);
                 truckService.saveTruck(currentTruck, 2);
                 openGate2(7);

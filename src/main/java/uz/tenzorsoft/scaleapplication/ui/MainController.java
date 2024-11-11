@@ -99,10 +99,10 @@ public class MainController {
         testController.start();
         printCheck.listAvailablePrinters();
         buttonController.connect();
-        if (isConnected) {
-            buttonController.closeGate1();
-            buttonController.closeGate2();
-        }
+//        if (isConnected) {
+//            buttonController.closeGate1();
+//            buttonController.closeGate2();
+//        }
         controlConnectButton();
         System.out.println("All tasks are submitted!");
 

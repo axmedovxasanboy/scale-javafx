@@ -76,20 +76,17 @@ public class CameraController {
                             if (!truckNumber.isEmpty()) {
                                 if (!truckService.isValidTruckNumber(truckNumber)) {
                                     log.warn("Truck number does not match: {}", truckNumber);
-                                    showAlert(Alert.AlertType.ERROR, "Error", "Truck number does not match");
                                     truckNumber = "";
                                     return ResponseEntity.ok("NOT_MATCH");
                                 }
                                 if (cameraId == 1) {
                                     if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
                                         System.err.println("Entrance available after 3 minutes");
-                                        showAlert(Alert.AlertType.ERROR, "Kirishda xatolik", "Kirish nmumkin emas");
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 } else {
                                     if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
                                         System.err.println("Entrance available after 3 minutes");
-                                        showAlert(Alert.AlertType.ERROR, "Kirishda xatolik", "Kirish mumkin emas");
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 }
