@@ -216,7 +216,13 @@ public class TruckScalingController {
                                     e.printStackTrace();
                                 }
                                 try {
-                                   printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                    Timer timer1 = new Timer();
+                                    timer1.schedule(new TimerTask() {
+                                        @Override
+                                        public void run() {
+                                            printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                        }
+                                    }, 500);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }

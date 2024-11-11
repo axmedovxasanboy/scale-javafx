@@ -18,7 +18,7 @@ public class PrintCheck {
 
 
     public void printReceipt(TruckEntity response) {
-        PrintService printer = findPrinter("XP-80C"); // Specify your printer name here
+        PrintService printer = findPrinter("XP-80C (copy 2)"); // Specify your printer name here
         if (printer == null) {
             System.out.println("Printer not found.");
             return;

@@ -343,7 +343,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         if (!isTruckNumberExists(truckNumber)) {
             return true;
         }
-        return truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedTrue(truckNumber, LocalDateTime.now());
+        return !truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(truckNumber, LocalDateTime.now());
     }
 
     private boolean isTruckNumberExists(String truckNumber) {

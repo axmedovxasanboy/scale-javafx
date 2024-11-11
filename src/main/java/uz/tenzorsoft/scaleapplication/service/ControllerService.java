@@ -81,7 +81,7 @@ public class ControllerService {
         writeCoil(COIL_CLOSE_GATE_2, true);
     }
 
-    public boolean checkConnection(Integer coilAddress) throws ModbusException {
+    public boolean checkConnection(Integer coilAddress) throws Exception {
         if (isConnected) {
             return readCoil(coilAddress) == 1;
         }
@@ -105,7 +105,7 @@ public class ControllerService {
         }
     }
 
-    private int readCoil(Integer coilAddress) throws ModbusException {
+    private int readCoil(Integer coilAddress) throws Exception {
         ReadCoilsRequest request = new ReadCoilsRequest(coilAddress, 1);
         if (transaction == null) transaction = new ModbusTCPTransaction(connection);
         transaction.setRequest(request);
@@ -115,7 +115,16 @@ public class ControllerService {
         if (response instanceof ExceptionResponse || response == null) {
             return -1;
         } else {
-            ReadCoilsResponse readResponse = (ReadCoilsResponse) response;
+            ReadCoilsResponse readResponse = null;
+            try {
+                readResponse = (ReadCoilsResponse) response;
+            } catch (Exception e) {
+                try {
+                    connect();
+                } catch (Exception ex) {
+
+                }
+            }
             return readResponse.getCoils().getBit(0) ? 1 : 0;
         }
     }
