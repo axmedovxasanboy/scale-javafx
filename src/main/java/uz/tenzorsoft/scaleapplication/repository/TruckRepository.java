@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByIsSentToCloud(boolean isSent);
+
     List<TruckEntity> findByIsSentToMyCoalAndIsFinished(boolean isSent, boolean isFinished);
 
     Optional<TruckEntity> findTopByOrderByIdDesc();
@@ -40,11 +41,13 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberAndIsFinishedOrderByCreatedAt(String truckNumber, Boolean finished);
 
-    Optional<TruckEntity> findByTruckNumberAndNextEntranceTimeIsAfterAndIsFinished(String truckNumber, LocalDateTime localDateTime, boolean isFinished);
+    boolean existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedTrue(String truckNumber, LocalDateTime localDateTime);
+
+    boolean existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(String truckNumber, LocalDateTime localDateTime);
 
     boolean existsByTruckNumber(String truckNumber);
 
-    boolean existsByTruckNumberAndIsFinished(String truckNumber, Boolean isFinished);
+    boolean existsByIsFinishedFalse();
 
     List<TruckEntity> findByIsFinished(Boolean isFinished);
 

@@ -4,8 +4,6 @@ import javafx.scene.control.Alert;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 
@@ -13,6 +11,7 @@ import java.util.Base64;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.currentTruck;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.CAMERA_2;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
@@ -50,8 +49,9 @@ public class CameraViewController {
         headers.set("Authorization", "Basic " + encodedAuth);
 
         try {
-            if(isTesting){
-                return attachService.getTestingImages();
+            if (isTesting) {
+                if (cameraIpAddress.equals(CAMERA_2)) return attachService.getTestingImages();
+                return attachService.getCameraImgTesting();
             }
             String url = "http://" + cameraIpAddress + "/ISAPI/Streaming/channels/1/picture";
             HttpEntity<String> entity = new HttpEntity<>(headers);

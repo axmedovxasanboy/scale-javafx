@@ -116,6 +116,14 @@ public class MainController {
         TextField licensePlateField = new TextField();
         licensePlateField.setPromptText("Enter License Plate");
 
+        licensePlateField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Replace spaces with dashes and convert lowercase letters to uppercase
+            String formattedText = newValue.replace(" ", "-").replaceAll("[^a-zA-Z0-9-]", "").toUpperCase();
+
+            // Set the formatted text back to the TextField
+            licensePlateField.setText(formattedText);
+        });
+
         dialog.getDialogPane().setContent(licensePlateField);
 
         // Add Confirm button
@@ -126,18 +134,18 @@ public class MainController {
             if (button == ButtonType.OK) {
                 return licensePlateField.getText();
             }
-            return null;
+            return "";
         });
 
-        // Show the dialog and wait for a result
-        dialog.showAndWait().ifPresent(licensePlate -> {
-            // Print the entered license plate to the console
-            System.out.println("License Plate Entered: " + licensePlate);
-        });
-        return licensePlateField.getText();
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse("");
     }
 
     public static String showNotFinishedTrucksDialog(List<String> notFinishedTrucks) {
+        if (notFinishedTrucks.isEmpty()) {
+            showAlert(Alert.AlertType.WARNING, "Warning", "All trucks are exited");
+            return "";
+        }
         Dialog<String> dialog = new Dialog<>();
         dialog.setTitle("License Plate Selection");
         dialog.setHeaderText("Select a License Plate");
@@ -146,10 +154,7 @@ public class MainController {
         Label instructionLabel = new Label("Please select your license plate from the options below:");
 
         ComboBox<String> licensePlateDropdown = new ComboBox<>();
-        for (String truck : notFinishedTrucks) {
-            licensePlateDropdown.getItems().add(truck);
-        }
-
+        licensePlateDropdown.getItems().addAll(notFinishedTrucks);
         licensePlateDropdown.setPromptText("Select License Plate");
 
         // Bind the Confirm button's disable property to the ComboBox's selection
@@ -166,7 +171,6 @@ public class MainController {
         // Layout for dialog content
         VBox content = new VBox(10, instructionLabel, licensePlateDropdown);
         content.setStyle("-fx-padding: 10;");
-
         dialog.getDialogPane().setContent(content);
 
         // Set the result converter to return the selected value only on confirmation
@@ -174,15 +178,12 @@ public class MainController {
             if (button == confirmButtonType) {
                 return licensePlateDropdown.getValue();
             }
-            return null;
+            return "";
         });
 
         // Show dialog and handle the result
-        dialog.showAndWait().ifPresent(selectedLicensePlate -> {
-            // Print selected license plate to the console
-            System.out.println("Selected License Plate: " + selectedLicensePlate);
-        });
-        return null;
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse("");
     }
 
     private void controlConnectButton() {

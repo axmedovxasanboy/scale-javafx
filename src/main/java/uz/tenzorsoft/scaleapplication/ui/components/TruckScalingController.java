@@ -56,7 +56,6 @@ public class TruckScalingController {
     private boolean isCargoPhotoTaken = false;
     private boolean isCargoConfirmationDialogOpened = false;
     private boolean isTruckExited = false;
-    private final Timer timer = new Timer();
 
     public void start() {
         scheduler.scheduleAtFixedRate(() -> {
@@ -78,6 +77,7 @@ public class TruckScalingController {
                 if ((!sensor2Connection || isOnScale) && truckPosition == 2 &&
                         (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
                                 currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
+                    Timer timer = new Timer();
                     timer.schedule((new TimerTask() {
                         @Override
                         public void run() {
@@ -127,6 +127,7 @@ public class TruckScalingController {
 
                 if (truckPosition == 3 && sensor2Connection && sensor3Connection && isScaled) {
                     System.out.println("Gate 2 is closing");
+                    Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -166,6 +167,7 @@ public class TruckScalingController {
                 if ((!sensor2Connection || isOnScale) && truckPosition == 5 &&
                         (currentTruck.getExitedStatus() == TruckAction.EXIT ||
                                 currentTruck.getExitedStatus() == TruckAction.MANUAL_EXIT)) {
+                    Timer timer = new Timer();
                     timer.schedule((new TimerTask() {
                         @Override
                         public void run() {
@@ -242,6 +244,7 @@ public class TruckScalingController {
                 }
 
                 if (truckPosition == 4 && sensor2Connection && sensor1Connection && isScaled && cargoConfirmationStatus == 1) {
+                    Timer timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {

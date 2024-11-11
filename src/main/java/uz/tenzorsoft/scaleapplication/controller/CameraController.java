@@ -4,7 +4,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,8 +31,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
@@ -76,16 +73,26 @@ public class CameraController {
                         if (fileName.equals("anpr.xml")) {
                             truckNumber = extractNumberFromXmlFile(file);
                             System.out.println("truckNumber = " + truckNumber);
-                            if (!truckService.isValidTruckNumber(truckNumber)) {
-                                log.warn("Truck number does not match: {}", truckNumber);
-                                showAlert(Alert.AlertType.ERROR, "Error", "Truck number does not match");
-                                truckNumber = "";
-                                return ResponseEntity.ok("NOT_MATCH");
-                            }
-                            if (!truckService.checkEntranceAvailable(truckNumber)) {
-                                System.err.println("Entrance available after 3 minutes");
-                                showAlert(Alert.AlertType.ERROR, "Entrance not available", "Entrance not available");
-                                return ResponseEntity.ok("Entrance exception");
+                            if (!truckNumber.isEmpty()) {
+                                if (!truckService.isValidTruckNumber(truckNumber)) {
+                                    log.warn("Truck number does not match: {}", truckNumber);
+                                    showAlert(Alert.AlertType.ERROR, "Error", "Truck number does not match");
+                                    truckNumber = "";
+                                    return ResponseEntity.ok("NOT_MATCH");
+                                }
+                                if (cameraId == 1) {
+                                    if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
+                                        System.err.println("Entrance available after 3 minutes");
+                                        showAlert(Alert.AlertType.ERROR, "Kirishda xatolik", "Kirish nmumkin emas");
+                                        return ResponseEntity.ok("Entrance exception");
+                                    }
+                                } else {
+                                    if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
+                                        System.err.println("Entrance available after 3 minutes");
+                                        showAlert(Alert.AlertType.ERROR, "Kirishda xatolik", "Kirish mumkin emas");
+                                        return ResponseEntity.ok("Entrance exception");
+                                    }
+                                }
                             }
 
                         }
@@ -119,16 +126,18 @@ public class CameraController {
                 }
             }
             currentTruck.setTruckNumber(truckNumber);
-            currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
             try {
                 truckService.saveTruck(currentTruck, cameraId);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
 
-            if (cameraId == 1) tableController.addLastRecord();
+            if (cameraId == 1) {
+                tableController.addLastRecord();
+            }
 
             if (cameraId == 1) {
+                currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
                 System.out.println("Opening gate 1");
                 buttonController.openGate1(0);
             } else if (cameraId == 2) {

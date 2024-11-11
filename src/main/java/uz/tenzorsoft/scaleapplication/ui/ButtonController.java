@@ -11,15 +11,13 @@ import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
-import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
-import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
+import uz.tenzorsoft.scaleapplication.service.ScaleSystem;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.UnsupportedEncodingException;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.currentTruck;
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.*;
 
@@ -29,8 +27,8 @@ public class ButtonController {
 
     private final ControllerService controllerService;
     private final TruckService truckService;
-    private final AttachService attachService;
     private final CameraViewController cameraViewController;
+    private final TableController tableController;
 
     @FXML
     private ImageView gate1;
@@ -75,41 +73,80 @@ public class ButtonController {
         try {
             if (!isTesting) controllerService.openGate1();
         } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
 
     public void openGate1(int truckPosition) {
         try {
             if (!isTesting) controllerService.openGate1(truckPosition);
+            else {
+                ScaleSystem.truckPosition = truckPosition;
+                gate1Connection = true;
+            }
         } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
 
     public void openGate1Manually() {
-        String truckNumber = showNumberInsertDialog();
-        if (truckService.isValidTruckNumber(truckNumber)) {
-            if (truckService.checkEntranceAvailable(truckNumber)) {
-                AttachResponse response = cameraViewController.takePicture(CAMERA_1);
-                currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.MANUAL_ENTRANCE_PHOTO));
+        try {
+            isWaiting = true;
+            String truckNumber = showNumberInsertDialog();
+            if (!truckNumber.isEmpty()) {
+                // truckNumber == "RAQAMSIZ"
+                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
+                    return;
+                }
+                if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
+                    showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
+                    return;
+                }
+                Long attachId = cameraViewController.takePicture(CAMERA_1).getId();
+                currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.MANUAL_ENTRANCE_PHOTO));
                 currentTruck.setTruckNumber(truckNumber);
                 currentTruck.setEnteredStatus(TruckAction.MANUAL_ENTRANCE);
+                truckService.saveTruck(currentTruck, 1);
+                tableController.addLastRecord();
                 openGate1(0);
+                isWaiting = false;
+                System.out.println("Saving truck number: " + truckNumber + " from Camera 1");
             }
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Error", truckNumber + " is invalid");
+        } catch (Exception e) {
+            isWaiting = false;
+            e.printStackTrace();
         }
     }
 
     public void openGate2Manually() {
-        String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
-        if (truckService.checkEntranceAvailable(truckNumber)) {
-            AttachResponse response = cameraViewController.takePicture(CAMERA_3);
-            currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.MANUAL_EXIT_PHOTO));
-            currentTruck.setTruckNumber(truckNumber);
-            currentTruck.setEnteredStatus(TruckAction.MANUAL_EXIT);
-            openGate2(7);
+        try {
+            isWaiting = true;
+            String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
+            if (!truckNumber.isEmpty()) {
+                // "RAQAMSIZ"
+                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
+                    return;
+                }
+                if (!truckService.isNotFinishedTrucksExists()) {
+                    showAlert(Alert.AlertType.WARNING, "Not found", "Barcha avtomobillar chiqib ketgan!");
+                    return;
+                }
+                if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
+                    showAlert(Alert.AlertType.WARNING, "Not found", truckNumber + " kirishi mumkin emas");
+                    return;
+                }
+                Long attachId = cameraViewController.takePicture(CAMERA_2).getId();
+                currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.MANUAL_EXIT_PHOTO));
+                currentTruck.setTruckNumber(truckNumber);
+                currentTruck.setExitedStatus(TruckAction.MANUAL_EXIT);
+                truckService.saveTruck(currentTruck, 2);
+                openGate2(7);
+                isWaiting = false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -125,15 +162,19 @@ public class ButtonController {
         try {
             if (!isTesting) controllerService.openGate2();
         } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
 
     public void openGate2(int truckPosition) {
         try {
-            controllerService.openGate2(truckPosition);
+            if (!isTesting) controllerService.openGate2(truckPosition);
+            else {
+                ScaleSystem.truckPosition = truckPosition;
+                gate2Connection = true;
+            }
         } catch (ModbusException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
 
@@ -149,7 +190,7 @@ public class ButtonController {
         try {
             controllerService.connect();
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
 
     }

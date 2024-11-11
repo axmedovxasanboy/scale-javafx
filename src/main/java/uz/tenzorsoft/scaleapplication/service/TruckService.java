@@ -46,8 +46,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     @Autowired
     private AttachService attachService;
 
-    @Value("${number.pattern.regexp}")
+    @Value("${number.pattern.regexp.number}")
     private String regexPattern;
+    @Value("${number.pattern.regexp.standard}")
+    private String regexStandard;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -251,41 +253,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     @Transactional
     public TruckEntity saveCurrentTruck(TruckResponse currentTruck, boolean isFinished) {
-
-//        List<AttachIdWithStatus> attaches = currentTruck.getAttaches();
-//        List<Long> attachIds = attaches.stream().map(AttachIdWithStatus::getId).toList();
-//        List<Long> truckAttachIds = truck.getTruckPhotos().stream().map(photo -> photo.getTruckPhoto().getId()).toList();
-
-//        List<TruckPhotosEntity> newTruckPhotos = new ArrayList<>();
-//        for (AttachIdWithStatus attach : attaches) {
-//            if (!truckAttachIds.contains(attach.getId())) {
-//                AttachEntity truckPhoto = attachService.findById(attach.getId());
-//                if (!truckPhotoRepository.existsById(truckPhoto.getId())) { // Check for existing record
-//                    newTruckPhotos.add(new TruckPhotosEntity(truckPhoto, attach.getStatus()));
-//                }
-//            }
-//        }
-//
-//        // Save all new photos in a batch if there are any new photos
-//        if (!newTruckPhotos.isEmpty()) {
-//            truckPhotoRepository.saveAll(newTruckPhotos);
-//        }
-
-//        List<TruckActionEntity> truckActions = List.of(
-//                new TruckActionEntity(
-//                        currentTruck.getEnteredWeight(),
-//                        currentTruck.getEnteredStatus(),
-//                        Instances.currentUser),
-//                new TruckActionEntity(
-//                        currentTruck.getExitedWeight(),
-//                        currentTruck.getExitedStatus(),
-//                        Instances.currentUser
-//                )
-//        );
-
-//        truck.getTruckPhotos().addAll(newTruckPhotos);
-//        truck.getTruckActions().addAll(truckActions);
-
         currentTruckEntity.setIsFinished(isFinished);
         currentTruckEntity.setIsSentToCloud(false);
         try {
@@ -355,32 +322,55 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckRepository.save(currentTruckEntity);
     }
 
-    public TruckEntity findNotFinishedTruck(String truckNumber) {
-        return truckRepository.findByTruckNumberAndIsFinished(truckNumber, false).orElse(null);
-    }
-
     public List<TruckEntity> findNotSentDataToMyCoal() {
         return truckRepository.findByIsSentToMyCoalAndIsFinished(false, true);
     }
 
-    public boolean checkEntranceAvailable(String truckNumber) {
-        if(truckNumber == null) return false;
-        if (!truckRepository.existsByTruckNumber(truckNumber)) {
-            return true;
-        }
-
-        return truckRepository.findByTruckNumberAndNextEntranceTimeIsAfterAndIsFinished(truckNumber, LocalDateTime.now(), false)
-                .orElse(null) != null;
+    public boolean isNumberExists(String truckNumber) {
+        if (truckNumber == null) return false;
+        return isTruckNumberExists(truckNumber);
     }
 
-    public boolean isValidTruckNumber(String truckNumber){
-        if(truckNumber == null) return false;
-        Pattern pattern = Pattern.compile(regexPattern);
-        Matcher matcher = pattern.matcher(truckNumber);
-        return matcher.find();
+    public boolean isValidTruckNumber(String truckNumber) {
+        return regexChecker(truckNumber, regexPattern);
     }
 
     public List<String> getNotFinishedTrucks() {
         return truckRepository.findByIsFinished(false).stream().map(TruckEntity::getTruckNumber).toList();
+    }
+
+    public boolean isEntranceAvailableForCamera1(String truckNumber) {
+        if (!isTruckNumberExists(truckNumber)) {
+            return true;
+        }
+        return truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedTrue(truckNumber, LocalDateTime.now());
+    }
+
+    private boolean isTruckNumberExists(String truckNumber) {
+        return truckRepository.existsByTruckNumber(truckNumber);
+    }
+
+    public boolean isNotFinishedTrucksExists() {
+        return truckRepository.existsByIsFinishedFalse();
+    }
+
+
+    public boolean isEntranceAvailableForCamera2(String truckNumber) {
+        if (!isTruckNumberExists(truckNumber)) {
+            return false;
+        }
+        return truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(truckNumber, LocalDateTime.now());
+
+    }
+
+    public boolean isStandard(String truckNumber) {
+        return regexChecker(truckNumber, regexStandard);
+    }
+
+    private boolean regexChecker(String str, String regex) {
+        if (str == null) return false;
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(str);
+        return matcher.find();
     }
 }

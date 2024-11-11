@@ -10,16 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.util.concurrent.ExecutorService;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
@@ -59,9 +57,6 @@ public class TestController {
 
     @FXML
     private Button camera1Button, camera2Button, weighButton;
-
-    @Value("${number.pattern.regexp}")
-    private String regexPattern;
 
     @FXML
     public void initialize() {
@@ -126,8 +121,23 @@ public class TestController {
     public void getTruckNumberFromCamera1() {
         String truckNumber = truckNumberFieldCamera1.getText();
         if (!truckNumber.isEmpty()) {
-            // Save the truck number to the database
-            saveTruckNumberToDatabase(truckNumber, "Camera 1");
+            if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+                return;
+            }
+            if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
+                showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
+                return;
+            }
+            Long attachId = attachService.getCameraImgTesting().getId();
+            currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.ENTRANCE_PHOTO));
+            currentTruck.setTruckNumber(truckNumber);
+            currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
+            truckService.saveTruck(currentTruck, 1);
+            gate1Switch.setSelected(true);
+            tableController.addLastRecord();
+            truckPosition = 0;
+            System.out.println("Saving truck number: " + truckNumber + " from Camera 1");
             truckNumberFieldCamera1.clear(); // Clear the text field after saving
         }
     }
@@ -135,50 +145,27 @@ public class TestController {
     public void getTruckNumberFromCamera2() {
         String truckNumber = truckNumberFieldCamera2.getText();
         if (!truckNumber.isEmpty()) {
-            Pattern pattern = Pattern.compile(regexPattern);
-            Matcher matcher = pattern.matcher(truckNumber);
-            if (!matcher.find()) {
+            if (!truckService.isValidTruckNumber(truckNumber)) {
                 showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
                 return;
             }
-            TruckEntity entity = truckService.findNotFinishedTruck(truckNumber);
-            if (entity == null) {
-                showAlert(Alert.AlertType.WARNING, "Not found", "Truck number does not found from database: " + truckNumber);
+            if (!truckService.isNotFinishedTrucksExists()) {
+                showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
                 return;
             }
-            if (!truckService.checkEntranceAvailable(truckNumber)) {
-                showAlert(Alert.AlertType.WARNING, "Entrance not available", "Entrance not available: " + truckNumber);
+            if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
+                showAlert(Alert.AlertType.WARNING, "Not found", "Entrance not available: " + truckNumber);
                 return;
             }
-            Long attachId = attachService.findTestingImg().getId();
+            Long attachId = attachService.getCameraImgTesting().getId();
             currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.EXIT_PHOTO));
             currentTruck.setTruckNumber(truckNumber);
-            truckService.saveTruckAttaches(currentTruck, attachId);
+            currentTruck.setExitedStatus(TruckAction.EXIT);
+            truckService.saveTruck(currentTruck, 2);
             gate2Switch.setSelected(true);
             truckPosition = 7;
             truckNumberFieldCamera2.clear();
         }
-    }
-
-    private void saveTruckNumberToDatabase(String truckNumber, String cameraSource) {
-        Pattern pattern = Pattern.compile(regexPattern);
-        Matcher matcher = pattern.matcher(truckNumber);
-        if (!matcher.find()) {
-            showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
-            return;
-        }
-        if (!truckService.checkEntranceAvailable(truckNumber)) {
-            showAlert(Alert.AlertType.WARNING, "Entrance not available", "Entrance not available: " + truckNumber);
-            return;
-        }
-        Long attachId = attachService.findTestingImg().getId();
-        currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.ENTRANCE_PHOTO));
-        currentTruck.setTruckNumber(truckNumber);
-        truckService.saveTruckAttaches(currentTruck, attachId);
-        gate1Switch.setSelected(true);
-        truckPosition = 0;
-        tableController.addLastRecord();
-        System.out.println("Saving truck number: " + truckNumber + " from " + cameraSource);
     }
 
     public void setWeigh() {

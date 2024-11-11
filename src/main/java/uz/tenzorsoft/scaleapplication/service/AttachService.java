@@ -176,7 +176,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         )));
     }
 
-    public AttachResponse findTestingImg() {
+    public AttachResponse getCameraImgTesting() {
         File file = new File(projectDirectory + "src/main/resources/images/camera1-no-image.png");
         return entityToResponse(attachRepository.save(new AttachEntity(
                 "camera 1 image", "camera-1", 2048L,

@@ -7,6 +7,7 @@ import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 
 import java.util.concurrent.ExecutorService;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
@@ -26,7 +27,12 @@ public class DataSendController {
                         System.err.println(e.getMessage());
                     }
                     try {
-                        sendDataService.sendDataToMyCoal();
+                        if(!isTesting) sendDataService.sendDataToMyCoal();
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    }
+                    try {
+                        sendDataService.sendStatuses();
                     } catch (Exception e) {
                         System.err.println(e.getMessage());
                     }
