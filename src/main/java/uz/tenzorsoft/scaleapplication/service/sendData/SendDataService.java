@@ -167,6 +167,8 @@ public class SendDataService {
         if(body == null){
             return;
         }
+        if(body.toString().length() < 5) return;
+
         for (TruckEntity truck : trucks) {
             for (TruckActionEntity actionEntity : truck.getTruckActions()) {
                 actionEntity.setIsSentToMyCoal(true);

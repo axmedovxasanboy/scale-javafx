@@ -57,7 +57,7 @@ public class CameraController {
             System.out.println("Camera id: " + cameraId);
             System.out.println("multipartRequest.getFileMap().size() = " + multipartRequest.getFileMap().size());
 
-            if (multipartRequest.getFileMap().size() < 2 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
+            if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
             for (Map.Entry<String, MultipartFile> entry : multipartRequest.getFileMap().entrySet()) {
@@ -132,6 +132,7 @@ public class CameraController {
                 System.out.println("Opening gate 1");
                 buttonController.openGate1(0);
             } else if (cameraId == 2) {
+                currentTruck.setExitedStatus(TruckAction.EXIT);
                 System.out.println("Opening gate 2");
                 buttonController.openGate2(7);
             }

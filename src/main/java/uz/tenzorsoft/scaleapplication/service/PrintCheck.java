@@ -18,7 +18,7 @@ public class PrintCheck {
 
 
     public void printReceipt(TruckEntity response) {
-        PrintService printer = findPrinter("XP-80C (copy 2)"); // Specify your printer name here
+        PrintService printer = findPrinter("XP-80C"); // Specify your printer name here
         if (printer == null) {
             System.out.println("Printer not found.");
             return;
@@ -72,7 +72,7 @@ public class PrintCheck {
             }
         }
         double tara = Math.min(enteredWeight, exitedWeight);
-        double brutto = Math.max(enteredWeight, exitedWeight);
+        double brutto = Math.abs(enteredWeight - exitedWeight);
         double netto = Math.abs(enteredWeight - exitedWeight);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
@@ -83,13 +83,12 @@ public class PrintCheck {
         receiptContent.append("       Sirdayo  Baxt      \n")
                 .append("--------------------------\n")
                 .append("Moshina raqami: ").append(truckNumber).append("\n")
-                .append("Kirgan vaqti: ").append(formattedEnteredAt).append("\n")
-                .append("Vazni (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
-                .append("Chiqgan vaqti: ").append(formattedExitedAt).append("\n")
-                .append("Vazni (kg): ").append(String.format("%.0f", exitedWeight)).append("\n")
+                .append("Kirish vaqti: ").append(formattedEnteredAt).append("\n")
+                .append("Kirish vazni (kg): ").append(String.format("%.0f", enteredWeight)).append("\n")
+                .append("Chiqish vaqti: ").append(formattedExitedAt).append("\n")
+                .append("Chiqish vazni (kg): ").append(String.format("%.0f", exitedWeight)).append("\n")
                 .append("Tara (kg): ").append(String.format("%.0f", tara)).append("\n")
-                .append("GROSS (kg): ").append(String.format("%.0f", brutto)).append("\n")
-                .append("NETTO (kg): ").append(String.format("%.0f", netto)).append("\n")
+                .append("Sof og'irlik (kg): ").append(String.format("%.0f", brutto)).append("\n")
                 .append("Operator: ").append(operatorNumber).append("\n")
                 .append("--------------------------\n")
                 .append("   Tashrifingiz uchun raxmat!   \n\n\n\n\n\n\n\n\n\n\n");

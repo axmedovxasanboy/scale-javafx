@@ -20,8 +20,16 @@ public class DataSendController {
         executors.execute(() -> {
             while (true) {
                 try {
-                    sendDataService.sendNotSentData();
-                    sendDataService.sendDataToMyCoal();
+                    try {
+                        sendDataService.sendNotSentData();
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    }
+                    try {
+                        sendDataService.sendDataToMyCoal();
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    }
                     Thread.sleep(2000);
                 } catch (Exception e) {
 //                    System.err.println(e.getMessage());

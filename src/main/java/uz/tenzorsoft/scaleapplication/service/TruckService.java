@@ -1,7 +1,6 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import jakarta.transaction.Transactional;
-import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
@@ -30,9 +28,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static uz.tenzorsoft.scaleapplication.domain.Instances.truckNumber;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Service
 @RequiredArgsConstructor
@@ -343,7 +338,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(3));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(1));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -356,7 +351,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(3));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(1));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -374,11 +369,12 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             return true;
         }
 
-        return truckRepository.findByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinished(truckNumber, LocalDateTime.now(), false)
+        return truckRepository.findByTruckNumberAndNextEntranceTimeIsAfterAndIsFinished(truckNumber, LocalDateTime.now(), false)
                 .orElse(null) != null;
     }
 
     public boolean isValidTruckNumber(String truckNumber){
+        if(truckNumber == null) return false;
         Pattern pattern = Pattern.compile(regexPattern);
         Matcher matcher = pattern.matcher(truckNumber);
         return matcher.find();
