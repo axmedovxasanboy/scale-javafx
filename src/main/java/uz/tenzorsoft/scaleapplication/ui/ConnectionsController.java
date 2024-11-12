@@ -9,6 +9,7 @@ import uz.tenzorsoft.scaleapplication.service.ControllerService;
 import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 
 

@@ -27,6 +27,8 @@ public class Instances<T> {
     public static boolean isScaleControlOn = true;
     public static short cargoConfirmationStatus = -1;
 
+    public static Configurations configurations;
+
 
 
     public static void reinitializeAll() {

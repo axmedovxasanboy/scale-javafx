@@ -15,10 +15,8 @@ import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.PrintCheck;
-import uz.tenzorsoft.scaleapplication.service.TruckService;
-import uz.tenzorsoft.scaleapplication.service.UserService;
+import uz.tenzorsoft.scaleapplication.domain.Settings;
+import uz.tenzorsoft.scaleapplication.service.*;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
@@ -31,6 +29,8 @@ import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isScaleControlOn;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 
 @Component
 @RequiredArgsConstructor
@@ -48,6 +48,7 @@ public class MainController {
     private final UserService userService;
     private final PrintCheck printCheck;
     private final TestController testController;
+    private final ConfigUtilsService configUtilsService;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -91,7 +92,9 @@ public class MainController {
 
 
     public void load() {
+        configUtilsService.loadConfigurations();
         loadMainMenu();
+        scalePort = new Settings(SCALE_PORT).getSerialPort();
         connectionsController.updateConnections();
         dataSendController.sendNotSentData();
         truckScalingController.start();
@@ -99,10 +102,10 @@ public class MainController {
         testController.start();
         printCheck.listAvailablePrinters();
         buttonController.connect();
-//        if (isConnected) {
-//            buttonController.closeGate1();
-//            buttonController.closeGate2();
-//        }
+        if (isConnected) {
+            buttonController.closeGate1();
+            buttonController.closeGate2();
+        }
         controlConnectButton();
         System.out.println("All tasks are submitted!");
 

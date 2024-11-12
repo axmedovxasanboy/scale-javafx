@@ -11,7 +11,7 @@ import java.util.Base64;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.currentTruck;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
-import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.CAMERA_2;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_2;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component

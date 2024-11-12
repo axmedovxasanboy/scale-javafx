@@ -13,9 +13,20 @@ import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Configurations;
+import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 
 @Component
 public class MenuBarController {
+
+    private final ConfigUtilsService configUtilsService;
+
+    public MenuBarController(ConfigUtilsService configUtilsService) {
+        this.configUtilsService = configUtilsService;
+    }
 
     @FXML
     private void onDatabaseMenuSelected() {
@@ -49,16 +60,16 @@ public class MenuBarController {
 
         // Form Elements
         Label nameLabel = new Label("Ma'lumotlar bazasi nomi:");
-        TextField nameField = new TextField("DefaultDB");
+        TextField nameField = new TextField(DATABASE_NAME);
 
         Label loginLabel = new Label("Login:");
-        TextField loginField = new TextField("admin");
+        TextField loginField = new TextField(USERNAME);
 
         Label passwordLabel = new Label("Parol:");
         PasswordField passwordField = new PasswordField();
-        passwordField.setText("password123");
+        passwordField.setText(PASSWORD);
 
-        TextField visiblePasswordField = new TextField("password123");
+        TextField visiblePasswordField = new TextField(PASSWORD);
         visiblePasswordField.setVisible(false);
 
         ImageView openEye = new ImageView(new Image("/images/opened-eye.png"));
@@ -95,9 +106,9 @@ public class MenuBarController {
         // Enable Save button on any change in text fields
         ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
             saveButton.setDisable(
-                    nameField.getText().equals("DefaultDB") &&
-                            loginField.getText().equals("admin") &&
-                            passwordField.getText().equals("password123")
+                    nameField.getText().equals(DATABASE_NAME) &&
+                            loginField.getText().equals(USERNAME) &&
+                            passwordField.getText().equals(PASSWORD)
             );
         };
 
@@ -107,6 +118,13 @@ public class MenuBarController {
         visiblePasswordField.textProperty().addListener(changeListener);
 
         saveButton.setOnAction(event -> {
+            DATABASE_NAME = nameField.getText();
+            USERNAME = loginField.getText();
+            PASSWORD = passwordField.getText();
+            configurations.setDatabaseName(nameField.getText());
+            configurations.setUsername(loginField.getText());
+            configurations.setPassword(passwordField.getText());
+            configUtilsService.saveConfig(configurations);
             // Add save logic here
             popupStage.close();
         });
@@ -139,15 +157,15 @@ public class MenuBarController {
 
         // Kirish Kamerasi
         Label camera1Label = new Label("1-kamera (Kirish kamerasi) IP manzili:");
-        TextField camera1Field = new TextField("192.168.1.101");
+        TextField camera1Field = new TextField(CAMERA_1);
 
         // Yuk Kamerasi
         Label camera2Label = new Label("2-kamera (Yuk kamerasi) IP manzili:");
-        TextField camera2Field = new TextField("192.168.1.102");
+        TextField camera2Field = new TextField(CAMERA_2);
 
         // Chiqish Kamerasi
         Label camera3Label = new Label("3-kamera (Chiqish kamerasi) IP manzili:");
-        TextField camera3Field = new TextField("192.168.1.103");
+        TextField camera3Field = new TextField(CAMERA_3);
 
         // Buttons
         Button saveButton = new Button("Save");
@@ -158,9 +176,9 @@ public class MenuBarController {
         // Enable Save button on any change in text fields
         ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
             saveButton.setDisable(
-                    camera1Field.getText().equals("192.168.1.101") &&
-                            camera2Field.getText().equals("192.168.1.102") &&
-                            camera3Field.getText().equals("192.168.1.103")
+                    camera1Field.getText().equals(CAMERA_1) &&
+                            camera2Field.getText().equals(CAMERA_2) &&
+                            camera3Field.getText().equals(CAMERA_3)
             );
         };
 
@@ -169,6 +187,13 @@ public class MenuBarController {
         camera3Field.textProperty().addListener(changeListener);
 
         saveButton.setOnAction(event -> {
+            CAMERA_1 = camera1Field.getText();
+            CAMERA_2 = camera2Field.getText();
+            CAMERA_3 = camera3Field.getText();
+            configurations.setCamera1(camera1Field.getText());
+            configurations.setCamera2(camera2Field.getText());
+            configurations.setCamera3(camera3Field.getText());
+            configUtilsService.saveConfig(configurations);
             // Add save logic for all three cameras here
             popupStage.close();
         });
@@ -206,13 +231,13 @@ public class MenuBarController {
 
         // Form Elements
         Label controllerAddressLabel = new Label("Controller addresi:");
-        TextField controllerAddressField = new TextField("192.168.1.200");
+        TextField controllerAddressField = new TextField(CONTROLLER_IP);
 
         Label portLabel = new Label("Porti:");
-        TextField portField = new TextField("8080");
+        TextField portField = new TextField(CONTROLLER_PORT.toString());
 
         Label timeoutLabel = new Label("Time out (ms):");
-        TextField timeoutField = new TextField("5000");
+        TextField timeoutField = new TextField(CONTROLLER_CONNECT_TIMEOUT.toString());
 
         // Buttons
         Button saveButton = new Button("Save");
@@ -223,17 +248,25 @@ public class MenuBarController {
         // Enable Save button on any change in text fields
         ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
             saveButton.setDisable(
-                    controllerAddressField.getText().equals("192.168.1.200") &&
-                            portField.getText().equals("8080") &&
-                            timeoutField.getText().equals("5000")
+                    controllerAddressField.getText().equals(CONTROLLER_IP) &&
+                            portField.getText().equals(CONTROLLER_PORT.toString()) &&
+                            timeoutField.getText().equals("" + CONTROLLER_CONNECT_TIMEOUT)
             );
         };
+
 
         controllerAddressField.textProperty().addListener(changeListener);
         portField.textProperty().addListener(changeListener);
         timeoutField.textProperty().addListener(changeListener);
 
         saveButton.setOnAction(event -> {
+            CONTROLLER_IP = controllerAddressField.getText();
+            CONTROLLER_PORT = Integer.parseInt(portField.getText());
+            CONTROLLER_CONNECT_TIMEOUT = Integer.parseInt(timeoutField.getText());
+            configurations.setControllerIp(controllerAddressField.getText());
+            configurations.setControllerPort(Integer.parseInt(portField.getText()));
+            configurations.setControllerConnectTimeout(Integer.parseInt(timeoutField.getText()));
+            configUtilsService.saveConfig(configurations);
             // Add save logic here
             popupStage.close();
         });
@@ -270,10 +303,10 @@ public class MenuBarController {
 
         // Form Elements
         Label firstShlagbaumLabel = new Label("1-shlagbaum yopilish vaqti (ms):");
-        TextField firstShlagbaumField = new TextField("3000");
+        TextField firstShlagbaumField = new TextField("" + CLOSE_GATE1_TIMEOUT);
 
         Label secondShlagbaumLabel = new Label("2-shlagbaum yopilish vaqti (ms):");
-        TextField secondShlagbaumField = new TextField("3000");
+        TextField secondShlagbaumField = new TextField("" + CLOSE_GATE2_TIMEOUT);
 
         // Buttons
         Button saveButton = new Button("Save");
@@ -284,8 +317,8 @@ public class MenuBarController {
         // Enable Save button on any change in text fields
         ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
             saveButton.setDisable(
-                    firstShlagbaumField.getText().equals("3000") &&
-                            secondShlagbaumField.getText().equals("3000")
+                    firstShlagbaumField.getText().equals("" + CLOSE_GATE1_TIMEOUT) &&
+                            secondShlagbaumField.getText().equals("" + CLOSE_GATE2_TIMEOUT)
             );
         };
 
@@ -293,6 +326,11 @@ public class MenuBarController {
         secondShlagbaumField.textProperty().addListener(changeListener);
 
         saveButton.setOnAction(event -> {
+            CLOSE_GATE1_TIMEOUT = Integer.parseInt(firstShlagbaumField.getText());
+            CLOSE_GATE2_TIMEOUT = Integer.parseInt(secondShlagbaumField.getText());
+            configurations.setCloseGate1Timeout(Integer.parseInt(firstShlagbaumField.getText()));
+            configurations.setCloseGate2Timeout(Integer.parseInt(secondShlagbaumField.getText()));
+            configUtilsService.saveConfig(configurations);
             // Add save logic here
             popupStage.close();
         });
@@ -329,10 +367,10 @@ public class MenuBarController {
 
         // Form Elements
         Label massTimeLabel = new Label("Tarozi massasini aniqlash vaqti (ms):");
-        TextField massTimeField = new TextField("5000");
+        TextField massTimeField = new TextField(SCALE_TIMEOUT.toString());
 
         Label portLabel = new Label("Porti:");
-        TextField portField = new TextField("9090");
+        TextField portField = new TextField(SCALE_PORT);
 
         // Buttons
         Button saveButton = new Button("Save");
@@ -343,8 +381,8 @@ public class MenuBarController {
         // Enable Save button on any change in text fields
         ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
             saveButton.setDisable(
-                    massTimeField.getText().equals("5000") &&
-                            portField.getText().equals("9090")
+                    massTimeField.getText().equals(SCALE_TIMEOUT.toString()) &&
+                            portField.getText().equals(SCALE_PORT)
             );
         };
 
@@ -352,6 +390,11 @@ public class MenuBarController {
         portField.textProperty().addListener(changeListener);
 
         saveButton.setOnAction(event -> {
+            SCALE_TIMEOUT = Integer.parseInt(massTimeField.getText());
+            SCALE_PORT = portField.getText();
+            configurations.setScaleTimeout(Integer.parseInt(massTimeField.getText()));
+            configurations.setScalePort(portField.getText());
+            configUtilsService.saveConfig(configurations);
             // Add save logic here
             popupStage.close();
         });
@@ -378,8 +421,5 @@ public class MenuBarController {
         popupStage.setScene(popupScene);
         popupStage.show();
     }
-
-
-
 
 }

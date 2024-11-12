@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
-import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.CAMERA_2;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showCargoScaleConfirmationDialog;
 
@@ -83,14 +83,13 @@ public class TruckScalingController {
                         public void run() {
                             double holder = buttonController.getTruckWeigh();
                             double helper = holder != 0 ? holder : weigh;
-                            if(helper > 0.0) System.out.println("helper weigh = " + helper);
+                            if (helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
                             if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                if (helper > 25000) helper = helper/10;
+                                if (helper > 25000) helper = helper / 10;
                                 weigh = helper;
-                            }
-                            else if (weigh == helper && helper != 0) {
+                            } else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
                             }
@@ -122,7 +121,7 @@ public class TruckScalingController {
                                 }
                             }
                         }
-                    }), 4000);
+                    }), SCALE_TIMEOUT);
                 }
 
                 if (truckPosition == 2 && sensor2Connection && !sensor3Connection && isScaled) {
@@ -148,7 +147,7 @@ public class TruckScalingController {
                                 weigh = 0.0;
                             }
                         }
-                    }, 10000);
+                    }, CLOSE_GATE2_TIMEOUT);
                 }
 
                 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -178,14 +177,13 @@ public class TruckScalingController {
                         public void run() {
                             double holder = buttonController.getTruckWeigh();
                             double helper = holder != 0 ? holder : weigh;
-                            if(helper > 0.0) System.out.println("helper weigh = " + helper);
+                            if (helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
                             if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                if(helper > 25000) helper = helper/10;
+                                if (helper > 25000) helper = helper / 10;
                                 weigh = helper;
-                            }
-                            else if (weigh == helper && helper != 0 && !isScaled) {
+                            } else if (weigh == helper && helper != 0 && !isScaled) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
                             }
@@ -237,7 +235,7 @@ public class TruckScalingController {
                                 currentTruck = new TruckResponse();
                             }
                         }
-                    }), 4000);
+                    }), SCALE_TIMEOUT);
                 }
                 if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 0) {
                     buttonController.openGate2();
@@ -277,7 +275,7 @@ public class TruckScalingController {
                                 weigh = 0.0;
                             }
                         }
-                    }, 10000);
+                    }, CLOSE_GATE2_TIMEOUT);
                 }
 
             } catch (Exception ignored) {

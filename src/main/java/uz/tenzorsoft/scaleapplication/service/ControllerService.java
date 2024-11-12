@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.CONTROLLER_IP;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.CONTROLLER_PORT;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 
 @Service
@@ -21,7 +23,7 @@ public class ControllerService {
         address = InetAddress.getByName(CONTROLLER_IP);
         connection = new TCPMasterConnection(address);
         connection.setTimeout(3000);
-        connection.setPort(port);
+        connection.setPort(CONTROLLER_PORT);
         connection.connect();
         isConnected = true;
         scalePort.openPort();

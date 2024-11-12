@@ -19,6 +19,7 @@ import uz.tenzorsoft.scaleapplication.service.TruckService;
 import java.io.UnsupportedEncodingException;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.*;
 
