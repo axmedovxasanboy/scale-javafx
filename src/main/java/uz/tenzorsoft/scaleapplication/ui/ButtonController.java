@@ -12,6 +12,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
+import uz.tenzorsoft.scaleapplication.service.ScaleLogService;
 import uz.tenzorsoft.scaleapplication.service.ScaleSystem;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
@@ -29,6 +30,7 @@ public class ButtonController {
     private final TruckService truckService;
     private final CameraViewController cameraViewController;
     private final TableController tableController;
+    private final ScaleLogService scaleLogService;
 
     @FXML
     private ImageView gate1;
@@ -214,12 +216,12 @@ public class ButtonController {
 
                 try {
                     System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
                 }
-
                 double numericValue = parseWeightData(data);
                 numericValue /= 10;
+                scaleLogService.save(data, String.valueOf(numericValue));
                 System.out.println("Kg: " + numericValue);
                 return numericValue;
             }
@@ -235,7 +237,8 @@ public class ButtonController {
             String numericPart = data.substring(1, 8);
             return Integer.parseInt(numericPart);
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            System.err.println("Unable to scale data");
+            System.err.println(e.getMessage());
         }
 
         return 0;
