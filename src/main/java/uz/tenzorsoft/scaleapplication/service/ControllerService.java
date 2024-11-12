@@ -110,23 +110,24 @@ public class ControllerService {
         if (transaction == null) transaction = new ModbusTCPTransaction(connection);
         transaction.setRequest(request);
         transaction.execute();
+
         ModbusResponse response = transaction.getResponse();
 
-        if (response instanceof ExceptionResponse || response == null) {
+        if (response == null) {
+            System.out.println("No response received from transaction.");
             return -1;
+        } else if (response instanceof ExceptionResponse) {
+            System.out.println("Received an exception response: " + ((ExceptionResponse) response).getExceptionCode());
+            return -1;
+        } else if (response instanceof ReadCoilsResponse) {
+            ReadCoilsResponse readResponse = (ReadCoilsResponse) response;
+            // Process readResponse, for example:
+            return readResponse.getCoils().getBit(0) ? 1 : 0;  // Example: return 1 if coil is true, 0 if false
         } else {
-            ReadCoilsResponse readResponse = null;
-            try {
-                readResponse = (ReadCoilsResponse) response;
-            } catch (Exception e) {
-                try {
-                    connect();
-                } catch (Exception ex) {
-
-                }
-            }
-            return readResponse.getCoils().getBit(0) ? 1 : 0;
+            System.out.println("Unexpected response type: " + response.getClass().getName());
+            return -1;
         }
+
     }
 
     public void disconnect() {

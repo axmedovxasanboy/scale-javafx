@@ -28,8 +28,8 @@
       <TableColumn fx:id="maxWeight" prefWidth="75.0" text="Brutto" />
       <TableColumn prefWidth="75.0" text="Netto">
          <columns>
-            <TableColumn fx:id="pickupWeight" prefWidth="75.0" text="Kirim" />
-            <TableColumn fx:id="dropWeight" prefWidth="75.0" text="Chiqim" />
+            <TableColumn fx:id="dropWeight" prefWidth="75.0" text="Kirim" />
+            <TableColumn fx:id="pickupWeight" prefWidth="75.0" text="Chiqim" />
          </columns>
       </TableColumn>
   </columns>

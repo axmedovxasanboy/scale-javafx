@@ -86,7 +86,10 @@ public class TruckScalingController {
                             if(helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
-                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) weigh = helper;
+                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
+                                if (helper > 25000) helper = helper/10;
+                                weigh = helper;
+                            }
                             else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
@@ -178,8 +181,11 @@ public class TruckScalingController {
                             if(helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
-                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) weigh = helper;
-                            else if (weigh == helper && helper != 0) {
+                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
+                                if(helper > 25000) helper = helper/10;
+                                weigh = helper;
+                            }
+                            else if (weigh == helper && helper != 0 && !isScaled) {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
                             }
@@ -222,7 +228,7 @@ public class TruckScalingController {
                                         public void run() {
                                             printCheck.printReceipt(truckService.getCurrentTruckEntity());
                                         }
-                                    }, 500);
+                                    }, 50);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -234,13 +240,13 @@ public class TruckScalingController {
                     }), 4000);
                 }
                 if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 0) {
+                    buttonController.openGate2();
                     truckPosition = 2;
                     cargoConfirmationStatus = -1;
                     isTruckEntered = true;
                     isTruckExited = false;
                     currentTruck = new TruckResponse();
                     System.out.println("Gate 2 is opening");
-                    buttonController.openGate2();
                 }
 
                 if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1) {

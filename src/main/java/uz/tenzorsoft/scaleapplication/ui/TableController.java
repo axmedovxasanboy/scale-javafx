@@ -120,7 +120,7 @@ public class TableController {
                     }
                     tableData.setItems(FXCollections.observableArrayList(data));
 
-                    Thread.sleep(60000 * 5);
+                    Thread.sleep(60000);
                 } catch (Exception e) {
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }

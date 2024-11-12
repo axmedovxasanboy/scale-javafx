@@ -326,7 +326,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(1));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -339,7 +339,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(1));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
     }
 
