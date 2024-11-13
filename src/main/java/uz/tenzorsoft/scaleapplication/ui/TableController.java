@@ -112,9 +112,9 @@ public class TableController {
                     TableViewData rowItem = row.getItem();
                     mainController.getIssueCheckButton().setOnMouseClicked(e->{
                         printCheck.printReceipt(truckService.findById(rowItem.getId()));
+                        mainController.getIssueCheckButton().setDisable(true);
                     });
                     imageController.showImages(rowItem); // Show images based on the selected row data
-                    mainController.getIssueCheckButton().setDisable(true);
                 }
             });
             return row;
