@@ -131,6 +131,29 @@
           <Button fx:id="weighButton" onAction="#setWeigh" layoutX="509.0" layoutY="148.0" mnemonicParsing="false" text="Button"/>
         </children>
       </Pane>
+
+      <HBox spacing="10" alignment="CENTER" style="-fx-padding: 20; -fx-background-color: #f4f4f9;">
+
+        <Button text="Open Gate 1" onMouseClicked="#openGate1"
+                style="-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"
+                minWidth="80" minHeight="40"/>
+
+        <Button text="Open Gate 2" onMouseClicked="#openGate2"
+                style="-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"
+                minWidth="80" minHeight="40"/>
+
+        <Button text="Measure Weight" onMouseClicked="#getWeight"
+                style="-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"
+                minWidth="80" minHeight="40"/>
+
+        <Button text="Close gate 1" onMouseClicked="#closeGate1"
+                style="-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"
+                minWidth="100" minHeight="40"/>
+
+        <Button text="Close gate 2" onMouseClicked="#closeGate2"
+                style="-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-cursor: hand;"
+                minWidth="80" minHeight="40"/>
+      </HBox>
     </children>
   </AnchorPane>
 </Tab>

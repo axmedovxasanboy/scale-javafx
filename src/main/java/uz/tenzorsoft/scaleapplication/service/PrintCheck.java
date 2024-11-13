@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
-import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 
 import javax.print.*;
 import java.io.ByteArrayInputStream;
@@ -13,12 +12,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static uz.tenzorsoft.scaleapplication.domain.Settings.PRINTER_NAME;
+
 @Service
 public class PrintCheck {
 
 
     public void printReceipt(TruckEntity response) {
-        PrintService printer = findPrinter("XP-80C"); // Specify your printer name here
+        PrintService printer = findPrinter(PRINTER_NAME); // Specify your printer name here
         if (printer == null) {
             System.out.println("Printer not found.");
             return;
@@ -119,6 +120,10 @@ public class PrintCheck {
                 System.out.println(printer.getName());
             }
         }
+    }
+
+    public void testCheckRecipient() {
+
     }
 }
 

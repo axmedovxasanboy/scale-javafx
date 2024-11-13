@@ -8,7 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
@@ -32,6 +31,7 @@ public class TestController {
     private final TruckScalingController truckScalingController;
     private final TruckService truckService;
     private final TableController tableController;
+    private final ButtonController buttonController;
 
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
@@ -262,4 +262,23 @@ public class TestController {
         });
     }
 
+    public void openGate1() {
+        buttonController.openGate1();
+    }
+
+    public void openGate2() {
+        buttonController.openGate2();
+    }
+
+    public void closeGate1() {
+        buttonController.closeGate1();
+    }
+
+    public void closeGate2() {
+        buttonController.closeGate2();
+    }
+
+    public void getWeight() {
+        buttonController.getTruckWeigh();
+    }
 }

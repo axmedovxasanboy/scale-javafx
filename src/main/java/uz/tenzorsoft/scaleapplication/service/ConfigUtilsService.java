@@ -3,11 +3,9 @@ package uz.tenzorsoft.scaleapplication.service;
 import com.ghgande.j2mod.modbus.Modbus;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Configurations;
-import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
@@ -39,6 +37,7 @@ public class ConfigUtilsService {
             e.printStackTrace();
         }
     }
+
     public void loadConfigurations() {
         try {
             Path path = Paths.get(CONFIG_FILE_PATH);
@@ -74,6 +73,7 @@ public class ConfigUtilsService {
         config.setCloseGate2Timeout(8000);
         config.setScaleTimeout(3000);
         config.setScalePort("COM3");
+        config.setPrinterName("XP 80C");
         config.setDatabaseName("postgres");
         config.setUsername("postgres");
         config.setPassword("postgres");
@@ -91,6 +91,7 @@ public class ConfigUtilsService {
         Settings.CLOSE_GATE2_TIMEOUT = config.getCloseGate2Timeout() == null ? defaultConfig.getCloseGate2Timeout() : config.getCloseGate2Timeout();
         Settings.SCALE_TIMEOUT = config.getScaleTimeout() == null ? defaultConfig.getScaleTimeout() : config.getScaleTimeout();
         Settings.SCALE_PORT = config.getScalePort() == null ? defaultConfig.getScalePort() : config.getScalePort();
+        Settings.PRINTER_NAME = config.getPrinterName() == null ? defaultConfig.getPrinterName() : config.getPrinterName();
         Settings.DATABASE_NAME = config.getDatabaseName() == null ? defaultConfig.getDatabaseName() : config.getDatabaseName();
         Settings.USERNAME = config.getUsername() == null ? defaultConfig.getUsername() : config.getUsername();
         Settings.PASSWORD = config.getPassword() == null ? defaultConfig.getPassword() : config.getPassword();
