@@ -12,21 +12,20 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import uz.tenzorsoft.scaleapplication.domain.Configurations;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
+import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 
 @Component
+@RequiredArgsConstructor
 public class MenuBarController {
 
     private final ConfigUtilsService configUtilsService;
-
-    public MenuBarController(ConfigUtilsService configUtilsService) {
-        this.configUtilsService = configUtilsService;
-    }
+    private final PrintCheck printCheck;
 
     @FXML
     private void onDatabaseMenuSelected() {
@@ -436,7 +435,7 @@ public class MenuBarController {
 
         // Form Elements
         Label printerNameLabel = new Label("Printer nomi:");
-        TextField printerNameField = new TextField("DefaultPrinter");
+        TextField printerNameField = new TextField(PRINTER_NAME);
 
         // Buttons
         Button testButton = new Button("Test");
@@ -447,17 +446,18 @@ public class MenuBarController {
 
         // Enable Save button when the text field value changes
         printerNameField.textProperty().addListener((observable, oldValue, newValue) -> {
-            saveButton.setDisable(printerNameField.getText().equals("DefaultPrinter"));
+            saveButton.setDisable(printerNameField.getText().equals(PRINTER_NAME));
         });
 
         // Test button action
         testButton.setOnAction(event -> {
-            // Simulate a test print action
-            System.out.println("Printing test check to printer: " + printerNameField.getText());
-            // Add actual print logic here, e.g., sending a sample document to the printer
+            printCheck.testCheckRecipient();
         });
 
         saveButton.setOnAction(event -> {
+            PRINTER_NAME = printerNameField.getText();
+            configurations.setPrinterName(printerNameField.getText());
+            configUtilsService.saveConfig(configurations);
             // Add save logic here
             popupStage.close();
         });
