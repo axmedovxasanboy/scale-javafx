@@ -114,6 +114,7 @@ public class TableController {
                         printCheck.printReceipt(truckService.findById(rowItem.getId()));
                     });
                     imageController.showImages(rowItem); // Show images based on the selected row data
+                    mainController.getIssueCheckButton().setDisable(true);
                 }
             });
             return row;
