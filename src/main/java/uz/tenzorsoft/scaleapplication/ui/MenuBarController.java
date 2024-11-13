@@ -53,6 +53,12 @@ public class MenuBarController {
         showTaroziPopup();
     }
 
+    @FXML
+    private void onPrinterMenuSelected() {
+        showPrinterPopup();
+    }
+
+
     private void showDatabasePopup() {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -421,5 +427,63 @@ public class MenuBarController {
         popupStage.setScene(popupScene);
         popupStage.show();
     }
+
+
+    private void showPrinterPopup() {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Printer Sozlamalari");
+
+        // Form Elements
+        Label printerNameLabel = new Label("Printer nomi:");
+        TextField printerNameField = new TextField("DefaultPrinter");
+
+        // Buttons
+        Button testButton = new Button("Test");
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+
+        saveButton.setDisable(true); // Disabled by default
+
+        // Enable Save button when the text field value changes
+        printerNameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveButton.setDisable(printerNameField.getText().equals("DefaultPrinter"));
+        });
+
+        // Test button action
+        testButton.setOnAction(event -> {
+            // Simulate a test print action
+            System.out.println("Printing test check to printer: " + printerNameField.getText());
+            // Add actual print logic here, e.g., sending a sample document to the printer
+        });
+
+        saveButton.setOnAction(event -> {
+            // Add save logic here
+            popupStage.close();
+        });
+
+        cancelButton.setOnAction(event -> popupStage.close());
+
+        testButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 5 15;");
+        saveButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 15;");
+        cancelButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 5 15;");
+
+        HBox buttonBox = new HBox(testButton, saveButton, cancelButton);
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // Layout
+        VBox layout = new VBox(10,
+                printerNameLabel, printerNameField,
+                buttonBox);
+        layout.setSpacing(15);
+        layout.setPadding(new Insets(15));
+        layout.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #c3c3c3; -fx-border-radius: 5; -fx-background-radius: 5;");
+
+        Scene popupScene = new Scene(layout, 400, 200);
+        popupStage.setScene(popupScene);
+        popupStage.show();
+    }
+
 
 }

@@ -17,6 +17,7 @@
         <MenuItem mnemonicParsing="false" text="Controller" onAction="#onControllerMenuSelected"/>
         <MenuItem mnemonicParsing="false" text="Shlagbaum" onAction="#onShlagbaumMenuSelected"/>
         <MenuItem mnemonicParsing="false" text="Tarozi" onAction="#onTaroziMenuSelected"/>
+        <MenuItem mnemonicParsing="false" text="Printer" onAction="#onPrinterMenuSelected"/>
       </items>
     </Menu>
     <Menu mnemonicParsing="false" text="Help">
