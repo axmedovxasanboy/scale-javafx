@@ -17,6 +17,9 @@ import uz.tenzorsoft.scaleapplication.service.ScaleSystem;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
@@ -221,7 +224,6 @@ public class ButtonController {
                     System.err.println(e.getMessage());
                 }
                 double numericValue = parseWeightData(data);
-                numericValue /= 10;
                 scaleLogService.save(data, String.valueOf(numericValue));
                 System.out.println("Kg: " + numericValue);
                 return numericValue;
@@ -235,13 +237,19 @@ public class ButtonController {
 
     private double parseWeightData(String data) {
         try {
-            String numericPart = data.substring(1, 8);
-            return Integer.parseInt(numericPart);
-        } catch (Exception e) {
-            System.err.println("Unable to scale data");
-            System.err.println(e.getMessage());
-        }
+            Pattern pattern = Pattern.compile("\\+\\d{7}\\w");
+            Matcher matcher = pattern.matcher(data);
 
-        return 0;
+            if (matcher.find()) {
+                String entry = matcher.group();
+                String numericPart = entry.substring(1, entry.length() - 1);
+                return Integer.parseInt(numericPart) / 10.0;
+            }
+            return 0.0;
+        } catch (Exception e) {
+            System.err.println("Unable to parse weight data");
+            System.err.println(e.getMessage());
+            return 0;
+        }
     }
 }
