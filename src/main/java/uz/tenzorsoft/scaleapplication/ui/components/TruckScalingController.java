@@ -87,7 +87,6 @@ public class TruckScalingController {
 
 
                             if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                if (helper > 25000) helper = helper / 10;
                                 weigh = helper;
                             } else if (weigh == helper && helper != 0) {
                                 log.info("Truck weigh: {}", weigh);
@@ -181,7 +180,6 @@ public class TruckScalingController {
 
 
                             if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                if (helper > 25000) helper = helper / 10;
                                 weigh = helper;
                             } else if (weigh == helper && helper != 0 && !isScaled) {
                                 log.info("Truck weigh: {}", weigh);
