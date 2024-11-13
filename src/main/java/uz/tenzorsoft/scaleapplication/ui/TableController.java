@@ -8,10 +8,13 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
+import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
@@ -28,6 +31,10 @@ public class TableController {
     private final TableService tableService;
     private final ExecutorService executors;
     private final ImageController imageController;
+    @Autowired
+    @Lazy
+    private MainController mainController;
+    private final PrintCheck printCheck;
     @FXML
     private TableView<TableViewData> tableData;
 
@@ -101,8 +108,12 @@ public class TableController {
             TableRow<TableViewData> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty()) {
-                    TableViewData rowData = row.getItem();
-                    imageController.showImages(rowData); // Show images based on the selected row data
+                    mainController.getIssueCheckButton().setDisable(false);
+                    TableViewData rowItem = row.getItem();
+                    mainController.getIssueCheckButton().setOnMouseClicked(e->{
+                        printCheck.printReceipt(truckService.findById(rowItem.getId()));
+                    });
+                    imageController.showImages(rowItem); // Show images based on the selected row data
                 }
             });
             return row;
