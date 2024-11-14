@@ -8,6 +8,8 @@ import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TruckPhotoService {
@@ -21,12 +23,14 @@ public class TruckPhotoService {
     }
 
     public AttachStatus findAttachStatus(AttachEntity attach) {
-        TruckPhotosEntity photosEntity = truckPhotosRepository.findByTruckPhoto(attach).orElse(null);
-        if (photosEntity == null) return null;
-        return photosEntity.getAttachStatus();
+        List<TruckPhotosEntity> list = truckPhotosRepository.findByTruckPhotoOrderByCreatedAtDesc(attach);
+        if (list.isEmpty()) return null;
+        return list.get(0).getAttachStatus();
     }
 
     public TruckPhotosEntity findByAttach(AttachEntity attach) {
-        return truckPhotosRepository.findByTruckPhoto(attach).orElse(null);
+        List<TruckPhotosEntity> list = truckPhotosRepository.findByTruckPhotoOrderByCreatedAtDesc(attach);
+        if (list.isEmpty()) return null;
+        return list.get(0);
     }
 }

@@ -5,11 +5,12 @@ import org.springframework.stereotype.Repository;
 import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface TruckPhotoRepository extends JpaRepository<TruckPhotosEntity, Long> {
 
-    Optional<TruckPhotosEntity> findByTruckPhoto(AttachEntity attachEntity);
+    List<TruckPhotosEntity> findByTruckPhotoOrderByCreatedAtDesc(AttachEntity attachEntity);
 
 }
