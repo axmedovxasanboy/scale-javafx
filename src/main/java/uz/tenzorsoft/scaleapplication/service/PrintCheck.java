@@ -29,7 +29,7 @@ public class PrintCheck {
     public void printReceipt(TruckEntity response) {
         PrintService printer = findPrinter(PRINTER_NAME); // Specify your printer name here
         if (printer == null) {
-            System.out.println("Printer not found.");
+            System.out.println(PRINTER_NAME + " printer not found.");
             return;
         }
 

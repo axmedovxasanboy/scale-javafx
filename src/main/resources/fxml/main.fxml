@@ -42,7 +42,7 @@
                     </Label>
                     <!-- Button with Image Icon and Text -->
                     <Button fx:id="issueCheckButton" layoutX="680.0" layoutY="8.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
-                      <text>Issuing the check</text>
+                      <text>Chek Chiqarish</text>
                     </Button>
                   </children>
                 </Pane>

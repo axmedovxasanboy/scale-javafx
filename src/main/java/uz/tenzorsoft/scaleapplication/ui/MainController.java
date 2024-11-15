@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
+import com.fazecast.jSerialComm.SerialPort;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -107,7 +108,11 @@ public class MainController {
     public void load() {
         configUtilsService.loadConfigurations();
         loadMainMenu();
-        scalePort = new Settings(SCALE_PORT).getSerialPort();
+        try {
+            scalePort = new Settings(SCALE_PORT).getSerialPort();
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
         connectionsController.updateConnections();
         dataSendController.sendNotSentData();
         truckScalingController.start();
