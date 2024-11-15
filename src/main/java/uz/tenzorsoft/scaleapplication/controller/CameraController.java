@@ -16,11 +16,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.ButtonController;
 import uz.tenzorsoft.scaleapplication.ui.TableController;
@@ -46,6 +49,7 @@ public class CameraController {
     private final TableController tableController;
     private final ButtonController buttonController;
     private final TruckService truckService;
+    private final LogService logService;
 
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
@@ -57,6 +61,7 @@ public class CameraController {
             if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
+            isWaiting = true;
             for (Map.Entry<String, MultipartFile> entry : multipartRequest.getFileMap().entrySet()) {
                 String fileName = entry.getKey();
                 MultipartFile file = entry.getValue();
@@ -74,19 +79,21 @@ public class CameraController {
                             truckNumber = extractNumberFromXmlFile(file);
                             System.out.println("truckNumber = " + truckNumber);
                             if (!truckNumber.isEmpty()) {
-                                if (!truckService.isValidTruckNumber(truckNumber)) {
-                                    log.warn("Truck number does not match: {}", truckNumber);
-                                    truckNumber = "";
-                                    return ResponseEntity.ok("NOT_MATCH");
-                                }
+//                                if (!truckService.isValidTruckNumber(truckNumber)) {
+//                                    log.warn("Truck number does not match: {}", truckNumber);
+//                                    truckNumber = "";
+//                                    return ResponseEntity.ok("NOT_MATCH");
+//                                }
                                 if (cameraId == 1) {
                                     if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                                        System.err.println("Entrance available after 3 minutes");
+                                        logService.save(new LogEntity(5L, truckNumber, "Entrance available after 5 minutes"));
+                                        System.err.println("Entrance available after 5 minutes");
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 } else {
                                     if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                                        System.err.println("Entrance available after 3 minutes");
+                                        logService.save(new LogEntity(5L, truckNumber, "Entrance available after 5 minutes"));
+                                        System.err.println("Entrance available after 5 minutes");
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 }
@@ -94,6 +101,7 @@ public class CameraController {
 
                         }
                     } catch (Exception e) {
+                        logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
                         System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
@@ -101,6 +109,7 @@ public class CameraController {
 
                             AttachResponse attachResponse = attachService.saveToSystem(file);
                             if (attachResponse == null) {
+                                logService.save(new LogEntity(5L, truckNumber, "Unable to save file"));
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
                                 return ResponseEntity.ok("Unable to save file");
                             }
@@ -113,9 +122,11 @@ public class CameraController {
                             }
                         }
                     } catch (Exception e) {
+                        logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
                         System.out.println("Image Exception " + e.getMessage());
                     }
                 } catch (Exception e) {
+                    logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
                     log.warn("File processing failed: {}", fileName);
                     log.error(e.getMessage(), e);
                     System.out.println(e.getMessage());
@@ -123,24 +134,24 @@ public class CameraController {
                 }
             }
             currentTruck.setTruckNumber(truckNumber);
-            try {
-                truckService.saveTruck(currentTruck, cameraId);
+            isWaiting = false;
+            try { // added
+                if (cameraId == 1) {
+                    currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
+                    truckService.saveTruck(currentTruck, cameraId);
+                    tableController.addLastRecord();
+                    System.out.println("Opening gate 1");
+                    buttonController.openGate1(0);
+                } else if (cameraId == 2) {
+                    currentTruck.setExitedStatus(TruckAction.EXIT);
+                    truckService.saveTruck(currentTruck, cameraId);
+                    System.out.println("Opening gate 2");
+                    buttonController.openGate2(7);
+                }
             } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-
-            if (cameraId == 1) {
-                tableController.addLastRecord();
-            }
-
-            if (cameraId == 1) {
-                currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
-                System.out.println("Opening gate 1");
-                buttonController.openGate1(0);
-            } else if (cameraId == 2) {
-                currentTruck.setExitedStatus(TruckAction.EXIT);
-                System.out.println("Opening gate 2");
-                buttonController.openGate2(7);
+                logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+                e.printStackTrace();
+                return ResponseEntity.status(500).body("Error occurred: " + e.getMessage());
             }
 
             return ResponseEntity.ok("Files uploaded and saved successfully.");
@@ -166,6 +177,7 @@ public class CameraController {
                 return element.getTextContent();
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             log.error(e.getMessage(), e);
         }
         return null;

@@ -250,7 +250,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             currentTruckEntity.setIsFinished(false);
             truckRepository.save(currentTruckEntity);
         } else {
-            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
+            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
             if (currentTruckEntity == null)
                 throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
@@ -272,7 +272,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         try {
             currentTruckEntity = truckRepository.save(currentTruckEntity);
         } catch (Exception e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             System.out.println(e.getMessage());
         }
         return currentTruckEntity;
@@ -305,9 +305,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     @Transactional
     public void saveTruckAttaches(TruckResponse currentTruck, Long id) {
-        currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
-                .orElse(new TruckEntity());
-        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
+//        currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
+//                .orElse(new TruckEntity());
+//        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
         List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
         TruckPhotosEntity photo = new TruckPhotosEntity(
                 attachService.findById(id), AttachStatus.ENTRANCE_CARGO_PHOTO
@@ -321,7 +321,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getEnteredAt());
         truckActionEntity.setWeight(currentTruck.getEnteredWeight());
-        truckActionEntity.setAction(TruckAction.ENTRANCE);
+        truckActionEntity.setAction(currentTruck.getEnteredStatus());
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
@@ -334,7 +334,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getExitedAt());
         truckActionEntity.setWeight(currentTruck.getExitedWeight());
-        truckActionEntity.setAction(TruckAction.EXIT);
+        truckActionEntity.setAction(currentTruck.getExitedStatus());
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
@@ -364,7 +364,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         if (!isTruckNumberExists(truckNumber)) {
             return true;
         }
-        return !truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(truckNumber, LocalDateTime.now());
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAtDesc(truckNumber, true);
+        if (list.isEmpty()) return false;
+        LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
+        return nextEntranceTime.isBefore(LocalDateTime.now());
     }
 
     private boolean isTruckNumberExists(String truckNumber) {
@@ -380,8 +383,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         if (!isTruckNumberExists(truckNumber)) {
             return false;
         }
-        return truckRepository.existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(truckNumber, LocalDateTime.now());
-
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAtDesc(truckNumber, false);
+        if (list.isEmpty()) return false;
+        LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
+        return nextEntranceTime.isBefore(LocalDateTime.now());
     }
 
     public boolean isStandard(String truckNumber) {

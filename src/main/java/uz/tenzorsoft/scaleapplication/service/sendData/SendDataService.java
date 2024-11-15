@@ -5,16 +5,14 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AllDataResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.LocalAndServerIds;
 import uz.tenzorsoft.scaleapplication.domain.response.StatusResponse;
-import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
-import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
-import uz.tenzorsoft.scaleapplication.domain.response.sendData.UserSendResponse;
-import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.sendData.*;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.*;
 import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 import uz.tenzorsoft.scaleapplication.service.*;
@@ -24,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 
@@ -38,6 +38,7 @@ public class SendDataService {
     private final AttachService attachService;
     private final CargoRepository cargoRepository;
     private final TruckActionService truckActionService;
+    private final LogService logService;
 
     public void sendNotSentData() {
 
@@ -50,7 +51,7 @@ public class SendDataService {
             return;
         }
 
-        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, null);
+        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
         LocalAndServerIds body = restTemplate.postForObject(
                 "https://api-scale.mycoal.uz/remote/localAndServerIds",
                 allDataResponse, LocalAndServerIds.class
@@ -62,16 +63,16 @@ public class SendDataService {
         userService.dataSent(notSentUserData, body.getUser());
         cargoService.dataSent(notSentWeighingData, body.getWeighing());
 
-        notSentAttachmentData = attachService.getNotSentData();
-        allDataResponse = new AllDataResponse(null, null, null, notSentAttachmentData);
-        body = restTemplate.postForObject(
-                "https://api-scale.mycoal.uz/remote/localAndServerIds",
-                allDataResponse, LocalAndServerIds.class
-        );
+//        notSentAttachmentData = attachService.getNotSentData();
+//        allDataResponse = new AllDataResponse(null, null, null, notSentAttachmentData);
+//        body = restTemplate.postForObject(
+//                "https://api-scale.mycoal.uz/remote/localAndServerIds",
+//                allDataResponse, LocalAndServerIds.class
+//        );
 
-        if (body == null) {
-            return;
-        }
+//        if (body == null) {
+//            return;
+//        }
 
         attachService.dataSent(notSentAttachmentData, body.getAttach());
 
@@ -97,6 +98,7 @@ public class SendDataService {
             }
 
         } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             e.printStackTrace();
             System.err.println("Unable to send data");
         }
@@ -164,10 +166,10 @@ public class SendDataService {
         Object body = restTemplate.exchange("https://api.mycoal.uz/be/api/v1/scales/save-list", HttpMethod.POST, entity, Object.class).getBody();
 
 
-        if(body == null){
+        if (body == null) {
             return;
         }
-        if(body.toString().length() < 5) return;
+        if (body.toString().length() < 5) return;
 
         for (TruckEntity truck : trucks) {
             for (TruckActionEntity actionEntity : truck.getTruckActions()) {
@@ -183,7 +185,19 @@ public class SendDataService {
 
     }
 
-    public void sendLogsToServer(){
+    public void sendLogsToServer() {
+        LogResponse request = new LogResponse();
+        List<LogEntity> notSentLogs = logService.getNotSentLogs();
+        if(notSentLogs.isEmpty()) return;
+        request.setDtoList(notSentLogs);
+        ResponseEntity<LocalAndServerIds> response = restTemplate.postForEntity(
+                "https://api-scale.mycoal.uz/logs/create",
+                request, LocalAndServerIds.class
+        );
+        System.out.println(response);
+
+        Map<Long, Long> data = Objects.requireNonNull(response.getBody()).getData();
+        logService.dataSent(notSentLogs, data);
 
     }
 

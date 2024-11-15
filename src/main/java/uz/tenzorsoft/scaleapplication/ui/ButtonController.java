@@ -8,22 +8,19 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
-import uz.tenzorsoft.scaleapplication.service.ControllerService;
-import uz.tenzorsoft.scaleapplication.service.ScaleLogService;
-import uz.tenzorsoft.scaleapplication.service.ScaleSystem;
-import uz.tenzorsoft.scaleapplication.service.TruckService;
+import uz.tenzorsoft.scaleapplication.service.*;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
-import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
-import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_1;
+import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_3;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.*;
 
 @Component
@@ -35,6 +32,7 @@ public class ButtonController {
     private final CameraViewController cameraViewController;
     private final TableController tableController;
     private final ScaleLogService scaleLogService;
+    private final LogService logService;
 
     @FXML
     private ImageView gate1;
@@ -79,6 +77,7 @@ public class ButtonController {
         try {
             if (!isTesting) controllerService.openGate1();
         } catch (ModbusException e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
@@ -91,6 +90,7 @@ public class ButtonController {
                 gate1Connection = true;
             }
         } catch (ModbusException e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
@@ -101,11 +101,12 @@ public class ButtonController {
             String truckNumber = showNumberInsertDialog();
             if (!truckNumber.isEmpty()) {
                 // truckNumber == "RAQAMSIZ"
-                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
-                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
-                    return;
-                }
+//                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+//                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
+//                    return;
+//                }
                 if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
+                    logService.save(new LogEntity(5L, truckNumber, "Entrance not available"));
                     showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
                     return;
                 }
@@ -121,6 +122,7 @@ public class ButtonController {
             }
         } catch (Exception e) {
             isWaiting = false;
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -131,15 +133,17 @@ public class ButtonController {
             String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
             if (!truckNumber.isEmpty()) {
                 // "RAQAMSIZ"
-                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
-                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
-                    return;
-                }
+//                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+//                    showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
+//                    return;
+//                }
                 if (!truckService.isNotFinishedTrucksExists()) {
+                    logService.save(new LogEntity(5L, truckNumber, "All trucks are exited!"));
                     showAlert(Alert.AlertType.WARNING, "Not found", "Barcha avtomobillar chiqib ketgan!");
                     return;
                 }
                 if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
+                    logService.save(new LogEntity(5L, truckNumber, "Entrance not available"));
                     showAlert(Alert.AlertType.WARNING, "Not found", truckNumber + " kirishi mumkin emas");
                     return;
                 }
@@ -152,6 +156,7 @@ public class ButtonController {
                 isWaiting = false;
             }
         } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -168,6 +173,7 @@ public class ButtonController {
         try {
             if (!isTesting) controllerService.openGate2();
         } catch (ModbusException e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
@@ -180,6 +186,7 @@ public class ButtonController {
                 gate2Connection = true;
             }
         } catch (ModbusException e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
     }
@@ -196,6 +203,7 @@ public class ButtonController {
         try {
             controllerService.connect();
         } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
 

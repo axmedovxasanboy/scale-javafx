@@ -20,10 +20,10 @@ import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.*;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
+import uz.tenzorsoft.scaleapplication.ui.components.SendStatuesDataController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
@@ -55,6 +55,7 @@ public class MainController {
     private final PrintCheck printCheck;
     private final TestController testController;
     private final ConfigUtilsService configUtilsService;
+    private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
 
     @FXML
@@ -112,6 +113,7 @@ public class MainController {
         truckScalingController.start();
         tableController.loadData();
         testController.start();
+        sendStatuesDataController.startSending();
         printCheck.listAvailablePrinters();
         buttonController.connect();
         if (isConnected) {
@@ -215,11 +217,12 @@ public class MainController {
                             connectButton.getStyleClass().removeAll("connect-button");
                             connectButton.getStyleClass().add("connect-button-disconnected");
                             truckPosition = -1;
+                            truckPosition = -1;
                         }
                     });
                     Thread.sleep(1000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
                 }
             }
@@ -266,7 +269,6 @@ public class MainController {
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
-
 
 
     }

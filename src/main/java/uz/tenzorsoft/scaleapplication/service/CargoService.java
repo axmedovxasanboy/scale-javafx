@@ -27,7 +27,7 @@ public class CargoService {
         cargoEntity.setTruck(truckEntity);
         double enteredWeight = 0.0;
         double exitedWeight = 0.0;
-        double netWeight = 0.0;
+        double netWeight;
 
         List<TruckActionEntity> truckAction = truckEntity.getTruckActions();
         for (TruckActionEntity action : truckAction) {

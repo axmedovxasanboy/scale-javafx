@@ -95,7 +95,7 @@ public class CloudService {
             String jsonRequestBody = objectMapper.writeValueAsString(requestBody);
             requestEntity = new HttpEntity<>(jsonRequestBody, headers);
         } catch (Exception e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
             return "";
         }
@@ -120,7 +120,7 @@ public class CloudService {
         } catch (HttpClientErrorException e) {
             return "INCORRECT_PASSWORD";
         } catch (Exception e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
             return "";
         }

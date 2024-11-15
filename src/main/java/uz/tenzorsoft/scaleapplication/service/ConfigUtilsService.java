@@ -41,7 +41,7 @@ public class ConfigUtilsService {
             System.out.println("Configuration saved successfully.");
 
         } catch (Exception e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -68,7 +68,7 @@ public class ConfigUtilsService {
                 System.out.println("Default configuration file created at " + CONFIG_FILE_PATH);
             }
         } catch (Exception e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }

@@ -125,10 +125,10 @@ public class TestController {
     public void getTruckNumberFromCamera1() {
         String truckNumber = truckNumberFieldCamera1.getText();
         if (!truckNumber.isEmpty()) {
-            if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
-                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
-                return;
-            }
+//            if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
+//                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+//                return;
+//            }
             if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
                 showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
                 return;
@@ -149,10 +149,10 @@ public class TestController {
     public void getTruckNumberFromCamera2() {
         String truckNumber = truckNumberFieldCamera2.getText();
         if (!truckNumber.isEmpty()) {
-            if (!truckService.isValidTruckNumber(truckNumber)) {
-                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
-                return;
-            }
+//            if (!truckService.isValidTruckNumber(truckNumber)) {
+//                showAlert(Alert.AlertType.WARNING, "Not match", "Truck number does not match: " + truckNumber);
+//                return;
+//            }
             if (!truckService.isNotFinishedTrucksExists()) {
                 showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
                 return;
@@ -261,7 +261,7 @@ public class TestController {
 
                     Thread.sleep(1000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
                 }
             }
         });

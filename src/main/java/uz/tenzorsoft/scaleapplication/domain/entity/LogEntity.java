@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity(name = "logs")
 public class LogEntity extends BaseEntity {
-
+    private Long scaleId;
     private String truckNumber;
     private String event;
 

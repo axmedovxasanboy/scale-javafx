@@ -53,7 +53,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }
@@ -80,7 +80,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
-            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }
@@ -110,6 +110,21 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     public List<AttachmentResponse> getNotSentData() {
         List<AttachmentResponse> result = new ArrayList<>();
         List<AttachEntity> notSentData = attachRepository.findByIsSentToCloud(false);
+
+        if (notSentData.isEmpty()) return result;
+
+        AttachEntity notSentAttach = notSentData.get(0);
+        TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(notSentAttach));
+        AttachmentResponse response = new AttachmentResponse(
+                truck == null ? null : truck.getIdOnServer(), notSentAttach.getOriginalName(),
+                notSentAttach.getSize(), notSentAttach.getType(), notSentAttach.getContentType(), notSentAttach.getPath(), null,
+                truckPhotoService.findAttachStatus(notSentAttach), notSentAttach.getCreatedAt(), getImageBytes(notSentAttach.getPath())
+        );
+        response.setId(notSentAttach.getId());
+        response.setIdOnServer(notSentAttach.getIdOnServer());
+        result.add(response);
+        return result;
+/*
         for (AttachEntity attach : notSentData) {
 
             TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(attach));
@@ -125,6 +140,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
 
         }
         return result;
+*/
     }
 
     private byte[] getImageBytes(String path) {

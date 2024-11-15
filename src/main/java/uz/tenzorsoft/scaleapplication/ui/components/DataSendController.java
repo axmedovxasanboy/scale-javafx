@@ -28,24 +28,29 @@ public class DataSendController {
                     try {
                         sendDataService.sendNotSentData();
                     } catch (Exception e) {
-                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
                     try {
                         if(!isTesting) sendDataService.sendDataToMyCoal();
                     } catch (Exception e) {
-                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
                     try {
-                        sendDataService.sendStatuses();
+                        if(!isTesting) sendDataService.sendLogsToServer();
                     } catch (Exception e) {
-                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
+//                    try {
+//                        sendDataService.sendStatuses();
+//                    } catch (Exception e) {
+//                        System.err.println(e.getMessage());
+//                    }
                     Thread.sleep(2000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
 //                    System.err.println(e.getMessage());
                 }
             }

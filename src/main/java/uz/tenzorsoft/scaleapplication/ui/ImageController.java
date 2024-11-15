@@ -82,7 +82,7 @@ public class ImageController {
                 setupImageClick(images.get(i), image);
 
             } catch (Exception e) {
-                logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             }
         }
     }
