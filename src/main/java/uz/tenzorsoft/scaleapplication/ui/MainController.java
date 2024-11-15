@@ -17,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.*;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
@@ -34,6 +36,7 @@ import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isScaleControlOn;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
 @RequiredArgsConstructor
@@ -52,6 +55,7 @@ public class MainController {
     private final PrintCheck printCheck;
     private final TestController testController;
     private final ConfigUtilsService configUtilsService;
+    private final LogService logService;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -210,10 +214,12 @@ public class MainController {
                             connectButton.setText("Disconnect");
                             connectButton.getStyleClass().removeAll("connect-button");
                             connectButton.getStyleClass().add("connect-button-disconnected");
+                            truckPosition = -1;
                         }
                     });
                     Thread.sleep(1000);
                 } catch (Exception e) {
+                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
                 }
             }

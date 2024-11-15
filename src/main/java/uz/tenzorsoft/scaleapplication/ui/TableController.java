@@ -11,9 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
@@ -82,6 +85,8 @@ public class TableController {
 
     @FXML
     private TableColumn<TableViewData, String> dropWeight;
+    @Autowired
+    private LogService logService;
 
 
     @FXML
@@ -134,6 +139,7 @@ public class TableController {
 
                     Thread.sleep(60000);
                 } catch (Exception e) {
+                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }

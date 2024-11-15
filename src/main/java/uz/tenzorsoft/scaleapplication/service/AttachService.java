@@ -3,7 +3,9 @@ package uz.tenzorsoft.scaleapplication.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.AttachEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.AttachmentResponse;
@@ -24,6 +26,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
     private final TruckService truckService;
     private final TruckPhotoService truckPhotoService;
     private final String projectDirectory = System.getProperty("user.dir") + "/";
+    private final LogService logService;
 
     public AttachResponse saveToSystem(MultipartFile file) {
         try {
@@ -50,6 +53,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }
@@ -76,6 +80,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }

@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
@@ -12,6 +14,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.CargoService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.ButtonController;
@@ -45,6 +48,7 @@ public class TruckScalingController {
     private final CargoService cargoService;
     private final ExecutorService executors;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final LogService logService;
     private boolean isTruckEntered = false;
     private boolean isOnScale = false;
     @Setter
@@ -110,6 +114,7 @@ public class TruckScalingController {
                                     try {
                                         truckService.saveCurrentTruck(currentTruck, false);
                                     } catch (Exception e) {
+                                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                                         e.printStackTrace();
                                     }
                                     tableController.updateTableRow(truckService.getCurrentTruckEntity());
@@ -210,11 +215,13 @@ public class TruckScalingController {
                                 try {
                                     truck = truckService.saveCurrentTruck(currentTruck, true);
                                 } catch (Exception e) {
+                                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                                     e.printStackTrace();
                                 }
                                 try {
                                     cargoService.saveCargo(truck);
                                 } catch (Exception e) {
+                                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                                     e.printStackTrace();
                                 }
                                 try {
@@ -226,6 +233,7 @@ public class TruckScalingController {
                                         }
                                     }, 50);
                                 } catch (Exception e) {
+                                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                                     e.printStackTrace();
                                 }
                                 tableController.updateTableRow(truckService.getCurrentTruckEntity());
@@ -273,11 +281,12 @@ public class TruckScalingController {
                                 weigh = 0.0;
                             }
                         }
-                    }, CLOSE_GATE2_TIMEOUT);
+                    }, CLOSE_GATE1_TIMEOUT);
                 }
 
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
+            } catch (Exception e) {
+                logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
+                e.printStackTrace();
             }
         }, 0, 500, TimeUnit.MILLISECONDS);
     }

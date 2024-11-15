@@ -3,7 +3,9 @@ package uz.tenzorsoft.scaleapplication.service;
 import com.ghgande.j2mod.modbus.Modbus;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Configurations;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -19,6 +21,11 @@ import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
 public class ConfigUtilsService {
 
     private static final String CONFIG_FILE_PATH = "bin/settings.conf";
+    private final LogService logService;
+
+    public ConfigUtilsService(LogService logService) {
+        this.logService = logService;
+    }
 
     public void saveConfig(Configurations config) {
         try {
@@ -34,6 +41,7 @@ public class ConfigUtilsService {
             System.out.println("Configuration saved successfully.");
 
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -60,6 +68,7 @@ public class ConfigUtilsService {
                 System.out.println("Default configuration file created at " + CONFIG_FILE_PATH);
             }
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }

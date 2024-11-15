@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +18,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class CloudService {
+
+    private final LogService logService;
 
     public boolean login(String phoneNumber, String password) {
         String url = "https://api-scale.mycoal.uz/auth/login";
@@ -91,6 +95,7 @@ public class CloudService {
             String jsonRequestBody = objectMapper.writeValueAsString(requestBody);
             requestEntity = new HttpEntity<>(jsonRequestBody, headers);
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
             return "";
         }
@@ -115,6 +120,7 @@ public class CloudService {
         } catch (HttpClientErrorException e) {
             return "INCORRECT_PASSWORD";
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
             return "";
         }

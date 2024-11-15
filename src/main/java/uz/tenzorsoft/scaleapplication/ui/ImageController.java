@@ -12,8 +12,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.io.FileInputStream;
@@ -29,6 +32,7 @@ import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 public class ImageController {
 
     private final TruckService truckService;
+    private final LogService logService;
     private List<ImageView> images;
     @FXML
     private ImageView imageView1, imageView2, imageView3, imageView4;
@@ -78,6 +82,7 @@ public class ImageController {
                 setupImageClick(images.get(i), image);
 
             } catch (Exception e) {
+                logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             }
         }
     }

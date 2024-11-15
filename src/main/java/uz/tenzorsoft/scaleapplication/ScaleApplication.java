@@ -23,7 +23,7 @@ public class ScaleApplication extends Application {
     @Override
     public void init() throws Exception {
         SpringApplicationBuilder builder = new SpringApplicationBuilder(ScaleApplication.class);
-        context = builder.  run(getParameters().getRaw().toArray(new String[0]));
+        context = builder.run(getParameters().getRaw().toArray(new String[0]));
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/index.fxml"));
         loader.setControllerFactory(context::getBean);
         loader.setLocation(getClass().getResource("/fxml/index.fxml"));

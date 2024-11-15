@@ -183,9 +183,16 @@ public class SendDataService {
 
     }
 
+    public void sendLogsToServer(){
+
+    }
+
+
     private static String getLocalDateTime(TruckActionEntity enteredWeigh) {
         LocalDateTime createdAt = enteredWeigh.getCreatedAt();
         if (createdAt == null) createdAt = LocalDateTime.now();
         return createdAt.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"));
     }
+
+
 }

@@ -1,6 +1,8 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
@@ -17,6 +19,12 @@ import static uz.tenzorsoft.scaleapplication.domain.Settings.PRINTER_NAME;
 @Service
 public class PrintCheck {
 
+
+    private final LogService logService;
+
+    public PrintCheck(LogService logService) {
+        this.logService = logService;
+    }
 
     public void printReceipt(TruckEntity response) {
         PrintService printer = findPrinter(PRINTER_NAME); // Specify your printer name here
@@ -38,6 +46,7 @@ public class PrintCheck {
             sendCutCommand(printer);
             System.out.println("Receipt printed and paper cut successfully.");
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -106,6 +115,7 @@ public class PrintCheck {
             Doc doc = new SimpleDoc(cutCommand, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
             printJob.print(doc, null);
         } catch (Exception e) {
+            logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
             e.printStackTrace();
         }
     }

@@ -3,6 +3,9 @@ package uz.tenzorsoft.scaleapplication.ui.components;
 import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 
 import java.util.concurrent.ExecutorService;
@@ -16,6 +19,7 @@ public class DataSendController {
 
     private final ExecutorService executors;
     private final SendDataService sendDataService;
+    private final LogService logService;
 
     public void sendNotSentData() {
         executors.execute(() -> {
@@ -24,20 +28,24 @@ public class DataSendController {
                     try {
                         sendDataService.sendNotSentData();
                     } catch (Exception e) {
+                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
                     try {
                         if(!isTesting) sendDataService.sendDataToMyCoal();
                     } catch (Exception e) {
+                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
                     try {
                         sendDataService.sendStatuses();
                     } catch (Exception e) {
+                        logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                         System.err.println(e.getMessage());
                     }
                     Thread.sleep(2000);
                 } catch (Exception e) {
+                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
 //                    System.err.println(e.getMessage());
                 }
             }

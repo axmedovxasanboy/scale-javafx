@@ -4,7 +4,10 @@ import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 
 import java.util.concurrent.ExecutorService;
 
@@ -19,6 +22,7 @@ public class ConnectionsController {
 
     private final ExecutorService executors;
     private final ControllerService controllerService;
+    private final LogService logService;
     @FXML
     private ImageView controller, camera1, camera2, camera3, gate1, gate2, sensor1, sensor2, sensor3;
 
@@ -65,6 +69,7 @@ public class ConnectionsController {
 
                     Thread.sleep(500);
                 } catch (Exception e) {
+                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }

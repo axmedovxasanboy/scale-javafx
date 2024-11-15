@@ -9,10 +9,13 @@ import javafx.scene.layout.Pane;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
@@ -32,6 +35,7 @@ public class TestController {
     private final TruckService truckService;
     private final TableController tableController;
     private final ButtonController buttonController;
+    private final LogService logService;
 
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
@@ -256,7 +260,8 @@ public class TestController {
                     }
 
                     Thread.sleep(1000);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    logService.save(new LogEntity(Instances.truckNumber, e.getMessage()));
                 }
             }
         });
@@ -264,18 +269,22 @@ public class TestController {
 
     public void openGate1() {
         buttonController.openGate1();
+        truckPosition = -1;
     }
 
     public void openGate2() {
         buttonController.openGate2();
+        truckPosition = -1;
     }
 
     public void closeGate1() {
         buttonController.closeGate1();
+        truckPosition = -1;
     }
 
     public void closeGate2() {
         buttonController.closeGate2();
+        truckPosition = -1;
     }
 
     public void getWeight() {
