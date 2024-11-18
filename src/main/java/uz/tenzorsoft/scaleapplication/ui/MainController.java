@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.controlsfx.control.ToggleSwitch;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
@@ -43,22 +45,27 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 @RequiredArgsConstructor
 public class MainController {
     private final FXMLLoader fxmlLoader;
-    private final ControllerService controllerService;
-    private final TruckService truckService;
-    private final SendDataService sendDataService;
     private final DataSendController dataSendController;
-    private final ConnectionsController connectionsController;
-    private final TruckScalingController truckScalingController;
-    private final ButtonController buttonController;
-    private final TableController tableController;
     private final ExecutorService executors;
-    private final UserService userService;
     private final PrintCheck printCheck;
-    private final TestController testController;
     private final ConfigUtilsService configUtilsService;
     private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
     private final UserController userController;
+    private final ConnectionsController connectionsController;
+
+    @Autowired
+    @Lazy
+    private TableController tableController;
+    @Autowired
+    @Lazy
+    private ButtonController buttonController;
+    @Autowired
+    @Lazy
+    private TruckScalingController truckScalingController;
+    @Autowired
+    @Lazy
+    private TestController testController;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -71,7 +78,7 @@ public class MainController {
     @Setter
     private Button issueCheckButton;
 
-    public static void showAlert(Alert.AlertType alertType, String headerText, String message) {
+    public void showAlert(Alert.AlertType alertType, String headerText, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(headerText);
         alert.setHeaderText(null);
@@ -167,7 +174,7 @@ public class MainController {
 
     public static String showNotFinishedTrucksDialog(List<String> notFinishedTrucks) {
         if (notFinishedTrucks.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Warning", "All trucks are exited");
+            //showAlert(Alert.AlertType.WARNING, "Warning", "All trucks are exited");
             return "";
         }
         Dialog<String> dialog = new Dialog<>();

@@ -1,9 +1,10 @@
 package uz.tenzorsoft.scaleapplication.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
-import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
-import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
@@ -37,7 +36,6 @@ import java.util.Map;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @RestController
 @RequestMapping("/api")
@@ -46,10 +44,15 @@ import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 public class CameraController {
 
     private final AttachService attachService;
-    private final TableController tableController;
-    private final ButtonController buttonController;
     private final TruckService truckService;
     private final LogService logService;
+    @Autowired
+    @Lazy
+    private TableController tableController;
+
+    @Autowired
+    @Lazy
+    private ButtonController buttonController;
 
     @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadFile(HttpServletRequest request, @PathVariable("id") Integer cameraId) {
@@ -58,9 +61,10 @@ public class CameraController {
             System.out.println("Camera id: " + cameraId);
             System.out.println("multipartRequest.getFileMap().size() = " + multipartRequest.getFileMap().size());
 
-            if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
+            if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || currentUser.getId() == null /*|| !isConnected*/) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
+            AttachResponse attachResponse = new AttachResponse();
 //            isWaiting = true;
             for (Map.Entry<String, MultipartFile> entry : multipartRequest.getFileMap().entrySet()) {
                 String fileName = entry.getKey();
@@ -107,7 +111,7 @@ public class CameraController {
                     try {
                         if (fileName.equals("detectionPicture.jpg")) {
 
-                            AttachResponse attachResponse = attachService.saveToSystem(file);
+                            attachResponse = attachService.saveToSystem(file);
                             if (attachResponse == null) {
                                 logService.save(new LogEntity(5L, truckNumber, "Unable to save file"));
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
@@ -115,10 +119,10 @@ public class CameraController {
                             }
                             if (cameraId == 1) {
                                 System.out.println("saving image " + cameraId);
-                                currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.ENTRANCE_PHOTO));
+                                // currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.ENTRANCE_PHOTO));
                             } else if (cameraId == 2) {
                                 System.out.println("saving image 2");
-                                currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.EXIT_PHOTO));
+                                // currentTruck.getAttaches().add(new AttachIdWithStatus(attachResponse.getId(), AttachStatus.EXIT_PHOTO));
                             }
                         }
                     } catch (Exception e) {
@@ -137,16 +141,24 @@ public class CameraController {
 //            isWaiting = false;
             try { // added
                 if (cameraId == 1) {
-                    currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
-                    truckService.saveTruck(currentTruck, cameraId);
-                    tableController.addLastRecord();
-                    System.out.println("Opening gate 1");
-                    buttonController.openGate1(0);
+                    if (buttonController.openGate1(0)) {
+                        currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
+                        truckService.saveTruck(currentTruck, cameraId, attachResponse);
+                        tableController.addLastRecord();
+                        System.out.println("Opening gate 1");
+                    } else {
+                        System.err.println("Unable to open gate 1");
+                        currentTruck = new TruckResponse();
+                    }
                 } else if (cameraId == 2) {
-                    currentTruck.setExitedStatus(TruckAction.EXIT);
-                    truckService.saveTruck(currentTruck, cameraId);
-                    System.out.println("Opening gate 2");
-                    buttonController.openGate2(7);
+                    if (buttonController.openGate2(7)) {
+                        currentTruck.setExitedStatus(TruckAction.EXIT);
+                        truckService.saveTruck(currentTruck, cameraId, attachResponse);
+                        System.out.println("Opening gate 2");
+                    } else {
+                        System.err.println("Unable to open gate 2");
+                        currentTruck = new TruckResponse();
+                    }
                 }
             } catch (Exception e) {
                 logService.save(new LogEntity(5L, truckNumber, e.getMessage()));

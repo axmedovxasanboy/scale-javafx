@@ -36,7 +36,6 @@ public class SendDataService {
     private final RestTemplate restTemplate;
     private final CargoService cargoService;
     private final AttachService attachService;
-    private final CargoRepository cargoRepository;
     private final TruckActionService truckActionService;
     private final LogService logService;
 

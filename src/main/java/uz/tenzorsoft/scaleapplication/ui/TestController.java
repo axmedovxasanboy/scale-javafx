@@ -8,12 +8,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import lombok.RequiredArgsConstructor;
 import org.controlsfx.control.ToggleSwitch;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
+import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
@@ -23,7 +25,6 @@ import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor
@@ -31,11 +32,14 @@ public class TestController {
 
     private final ExecutorService executors;
     private final AttachService attachService;
-    private final TruckScalingController truckScalingController;
     private final TruckService truckService;
     private final TableController tableController;
     private final ButtonController buttonController;
     private final LogService logService;
+    @Lazy
+    private final MainController mainController;
+    @Lazy
+    private final TruckScalingController truckScalingController;
 
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
@@ -130,14 +134,15 @@ public class TestController {
 //                return;
 //            }
             if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
+                mainController.showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
                 return;
             }
-            Long attachId = attachService.getCameraImgTesting().getId();
+            AttachResponse response = attachService.getCameraImgTesting();
+            Long attachId = response.getId();
             currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.ENTRANCE_PHOTO));
             currentTruck.setTruckNumber(truckNumber);
             currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
-            truckService.saveTruck(currentTruck, 1);
+            truckService.saveTruck(currentTruck, 1, response);
             gate1Switch.setSelected(true);
             tableController.addLastRecord();
             truckPosition = 0;
@@ -154,18 +159,19 @@ public class TestController {
 //                return;
 //            }
             if (!truckService.isNotFinishedTrucksExists()) {
-                showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
+                mainController.showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
                 return;
             }
             if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                showAlert(Alert.AlertType.WARNING, "Not found", "Entrance not available: " + truckNumber);
+                mainController.showAlert(Alert.AlertType.WARNING, "Not found", "Entrance not available: " + truckNumber);
                 return;
             }
-            Long attachId = attachService.getCameraImgTesting().getId();
+            AttachResponse response = attachService.getCameraImgTesting();
+            Long attachId = response.getId();
             currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.EXIT_PHOTO));
             currentTruck.setTruckNumber(truckNumber);
             currentTruck.setExitedStatus(TruckAction.EXIT);
-            truckService.saveTruck(currentTruck, 2);
+            truckService.saveTruck(currentTruck, 2, response);
             gate2Switch.setSelected(true);
             truckPosition = 7;
             truckNumberFieldCamera2.clear();

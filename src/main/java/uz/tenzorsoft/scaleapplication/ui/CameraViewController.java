@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.scene.control.Alert;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -13,18 +14,13 @@ import java.util.Base64;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_2;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
-//@RequiredArgsConstructor
+@RequiredArgsConstructor
 public class CameraViewController {
     private final AttachService attachService;
     private final LogService logService;
 
-    public CameraViewController(AttachService attachService, LogService logService) {
-        this.attachService = attachService;
-        this.logService = logService;
-    }
 
 //    @FXML
 //    private ImageView camera1;
@@ -69,7 +65,8 @@ public class CameraViewController {
             }
         } catch (Exception e) {
             logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
+            // Not on FX application error
+            //showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
         }
         return null;
     }

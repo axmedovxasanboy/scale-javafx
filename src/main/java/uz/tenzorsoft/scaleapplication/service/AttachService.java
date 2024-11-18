@@ -22,11 +22,12 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AttachService implements BaseService<AttachEntity, AttachResponse, Object> {
     private final AttachRepository attachRepository;
-    private final String attachUploadFolder = System.getProperty("user.dir") + "/uploads/";
     private final TruckService truckService;
     private final TruckPhotoService truckPhotoService;
-    private final String projectDirectory = System.getProperty("user.dir") + "/";
     private final LogService logService;
+
+    private final String attachUploadFolder = System.getProperty("user.dir") + "/uploads/";
+    private final String projectDirectory = System.getProperty("user.dir") + "/";
 
     public AttachResponse saveToSystem(MultipartFile file) {
         try {

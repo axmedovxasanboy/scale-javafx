@@ -1,6 +1,8 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
@@ -13,7 +15,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class TableService {
 
-    private final CargoService cargoService;
+    @Autowired
+    @Lazy
+    private CargoService cargoService;
 
     public TableViewData entityToTableData(TruckEntity truckEntity) {
         TableViewData data = new TableViewData();

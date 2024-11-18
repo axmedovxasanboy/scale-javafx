@@ -17,6 +17,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
 @Entity(name = "cargos")
 public class CargoEntity extends BaseEntity {
     private Double netWeight;
+
     @Enumerated(EnumType.STRING)
     private CargoStatus cargoStatus;
     private Long scaleId;

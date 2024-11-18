@@ -11,6 +11,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
@@ -25,8 +27,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
-
 @Component
 @RequiredArgsConstructor
 public class ImageController {
@@ -34,6 +34,11 @@ public class ImageController {
     private final TruckService truckService;
     private final LogService logService;
     private List<ImageView> images;
+
+    @Autowired
+    @Lazy
+    private MainController mainController;
+
     @FXML
     private ImageView imageView1, imageView2, imageView3, imageView4;
 
@@ -66,7 +71,7 @@ public class ImageController {
         Image defaultImage = new Image("/images/no-image.jpg");
         TruckEntity truck = truckService.findById(data.getId());
         if (truck == null) {
-            showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
+            mainController.showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
             return;
         }
         for (ImageView image : images) {

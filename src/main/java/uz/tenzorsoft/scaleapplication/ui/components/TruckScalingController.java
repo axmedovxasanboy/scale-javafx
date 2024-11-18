@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
@@ -47,8 +49,15 @@ public class TruckScalingController {
     private final TruckService truckService;
     private final CargoService cargoService;
     private final ExecutorService executors;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final LogService logService;
+
+    private TruckActionEntity enteredAction = new TruckActionEntity();
+    private TruckPhotosEntity enteredPhoto = new TruckPhotosEntity();
+
+    private TruckActionEntity exitedAction = new TruckActionEntity();
+    private TruckPhotosEntity exitedPhoto = new TruckPhotosEntity();
+
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private boolean isTruckEntered = false;
     private boolean isOnScale = false;
     @Setter
@@ -98,8 +107,8 @@ public class TruckScalingController {
 
                             if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
-                                currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO);
+                                //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
+                                truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
                                 isCargoPhotoTaken = true;
                                 System.out.println("Opening gate 2");
                                 buttonController.openGate2(); // Open Gate 2
@@ -198,8 +207,8 @@ public class TruckScalingController {
 
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
-                                currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response.getId(), AttachStatus.EXIT_CARGO_PHOTO);
+                                //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
+                                truckService.saveTruckAttaches(currentTruck, response, AttachStatus.EXIT_CARGO_PHOTO);
                                 isCargoPhotoTaken = true;
                                 currentTruck.setExitedWeight(weigh);
                                 log.info("Truck weigh: {}", currentTruck.getExitedWeight());

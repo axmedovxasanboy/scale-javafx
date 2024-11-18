@@ -11,7 +11,6 @@ import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
-import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
 @Component
 @RequiredArgsConstructor

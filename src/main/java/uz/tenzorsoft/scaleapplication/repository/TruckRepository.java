@@ -56,6 +56,8 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     boolean existsByIsFinishedFalse();
 
+    boolean existsByTruckNumberAndIsFinished(String truckNumber, boolean isFinished);
+
     List<TruckEntity> findByIsFinished(Boolean isFinished);
 
 }

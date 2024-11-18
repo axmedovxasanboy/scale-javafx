@@ -33,11 +33,15 @@ public class TableController {
     private final TruckService truckService;
     private final TableService tableService;
     private final ExecutorService executors;
-    private final ImageController imageController;
+    private final PrintCheck printCheck;
+
     @Autowired
     @Lazy
     private MainController mainController;
-    private final PrintCheck printCheck;
+    @Autowired
+    @Lazy
+    private ImageController imageController;
+
     @FXML
     private TableView<TableViewData> tableData;
 
@@ -151,7 +155,7 @@ public class TableController {
     public void addLastRecord() {
         TableViewData record = truckService.findLastRecord();
         if (record == null) return;
-        tableData.getItems().add(record);
+        tableData.getItems().add(0, record);
     }
 
     public void updateTableRow(TruckEntity truckEntity) {
