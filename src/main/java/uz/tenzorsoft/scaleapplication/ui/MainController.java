@@ -18,7 +18,6 @@ import lombok.Setter;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.service.*;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
@@ -38,6 +37,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 @Component
 @RequiredArgsConstructor
 public class MainController {
+
     private final FXMLLoader fxmlLoader;
     private final ControllerService controllerService;
     private final TruckService truckService;
@@ -96,27 +96,6 @@ public class MainController {
 
         // Waits until the dialog result is available
         return futureResult.join();
-    }
-
-
-    public void load() {
-        configUtilsService.loadConfigurations();
-        loadMainMenu();
-        scalePort = new Settings(SCALE_PORT).getSerialPort();
-        connectionsController.updateConnections();
-        dataSendController.sendNotSentData();
-        truckScalingController.start();
-        tableController.loadData();
-        testController.start();
-        printCheck.listAvailablePrinters();
-        buttonController.connect();
-        if (isConnected) {
-            buttonController.closeGate1();
-            buttonController.closeGate2();
-        }
-        controlConnectButton();
-        System.out.println("All tasks are submitted!");
-
     }
 
     public static String showNumberInsertDialog() {
@@ -197,6 +176,26 @@ public class MainController {
         return result.orElse("");
     }
 
+    public void load() {
+        configUtilsService.loadConfigurations();
+        loadMainMenu();
+        scalePort = new Settings(SCALE_PORT).getSerialPort();
+        connectionsController.updateConnections();
+        dataSendController.sendNotSentData();
+        truckScalingController.start();
+        tableController.loadData();
+        testController.start();
+        printCheck.listAvailablePrinters();
+        buttonController.connect();
+        if (isConnected) {
+            buttonController.closeGate1();
+            buttonController.closeGate2();
+        }
+        controlConnectButton();
+        System.out.println("All tasks are submitted!");
+
+    }
+
     private void controlConnectButton() {
         executors.execute(() -> {
             while (true) {
@@ -260,7 +259,6 @@ public class MainController {
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
-
 
 
     }
