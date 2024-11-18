@@ -61,7 +61,7 @@ public class CameraController {
             if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || isWaiting || currentUser.getId() == null) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
-            isWaiting = true;
+//            isWaiting = true;
             for (Map.Entry<String, MultipartFile> entry : multipartRequest.getFileMap().entrySet()) {
                 String fileName = entry.getKey();
                 MultipartFile file = entry.getValue();
@@ -134,7 +134,7 @@ public class CameraController {
                 }
             }
             currentTruck.setTruckNumber(truckNumber);
-            isWaiting = false;
+//            isWaiting = false;
             try { // added
                 if (cameraId == 1) {
                     currentTruck.setEnteredStatus(TruckAction.ENTRANCE);

@@ -159,6 +159,7 @@ public class ButtonController {
             logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             e.printStackTrace();
         }
+        isWaiting = false;
     }
 
     public void closeGate1() {

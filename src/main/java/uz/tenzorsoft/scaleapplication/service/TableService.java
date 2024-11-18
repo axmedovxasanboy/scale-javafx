@@ -27,16 +27,16 @@ public class TableService {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
                     data.setEnteredTruckNumber(truckEntity.getTruckNumber());
                     data.setEnteredDate(getDate(action.getCreatedAt()));
-                    data.setEnteredWeight(action.getWeight());
-                    enteredWeight = action.getWeight();
+                    data.setEnteredWeight(action.getWeight() == null ? 0.0 : action.getWeight());
+                    enteredWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
                 }
                 case EXIT, MANUAL_EXIT -> {
                     data.setExitedTruckNumber(truckEntity.getTruckNumber());
                     data.setExitedDate(getDate(action.getCreatedAt()));
-                    data.setExitedWeight(action.getWeight());
-                    exitedWeight = action.getWeight();
+                    data.setExitedWeight(action.getWeight() == null ? 0.0 : action.getWeight());
+                    exitedWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
                 }

@@ -36,6 +36,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private final TruckActionRepository truckActionRepository;
     private final TruckPhotoRepository truckPhotoRepository;
     private final UserService userService;
+    private final CargoService cargoService;
+    private final LogService logService;
 
     @Setter
     @Getter
@@ -48,10 +50,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private String regexPattern;
     @Value("${number.pattern.regexp.standard}")
     private String regexStandard;
-    @Autowired
-    private CargoService cargoService;
-    @Autowired
-    private LogService logService;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -167,7 +165,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public List<TruckEntity> findAll() {
-        return truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+        return truckRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public TableViewData entityToTableViewData(TruckEntity entity) {
@@ -236,28 +234,40 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return truckRepository.findByTruckPhotosContains(truckPhotos).orElse(null);
     }
 
+    @Transactional
     public void saveTruck(TruckResponse currentTruck, Integer id) {
+        if (currentTruckEntity.getId() != null) return;
         if (id == 1) {
-            currentTruckEntity = new TruckEntity();
             currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
+            currentTruckEntity.getTruckPhotos().clear();
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
-                truckPhotos.add(truckPhotoRepository.save(
-                        new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
-                ));
+                if (attach.getStatus().equals(AttachStatus.ENTRANCE_PHOTO)) {
+                    TruckPhotosEntity entity = truckPhotoRepository.save(
+                            new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+                    );
+                    truckPhotos.add(entity);
+                    break;
+                }
             }
             currentTruckEntity.setTruckPhotos(truckPhotos);
             currentTruckEntity.setIsFinished(false);
             truckRepository.save(currentTruckEntity);
         } else {
-            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
-            if (currentTruckEntity == null)
-                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
+//            1 ta malumot kelmasligi mumkin
+//            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
+//            if (currentTruckEntity == null)
+//                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
+            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             for (AttachIdWithStatus attach : currentTruck.getAttaches()) {
-                truckPhotos.add(truckPhotoRepository.save(
-                        new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
-                ));
+                if (attach.getStatus().equals(AttachStatus.EXIT_PHOTO)) {
+                    TruckPhotosEntity entity = truckPhotoRepository.save(
+                            new TruckPhotosEntity(attachService.findById(attach.getId()), attach.getStatus())
+                    );
+                    truckPhotos.add(entity);
+                    break;
+                }
             }
             currentTruckEntity.getTruckPhotos().addAll(truckPhotos);
 
@@ -304,17 +314,29 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     @Transactional
-    public void saveTruckAttaches(TruckResponse currentTruck, Long id) {
+    public void saveTruckAttaches(TruckResponse currentTruck, Long id, AttachStatus attachStatus) {
 //        currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
 //                .orElse(new TruckEntity());
 //        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
         List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
-        TruckPhotosEntity photo = new TruckPhotosEntity(
-                attachService.findById(id), AttachStatus.ENTRANCE_CARGO_PHOTO
-        );
-        truckPhotoRepository.save(photo);
-        truckPhotos.add(photo);
-        currentTruckEntity = truckRepository.save(currentTruckEntity);
+        AttachEntity attach = attachService.findById(id);
+        for (TruckPhotosEntity truckPhoto : truckPhotos) {
+            if (truckPhoto.getAttachStatus().equals(attachStatus)) {
+                return;
+            }
+        }
+        for (TruckPhotosEntity photo : truckPhotos) {
+            if (photo.getAttachStatus().equals(attachStatus)) {
+                TruckPhotosEntity photosEntity = new TruckPhotosEntity(
+                        attach, attachStatus
+                );
+                truckPhotoRepository.save(photosEntity);
+                truckPhotos.add(photosEntity);
+                currentTruckEntity = truckRepository.save(currentTruckEntity);
+                break;
+            }
+        }
+
     }
 
     public void saveTruckEnteredActions(TruckResponse currentTruck) {

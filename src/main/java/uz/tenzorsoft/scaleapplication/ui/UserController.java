@@ -38,7 +38,7 @@ public class UserController {
         changePasswordText.setOnMouseClicked(event -> openPasswordChangeDialog());
     }
 
-    private void loadUserMenu() {
+    public void loadUserMenu() {
         username.setText(currentUser.getUsername());
         phoneNumber.setText(currentUser.getPhoneNumber());
     }

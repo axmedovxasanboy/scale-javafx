@@ -4,13 +4,14 @@ import javafx.scene.control.Alert;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
 
 import java.util.Base64;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.currentTruck;
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_2;
 import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 
@@ -18,9 +19,11 @@ import static uz.tenzorsoft.scaleapplication.ui.MainController.showAlert;
 //@RequiredArgsConstructor
 public class CameraViewController {
     private final AttachService attachService;
+    private final LogService logService;
 
-    public CameraViewController(AttachService attachService) {
+    public CameraViewController(AttachService attachService, LogService logService) {
         this.attachService = attachService;
+        this.logService = logService;
     }
 
 //    @FXML
@@ -65,6 +68,7 @@ public class CameraViewController {
                 System.out.println("Failed to get snapshot, status: " + response.getStatusCode());
             }
         } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
         }
         return null;

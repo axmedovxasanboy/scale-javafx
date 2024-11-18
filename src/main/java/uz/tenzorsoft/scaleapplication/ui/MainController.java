@@ -58,6 +58,7 @@ public class MainController {
     private final ConfigUtilsService configUtilsService;
     private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
+    private final UserController userController;
 
     @FXML
     private Pane scaleAutomationPane;
@@ -108,6 +109,7 @@ public class MainController {
     public void load() {
         configUtilsService.loadConfigurations();
         loadMainMenu();
+        userController.loadUserMenu();
         try {
             scalePort = new Settings(SCALE_PORT).getSerialPort();
         } catch (Exception e) {

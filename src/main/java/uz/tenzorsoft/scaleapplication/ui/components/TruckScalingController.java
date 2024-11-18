@@ -99,7 +99,7 @@ public class TruckScalingController {
                             if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                                 currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response.getId());
+                                truckService.saveTruckAttaches(currentTruck, response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO);
                                 isCargoPhotoTaken = true;
                                 System.out.println("Opening gate 2");
                                 buttonController.openGate2(); // Open Gate 2
@@ -199,7 +199,7 @@ public class TruckScalingController {
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                                 currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response.getId());
+                                truckService.saveTruckAttaches(currentTruck, response.getId(), AttachStatus.EXIT_CARGO_PHOTO);
                                 isCargoPhotoTaken = true;
                                 currentTruck.setExitedWeight(weigh);
                                 log.info("Truck weigh: {}", currentTruck.getExitedWeight());
@@ -234,6 +234,7 @@ public class TruckScalingController {
                                     e.printStackTrace();
                                 }
                                 tableController.updateTableRow(truckService.getCurrentTruckEntity());
+                                truckService.setCurrentTruckEntity(new TruckEntity());
 
                                 currentTruck = new TruckResponse();
                             }
