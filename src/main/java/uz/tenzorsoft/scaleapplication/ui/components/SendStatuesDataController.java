@@ -72,7 +72,7 @@ public class SendStatuesDataController {
 
                     Thread.sleep(500);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, truckNumber, "00041: (" + getClass().getName() + ") " + e.getMessage()));
                     e.printStackTrace();
                 }
             }

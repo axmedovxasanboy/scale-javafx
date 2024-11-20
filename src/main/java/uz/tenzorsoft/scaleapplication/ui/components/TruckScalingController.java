@@ -129,7 +129,7 @@ public class TruckScalingController {
                                     try {
                                         truckService.saveCurrentTruck(currentTruck, false);
                                     } catch (Exception e) {
-                                        logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00042: (" + getClass().getName() + ") " +e.getMessage()));
                                         e.printStackTrace();
                                     }
                                     tableController.updateTableRow(truckService.getCurrentTruckEntity());
@@ -228,13 +228,13 @@ public class TruckScalingController {
                                 try {
                                     truck = truckService.saveCurrentTruck(currentTruck, true);
                                 } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00043: (" + getClass().getName() + ") " + e.getMessage()));
                                     e.printStackTrace();
                                 }
                                 try {
                                     cargoService.saveCargo(truck);
                                 } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00044: (" + getClass().getName() + ") " + e.getMessage()));
                                     e.printStackTrace();
                                 }
                                 try {
@@ -246,7 +246,7 @@ public class TruckScalingController {
 //                                        }
 //                                    }, 50);
                                 } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00045: (" + getClass().getName() + ") " + e.getMessage()));
                                     e.printStackTrace();
                                     System.out.println(e.getMessage());
                                 }
@@ -299,7 +299,7 @@ public class TruckScalingController {
                 }
 
             } catch (Exception e) {
-                logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                logService.save(new LogEntity(5L, Instances.truckNumber, "00046: (" + getClass().getName() + ") " +e.getMessage()));
                 e.printStackTrace();
             }
         }, 0, 500, TimeUnit.MILLISECONDS);

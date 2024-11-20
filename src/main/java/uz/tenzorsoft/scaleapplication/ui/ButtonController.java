@@ -86,7 +86,7 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.openGate1();
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
@@ -101,7 +101,7 @@ public class ButtonController {
                 return true;
             }
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00018: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
@@ -118,7 +118,7 @@ public class ButtonController {
 //                    return;
 //                }
                 if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                    logService.save(new LogEntity(5L, truckNumber, "Entrance not available"));
+                    logService.save(new LogEntity(5L, truckNumber, "00019: (" + getClass().getName() + ") " + "Entrance not available"));
                     //// mainController.showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
                     return false;
                 }
@@ -136,7 +136,7 @@ public class ButtonController {
             }
         } catch (Exception e) {
             isWaiting = false;
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00020: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
         }
         return false;
@@ -153,12 +153,12 @@ public class ButtonController {
 //                    return;
 //                }
                 if (!truckService.isNotFinishedTrucksExists()) {
-                    logService.save(new LogEntity(5L, truckNumber, "All trucks are exited!"));
+                    logService.save(new LogEntity(5L, truckNumber, "00021: (" + getClass().getName() + ") " +"All trucks are exited!"));
                     // mainController.showAlert(Alert.AlertType.WARNING, "Not found", "Barcha avtomobillar chiqib ketgan!");
                     return false;
                 }
                 if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                    logService.save(new LogEntity(5L, truckNumber, "Entrance not available"));
+                    logService.save(new LogEntity(5L, truckNumber, "00022: (" + getClass().getName() + ") " +"Entrance not available"));
                     // mainController.showAlert(Alert.AlertType.WARNING, "Not found", truckNumber + " kirishi mumkin emas");
                     return false;
                 }
@@ -172,7 +172,7 @@ public class ButtonController {
                 return true;
             }
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00023: (" + getClass().getName() + ") " +e.getMessage()));
             e.printStackTrace();
         }
         isWaiting = false;
@@ -183,7 +183,7 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.closeGate1();
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber,"00024: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
         return false;
@@ -193,7 +193,7 @@ public class ButtonController {
         try {
             if (!isTesting)  return controllerService.openGate2();
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
@@ -208,7 +208,7 @@ public class ButtonController {
                 return true;
             }
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber,"00026: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
@@ -218,7 +218,7 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.closeGate2();
         } catch (ModbusException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber,"00027: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
         return false;
@@ -228,7 +228,7 @@ public class ButtonController {
         try {
             controllerService.connect();
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00028: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
 

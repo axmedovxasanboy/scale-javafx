@@ -69,9 +69,9 @@ public class ConnectionsController {
 
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00030: (" + getClass().getName() + ") " +e.getMessage()));
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00031: (" + getClass().getName() + ") " +e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }

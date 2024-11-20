@@ -54,7 +54,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00008: (" + getClass().getName() + ") " + e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }
@@ -81,7 +81,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00009: (" + getClass().getName() + ") " +e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }

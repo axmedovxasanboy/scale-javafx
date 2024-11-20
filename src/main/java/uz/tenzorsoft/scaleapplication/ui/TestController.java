@@ -267,7 +267,7 @@ public class TestController {
 
                     Thread.sleep(1000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00035: (" + getClass().getName() + ") " + e.getMessage()));
                 }
             }
         });

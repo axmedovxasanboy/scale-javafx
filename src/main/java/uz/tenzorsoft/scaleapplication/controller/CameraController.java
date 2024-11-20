@@ -90,13 +90,13 @@ public class CameraController {
 //                                }
                                 if (cameraId == 1) {
                                     if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                                        logService.save(new LogEntity(5L, truckNumber, "Chiqishi topilmadi"+truckNumber));
+                                        logService.save(new LogEntity(5L, truckNumber, "00001: (CameraController) Chiqishi topilmadi"+truckNumber));
                                         System.err.println("Chiqishi topilmadi"+truckNumber);
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 } else {
                                     if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                                        logService.save(new LogEntity(5L, truckNumber, "Kirishi topilmadi"+truckNumber));
+                                        logService.save(new LogEntity(5L, truckNumber, "00002: (CameraController) Kirishi topilmadi"+truckNumber));
                                         System.err.println("Kirishi topilmadi"+truckNumber);
                                         return ResponseEntity.ok("Entrance exception");
                                     }
@@ -105,7 +105,7 @@ public class CameraController {
 
                         }
                     } catch (Exception e) {
-                        logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+                        logService.save(new LogEntity(5L, truckNumber, "00003: (" + getClass().getName() + ") " +e.getMessage()));
                         System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
@@ -113,7 +113,7 @@ public class CameraController {
 
                             attachResponse = attachService.saveToSystem(file);
                             if (attachResponse == null) {
-                                logService.save(new LogEntity(5L, truckNumber, "Unable to save file"));
+                                logService.save(new LogEntity(5L, truckNumber, "00004: (CameraController) Unable to save file"));
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
                                 return ResponseEntity.ok("Unable to save file");
                             }
@@ -126,11 +126,11 @@ public class CameraController {
                             }
                         }
                     } catch (Exception e) {
-                        logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+                        logService.save(new LogEntity(5L, truckNumber, "00005: (CameraController) " + e.getMessage()));
                         System.out.println("Image Exception " + e.getMessage());
                     }
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, truckNumber, "00006: (CameraController) " + e.getMessage()));
                     log.warn("File processing failed: {}", fileName);
                     log.error(e.getMessage(), e);
                     System.out.println(e.getMessage());
@@ -161,7 +161,7 @@ public class CameraController {
                 }
             }
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00047: (" + getClass().getName() + ") " +e.getMessage()));
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error occurred: " + e.getMessage());
             }
@@ -189,7 +189,7 @@ public class CameraController {
                 return element.getTextContent();
             }
         } catch (ParserConfigurationException | SAXException | IOException e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00007: (CameraController) " + e.getMessage()));
             log.error(e.getMessage(), e);
         }
         return null;

@@ -26,7 +26,9 @@ public class TableService {
         double exitedWeight = 0.0;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
-
+            if (action.getAction() == null) {
+                continue;
+            }
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
                     data.setEnteredTruckNumber(truckEntity.getTruckNumber());

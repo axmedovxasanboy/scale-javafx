@@ -143,7 +143,7 @@ public class TableController {
 
                     Thread.sleep(60000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " +e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }

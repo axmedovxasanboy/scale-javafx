@@ -281,7 +281,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         try {
             currentTruckEntity = truckRepository.save(currentTruckEntity);
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber,"00015: (" + getClass().getName() + ") " + e.getMessage()));
             System.err.println(e.getMessage());
         }
         return currentTruckEntity;

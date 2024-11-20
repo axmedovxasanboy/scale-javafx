@@ -46,7 +46,7 @@ public class PrintCheck {
             sendCutCommand(printer);
             System.out.println("Receipt printed and paper cut successfully.");
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00013: (" + getClass().getName() + ") " +e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -115,7 +115,7 @@ public class PrintCheck {
             Doc doc = new SimpleDoc(cutCommand, DocFlavor.BYTE_ARRAY.AUTOSENSE, null);
             printJob.print(doc, null);
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00014: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
         }
     }

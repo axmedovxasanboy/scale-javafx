@@ -27,7 +27,7 @@ public class DataSendController {
                 try {
                     CompletableFuture.runAsync(() -> sendDataService.sendNotSentData())
                             .exceptionally(e -> {
-                                logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                logService.save(new LogEntity(5L, Instances.truckNumber, "00036: (" + getClass().getName() + ") " +e.getMessage()));
                                 System.err.println(e.getMessage());
                                 return null;
                             });
@@ -35,14 +35,14 @@ public class DataSendController {
                     if (!isTesting) {
                         CompletableFuture.runAsync(() -> sendDataService.sendDataToMyCoal())
                                 .exceptionally(e -> {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00037: (" + getClass().getName() + ") " + e.getMessage()));
                                     System.err.println(e.getMessage());
                                     return null;
                                 });
 
                         CompletableFuture.runAsync(() -> sendDataService.sendLogsToServer())
                                 .exceptionally(e -> {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00038: (" + getClass().getName() + ") " + e.getMessage()));
                                     System.err.println(e.getMessage());
                                     return null;
                                 });
@@ -52,9 +52,9 @@ public class DataSendController {
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Tarmoqni xavfsiz to'xtatish
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "Thread interrupted: " + e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00039: (" + getClass().getName() + ") " +"Thread interrupted: " + e.getMessage()));
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00040: (" + getClass().getName() + ") " +e.getMessage()));
                     System.err.println(e.getMessage());
                 }
             }

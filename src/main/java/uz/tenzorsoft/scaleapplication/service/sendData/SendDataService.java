@@ -97,7 +97,7 @@ public class SendDataService {
             }
 
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00016: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
             System.err.println("Unable to send data");
         }
@@ -116,17 +116,24 @@ public class SendDataService {
             CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
             MyCoalData myCoalData = new MyCoalData();
             TruckActionEntity exitedWeigh = new TruckActionEntity();
+            TruckActionEntity noneAction = new TruckActionEntity();
+            TruckActionEntity enteredWeigh = new TruckActionEntity();
+
             for (TruckActionEntity action : truckEntity.getTruckActions()) {
+
+                if (action.getAction() == null) {
+                    noneAction = action;
+                    continue;
+                }
+
                 if (action.getAction().equals(TruckAction.EXIT) || action.getAction().equals(TruckAction.MANUAL_EXIT)) {
                     exitedWeigh = action;
-                    break;
+                    continue;
                 }
-            }
-            TruckActionEntity enteredWeigh = new TruckActionEntity();
-            for (TruckActionEntity action : truckEntity.getTruckActions()) {
+
                 if (action.getAction().equals(TruckAction.ENTRANCE) || action.getAction().equals(TruckAction.MANUAL_ENTRANCE)) {
                     enteredWeigh = action;
-                    break;
+                    continue;
                 }
             }
 
@@ -146,10 +153,20 @@ public class SendDataService {
             ));
             myCoalData.setAccord(new AccordResponse(null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
             myCoalData.setDoverennost(new Doverennost(null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))));
+            if (noneAction.getId() != null) {
+                if (enteredWeigh.getAction() == null) {
+                    enteredWeigh = noneAction;
+                }
+
+                if (exitedWeigh.getAction() == null) {
+                    exitedWeigh = noneAction;
+                }
+            }
+
+            double brutto = Math.max(exitedWeigh.getWeight(), enteredWeigh.getWeight());
+            double tara = Math.min(exitedWeigh.getWeight(), enteredWeigh.getWeight());
             myCoalData.setHeft(new Heft(
-                    Math.max(exitedWeigh.getWeight(), enteredWeigh.getWeight()),
-                    Math.min(exitedWeigh.getWeight(), enteredWeigh.getWeight()),
-                    Math.max(exitedWeigh.getWeight(), enteredWeigh.getWeight()),
+                    brutto, tara, brutto,
                     cargo != null ? cargo.getNetWeight() : null
             ));
 
@@ -187,7 +204,7 @@ public class SendDataService {
     public void sendLogsToServer() {
         LogResponse request = new LogResponse();
         List<LogEntity> notSentLogs = logService.getNotSentLogs();
-        if(notSentLogs.isEmpty()) return;
+        if (notSentLogs.isEmpty()) return;
         request.setDtoList(notSentLogs);
         ResponseEntity<LocalAndServerIds> response = restTemplate.postForEntity(
                 "https://api-scale.mycoal.uz/logs/create",

@@ -234,7 +234,7 @@ public class MainController {
                     });
                     Thread.sleep(1000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
                     Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
                 }
             }
