@@ -86,9 +86,10 @@ public class TruckScalingController {
                     buttonController.closeGate1();
                 }
 
-                if ((!sensor2Connection || isOnScale) && truckPosition == 2 &&
+                if ((!sensor2Connection || isOnScale) && (truckPosition == 2) &&
                         (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
                                 currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
+                    System.out.println("Scaling ---- isScaled = " + isOnScale+ "Status "+currentTruck.getEnteredStatus());
                     Timer timer = new Timer();
                     timer.schedule((new TimerTask() {
                         @Override
@@ -106,10 +107,16 @@ public class TruckScalingController {
                             }
 
                             if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
-                                AttachResponse response = cameraViewController.takePicture(CAMERA_2);
-                                //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
-                                isCargoPhotoTaken = true;
+                                try{
+                                    AttachResponse response = cameraViewController.takePicture(CAMERA_2);
+                                    //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
+                                    truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
+                                    isCargoPhotoTaken = true;
+
+                                } catch (Exception e) {
+                                    System.out.println(e.getMessage());
+                                }
+
                                 System.out.println("Opening gate 2");
                                 buttonController.openGate2(); // Open Gate 2
 //                                if (weigh > 0) {
@@ -231,19 +238,19 @@ public class TruckScalingController {
                                     e.printStackTrace();
                                 }
                                 try {
-                                    Timer timer1 = new Timer();
-                                    timer1.schedule(new TimerTask() {
-                                        @Override
-                                        public void run() {
+//                                    Timer timer1 = new Timer();
+//                                    timer1.schedule(new TimerTask() {
+//                                        @Override
+//                                        public void run() {
                                             printCheck.printReceipt(truckService.getCurrentTruckEntity());
-                                        }
-                                    }, 50);
+//                                        }
+//                                    }, 50);
                                 } catch (Exception e) {
                                     logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
                                     e.printStackTrace();
+                                    System.out.println(e.getMessage());
                                 }
                                 tableController.updateTableRow(truckService.getCurrentTruckEntity());
-                                truckService.setCurrentTruckEntity(new TruckEntity());
 
                                 currentTruck = new TruckResponse();
                             }
@@ -260,13 +267,13 @@ public class TruckScalingController {
                     System.out.println("Gate 2 is opening");
                 }
 
-                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1) {
-                    isTruckExited = true;
+                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1 && gate1Connection) {
                     System.out.println("Opening gate 1");
                     buttonController.openGate1();
                 }
 
                 if (truckPosition == 5 && sensor2Connection && !sensor1Connection && isScaled && cargoConfirmationStatus == 1 && !gate1Connection) {
+                    isTruckExited = true;
                     truckPosition = 4;
                 }
 
@@ -285,6 +292,7 @@ public class TruckScalingController {
                                 cargoConfirmationStatus = -1;
                                 truckPosition = -1;
                                 weigh = 0.0;
+                                truckService.setCurrentTruckEntity(new TruckEntity());
                             }
                         }
                     }, CLOSE_GATE1_TIMEOUT);

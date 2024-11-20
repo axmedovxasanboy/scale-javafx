@@ -8,6 +8,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
@@ -22,37 +23,42 @@ public class DataSendController {
 
     public void sendNotSentData() {
         executors.execute(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    try {
-                        sendDataService.sendNotSentData();
-                    } catch (Exception e) {
-                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
-                        System.err.println(e.getMessage());
+                    CompletableFuture.runAsync(() -> sendDataService.sendNotSentData())
+                            .exceptionally(e -> {
+                                logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                System.err.println(e.getMessage());
+                                return null;
+                            });
+
+                    if (!isTesting) {
+                        CompletableFuture.runAsync(() -> sendDataService.sendDataToMyCoal())
+                                .exceptionally(e -> {
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    System.err.println(e.getMessage());
+                                    return null;
+                                });
+
+                        CompletableFuture.runAsync(() -> sendDataService.sendLogsToServer())
+                                .exceptionally(e -> {
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                                    System.err.println(e.getMessage());
+                                    return null;
+                                });
                     }
-                    try {
-                        if(!isTesting) sendDataService.sendDataToMyCoal();
-                    } catch (Exception e) {
-                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
-                        System.err.println(e.getMessage());
-                    }
-                    try {
-                        if(!isTesting) sendDataService.sendLogsToServer();
-                    } catch (Exception e) {
-                        logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
-                        System.err.println(e.getMessage());
-                    }
-//                    try {
-//                        sendDataService.sendStatuses();
-//                    } catch (Exception e) {
-//                        System.err.println(e.getMessage());
-//                    }
+
                     Thread.sleep(2000);
+
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Tarmoqni xavfsiz to'xtatish
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "Thread interrupted: " + e.getMessage()));
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L,Instances.truckNumber, e.getMessage()));
-//                    System.err.println(e.getMessage());
+                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    System.err.println(e.getMessage());
                 }
             }
         });
     }
+
 }

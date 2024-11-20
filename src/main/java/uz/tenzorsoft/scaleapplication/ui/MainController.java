@@ -230,8 +230,6 @@ public class MainController {
                             connectButton.setText("Disconnect");
                             connectButton.getStyleClass().removeAll("connect-button");
                             connectButton.getStyleClass().add("connect-button-disconnected");
-                            truckPosition = -1;
-                            truckPosition = -1;
                         }
                     });
                     Thread.sleep(1000);
@@ -291,6 +289,7 @@ public class MainController {
     private void connectToController() {
         if (isConnected) {
             buttonController.disconnect();
+            truckPosition = -1;
         } else {
             buttonController.connect();
         }

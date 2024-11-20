@@ -40,7 +40,7 @@ public class ConnectionsController {
 
     public void updateConnections() {
         executors.execute(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     if (!isTesting) {
                         gate1Connection = controllerService.checkConnection(COIL_CLOSE_GATE_1);
@@ -68,6 +68,8 @@ public class ConnectionsController {
                     isConnectedToInternet = controllerService.checkConnection(GOOGLE_DNS);
 
                     Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());

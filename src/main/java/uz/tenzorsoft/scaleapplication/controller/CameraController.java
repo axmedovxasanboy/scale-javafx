@@ -90,14 +90,14 @@ public class CameraController {
 //                                }
                                 if (cameraId == 1) {
                                     if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                                        logService.save(new LogEntity(5L, truckNumber, "Entrance available after 5 minutes"));
-                                        System.err.println("Entrance available after 5 minutes");
+                                        logService.save(new LogEntity(5L, truckNumber, "Chiqishi topilmadi"+truckNumber));
+                                        System.err.println("Chiqishi topilmadi"+truckNumber);
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 } else {
                                     if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                                        logService.save(new LogEntity(5L, truckNumber, "Entrance available after 5 minutes"));
-                                        System.err.println("Entrance available after 5 minutes");
+                                        logService.save(new LogEntity(5L, truckNumber, "Kirishi topilmadi"+truckNumber));
+                                        System.err.println("Kirishi topilmadi"+truckNumber);
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 }
@@ -142,28 +142,28 @@ public class CameraController {
             try { // added
                 if (cameraId == 1) {
                     if (buttonController.openGate1(0)) {
-                        currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
-                        truckService.saveTruck(currentTruck, cameraId, attachResponse);
-                        tableController.addLastRecord();
-                        System.out.println("Opening gate 1");
-                    } else {
-                        System.err.println("Unable to open gate 1");
-                        currentTruck = new TruckResponse();
-                    }
-                } else if (cameraId == 2) {
-                    if (buttonController.openGate2(7)) {
-                        currentTruck.setExitedStatus(TruckAction.EXIT);
-                        truckService.saveTruck(currentTruck, cameraId, attachResponse);
-                        System.out.println("Opening gate 2");
-                    } else {
-                        System.err.println("Unable to open gate 2");
-                        currentTruck = new TruckResponse();
-                    }
+                    currentTruck.setEnteredStatus(TruckAction.ENTRANCE);
+                    truckService.saveTruck(currentTruck, cameraId, attachResponse);
+                    tableController.addLastRecord();
+                    System.out.println("Opening gate 1");
+                } else {
+                    System.err.println("Unable to open gate 1");
+                    currentTruck = new TruckResponse();
                 }
-            } catch (Exception e) {
-                logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
-                e.printStackTrace();
-                return ResponseEntity.status(500).body("Error occurred: " + e.getMessage());
+            } else if (cameraId == 2) {
+                if (buttonController.openGate2(7)) {
+                    currentTruck.setExitedStatus(TruckAction.EXIT);
+                    truckService.saveTruck(currentTruck, cameraId, attachResponse);
+                    System.out.println("Opening gate 2");
+                } else {
+                    System.err.println("Unable to open gate 2");
+                    currentTruck = new TruckResponse();
+                }
+            }
+        } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error occurred: " + e.getMessage());
             }
 
             return ResponseEntity.ok("Files uploaded and saved successfully.");

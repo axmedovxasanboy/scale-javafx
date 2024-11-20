@@ -121,13 +121,12 @@ public class ControllerService {
         ModbusResponse response = transaction.getResponse();
 
         if (response == null) {
-            System.out.println("No response received from transaction.");
+            System.err.println("No response received from transaction.");
             return -1;
         } else if (response instanceof ExceptionResponse) {
-            System.out.println("Received an exception response: " + ((ExceptionResponse) response).getExceptionCode());
+            System.err.println("Received an exception response: " + ((ExceptionResponse) response).getExceptionCode());
             return -1;
-        } else if (response instanceof ReadCoilsResponse) {
-            ReadCoilsResponse readResponse = (ReadCoilsResponse) response;
+        } else if (response instanceof ReadCoilsResponse readResponse) {
             // Process readResponse, for example:
             return readResponse.getCoils().getBit(0) ? 1 : 0;  // Example: return 1 if coil is true, 0 if false
         } else {
