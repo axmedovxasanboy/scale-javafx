@@ -109,8 +109,8 @@ public class CameraController {
                         System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
-                        if (fileName.equals("detectionPicture.jpg")) {
 
+                        if (fileName.contains("detectionPicture")){
                             attachResponse = attachService.saveToSystem(file);
                             if (attachResponse == null) {
                                 logService.save(new LogEntity(5L, truckNumber, "00004: (CameraController) Unable to save file"));
