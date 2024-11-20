@@ -1,6 +1,5 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
-import com.fazecast.jSerialComm.SerialPort;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -23,13 +23,16 @@ import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
-import uz.tenzorsoft.scaleapplication.service.*;
-import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
+import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
+import uz.tenzorsoft.scaleapplication.service.LogService;
+import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.SendStatuesDataController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -74,9 +77,36 @@ public class MainController {
     private Button connectButton;
 
     @FXML
+    private DatePicker startDate;
+
+    @FXML
+    private DatePicker endDate;
+
+    @FXML
     @Getter
     @Setter
     private Button issueCheckButton;
+
+    @FXML
+    public void initialize() {
+
+        StringConverter<LocalDate> dateStringConverter = new StringConverter<>() {
+            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+            @Override
+            public String toString(LocalDate date) {
+                return date != null ? date.format(formatter) : "";
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                return string != null && !string.isEmpty() ? LocalDate.parse(string, formatter) : null;
+            }
+        };
+
+        startDate.setConverter(dateStringConverter);
+        endDate.setConverter(dateStringConverter);
+    }
 
     public void showAlert(Alert.AlertType alertType, String headerText, String message) {
         Alert alert = new Alert(alertType);
@@ -293,6 +323,17 @@ public class MainController {
         } else {
             buttonController.connect();
         }
+    }
+
+    @FXML
+    private void getFilteredData() {
+        LocalDate startDateValue = startDate.getValue();
+        LocalDate endDateValue = endDate.getValue();
+
+
+        if (true) {
+        }
+
     }
 
 

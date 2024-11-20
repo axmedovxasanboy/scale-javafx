@@ -14,7 +14,6 @@ import uz.tenzorsoft.scaleapplication.domain.response.LocalAndServerIds;
 import uz.tenzorsoft.scaleapplication.domain.response.StatusResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.*;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.mycoal.*;
-import uz.tenzorsoft.scaleapplication.repository.CargoRepository;
 import uz.tenzorsoft.scaleapplication.service.*;
 
 import java.time.LocalDate;
@@ -113,6 +112,7 @@ public class SendDataService {
         }
 
         for (TruckEntity truckEntity : trucks) {
+            if (!isSendAvailable(truckEntity)) continue;
             CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
             MyCoalData myCoalData = new MyCoalData();
             TruckActionEntity exitedWeigh = new TruckActionEntity();
@@ -156,10 +156,12 @@ public class SendDataService {
             if (noneAction.getId() != null) {
                 if (enteredWeigh.getAction() == null) {
                     enteredWeigh = noneAction;
+                    enteredWeigh.setAction(TruckAction.ENTRANCE);
                 }
 
                 if (exitedWeigh.getAction() == null) {
                     exitedWeigh = noneAction;
+                    exitedWeigh.setAction(TruckAction.EXIT);
                 }
             }
 
@@ -201,6 +203,18 @@ public class SendDataService {
 
     }
 
+    private boolean isSendAvailable(TruckEntity truckEntity) {
+        boolean isEntered = false;
+        boolean isExited = false;
+        for (TruckActionEntity action : truckEntity.getTruckActions()) {
+            switch (action.getAction()) {
+                case MANUAL_ENTRANCE, ENTRANCE -> isEntered = true;
+                case MANUAL_EXIT, EXIT -> isExited = true;
+            }
+        }
+        return isEntered && isExited;
+    }
+
     public void sendLogsToServer() {
         LogResponse request = new LogResponse();
         List<LogEntity> notSentLogs = logService.getNotSentLogs();
@@ -210,7 +224,7 @@ public class SendDataService {
                 "https://api-scale.mycoal.uz/logs/create",
                 request, LocalAndServerIds.class
         );
-        System.out.println(response);
+        System.out.println("Log response: " + response);
 
         Map<Long, Long> data = Objects.requireNonNull(response.getBody()).getData();
         logService.dataSent(notSentLogs, data);

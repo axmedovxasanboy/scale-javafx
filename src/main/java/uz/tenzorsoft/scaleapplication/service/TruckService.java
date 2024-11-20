@@ -338,7 +338,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getEnteredAt());
         truckActionEntity.setWeight(currentTruck.getEnteredWeight());
-        truckActionEntity.setAction(currentTruck.getEnteredStatus());
+        truckActionEntity.setAction(currentTruck.getEnteredStatus() == null ? TruckAction.NO_ACTION : currentTruck.getEnteredStatus());
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);
@@ -351,7 +351,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getExitedAt());
         truckActionEntity.setWeight(currentTruck.getExitedWeight());
-        truckActionEntity.setAction(currentTruck.getExitedStatus());
+        truckActionEntity.setAction(currentTruck.getExitedStatus() == null ? TruckAction.NO_ACTION : currentTruck.getExitedStatus());
         truckActionEntity.setOnDuty(Instances.currentUser);
         truckActionRepository.save(truckActionEntity);
         currentTruckEntity.getTruckActions().add(truckActionEntity);

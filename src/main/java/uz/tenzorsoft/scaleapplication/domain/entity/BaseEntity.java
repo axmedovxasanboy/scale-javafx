@@ -1,9 +1,6 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -23,4 +20,6 @@ public class BaseEntity {
 
     private Long idOnServer;
     private Boolean isSentToCloud = false;
+    @Column(columnDefinition = "boolean default false")
+    private boolean isDeleted = false;
 }
