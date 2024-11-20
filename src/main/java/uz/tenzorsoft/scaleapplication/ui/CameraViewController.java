@@ -64,7 +64,7 @@ public class CameraViewController {
                 System.out.println("Failed to get snapshot, status: " + response.getStatusCode());
             }
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00029: (" + getClass().getName() + ") " +e.getMessage()));
             // Not on FX application error
             //showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
         }
