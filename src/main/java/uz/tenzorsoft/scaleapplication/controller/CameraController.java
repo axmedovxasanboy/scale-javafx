@@ -109,7 +109,7 @@ public class CameraController {
                         System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
-                        if (fileName.contains("detectionPicture")) {
+                        if (fileName.contains("detectionPicture")){
 
                             attachResponse = attachService.saveToSystem(file);
                             if (attachResponse.getId() == null) {
