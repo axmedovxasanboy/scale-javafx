@@ -109,13 +109,13 @@ public class CameraController {
                         System.out.println("ANPR Exception" + e.getMessage());
                     }
                     try {
-                        if (fileName.equals("detectionPicture.jpg")) {
+                        if (fileName.contains("detectionPicture")) {
 
                             attachResponse = attachService.saveToSystem(file);
-                            if (attachResponse == null) {
+                            if (attachResponse.getId() == null) {
                                 logService.save(new LogEntity(5L, truckNumber, "Unable to save file"));
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
-                                return ResponseEntity.ok("Unable to save file");
+                                return ResponseEntity.badRequest().body("Unable to save file");
                             }
                             if (cameraId == 1) {
                                 System.out.println("saving image " + cameraId);
