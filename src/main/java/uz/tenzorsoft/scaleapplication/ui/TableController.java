@@ -15,12 +15,12 @@ import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
-import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TableService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +34,7 @@ public class TableController {
     private final TableService tableService;
     private final ExecutorService executors;
     private final PrintCheck printCheck;
+    private final LogService logService;
 
     @Autowired
     @Lazy
@@ -89,8 +90,6 @@ public class TableController {
 
     @FXML
     private TableColumn<TableViewData, String> dropWeight;
-    @Autowired
-    private LogService logService;
 
 
     @FXML
@@ -119,7 +118,7 @@ public class TableController {
                 if (!row.isEmpty()) {
                     mainController.getIssueCheckButton().setDisable(false);
                     TableViewData rowItem = row.getItem();
-                    mainController.getIssueCheckButton().setOnMouseClicked(e->{
+                    mainController.getIssueCheckButton().setOnMouseClicked(e -> {
                         printCheck.printReceipt(truckService.findById(rowItem.getId()));
                         mainController.getIssueCheckButton().setDisable(true);
                     });
@@ -171,6 +170,20 @@ public class TableController {
         if (index != -1) {
             TableViewData record = truckService.entityToTableViewData(truckEntity);
             items.set(index, record);
+        }
+    }
+
+    public void loadFilter(LocalDate startDateValue, LocalDate endDateValue) {
+        try {
+            List<TableViewData> data = new ArrayList<>();
+            List<TruckEntity> filteredData = truckService.filterWithDate(startDateValue, endDateValue);
+            for (TruckEntity truck : filteredData) {
+                data.add(tableService.entityToTableData(truck));
+            }
+            tableData.setItems(FXCollections.observableArrayList(data));
+        } catch (Exception e) {
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00049: (" + getClass().getName() + ") " + e.getMessage()));
+//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 

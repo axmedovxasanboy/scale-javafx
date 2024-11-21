@@ -22,7 +22,9 @@ import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -281,7 +283,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         try {
             currentTruckEntity = truckRepository.save(currentTruckEntity);
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber,"00015: (" + getClass().getName() + ") " + e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00015: (" + getClass().getName() + ") " + e.getMessage()));
             System.err.println(e.getMessage());
         }
         return currentTruckEntity;
@@ -418,5 +420,27 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         return matcher.find();
+    }
+
+    public List<TruckEntity> filterWithDate(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null && endDate == null) {
+            return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
+        }
+
+        if (startDate == null) {
+            return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(endDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        } else if (endDate == null) {
+            return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(startDate.atStartOfDay(), startDate.atTime(LocalTime.MAX));
+        }
+
+        if (startDate.isBefore(endDate)) {
+            return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        }
+
+        if (startDate.equals(endDate)) {
+            return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX));
+        }
+
+        return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
     }
 }

@@ -106,6 +106,8 @@ public class MainController {
 
         startDate.setConverter(dateStringConverter);
         endDate.setConverter(dateStringConverter);
+        startDate.setValue(LocalDate.now());
+        endDate.setValue(LocalDate.now());
     }
 
     public void showAlert(Alert.AlertType alertType, String headerText, String message) {
@@ -330,11 +332,16 @@ public class MainController {
         LocalDate startDateValue = startDate.getValue();
         LocalDate endDateValue = endDate.getValue();
 
-
-        if (true) {
+        if (startDateValue != null && startDateValue.isAfter(LocalDate.now())) {
+            startDateValue = LocalDate.now();
+            startDate.setValue(startDateValue);
         }
+        if (endDateValue != null && endDateValue.isAfter(LocalDate.now())) {
+            endDateValue = LocalDate.now();
+            endDate.setValue(endDateValue);
+        }
+        tableController.loadFilter(startDateValue, endDateValue);
 
     }
-
 
 }

@@ -21,5 +21,5 @@ public class BaseEntity {
     private Long idOnServer;
     private Boolean isSentToCloud = false;
     @Column(columnDefinition = "boolean default false")
-    private boolean isDeleted = false;
+    private Boolean isDeleted = false;
 }
