@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +16,7 @@ import java.util.Optional;
 @Repository
 public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
-    List<TruckEntity> findByIsSentToCloud(boolean isSent);
+    List<TruckEntity> findTop10ByIsSentToCloud(boolean isSent);
 
     List<TruckEntity> findByIsSentToMyCoalAndIsFinished(boolean isSent, boolean isFinished);
 
@@ -61,5 +62,7 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
     List<TruckEntity> findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(LocalDateTime start, LocalDateTime end);
 
     List<TruckEntity> findByIsFinished(Boolean isFinished);
+
+    List<TruckEntity> findAllByIsDeleted(boolean isDeleted, Sort sort);
 
 }

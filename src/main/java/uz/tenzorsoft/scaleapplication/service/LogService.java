@@ -19,7 +19,7 @@ public class LogService {
     }
 
     public List<LogEntity> getNotSentLogs() {
-        return logRepository.findByIdOnServer(null);
+        return logRepository.findTop10ByIdOnServer(null);
     }
 
     public void dataSent(List<LogEntity> notSentLogs, Map<Long, Long> logMap) {

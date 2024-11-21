@@ -49,7 +49,7 @@ public class SendDataService {
             return;
         }
 
-        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, notSentAttachmentData);
+        AllDataResponse allDataResponse = new AllDataResponse(notSentTruckData, notSentUserData, notSentWeighingData, null);
         LocalAndServerIds body = restTemplate.postForObject(
                 "https://api-scale.mycoal.uz/remote/localAndServerIds",
                 allDataResponse, LocalAndServerIds.class
@@ -61,16 +61,16 @@ public class SendDataService {
         userService.dataSent(notSentUserData, body.getUser());
         cargoService.dataSent(notSentWeighingData, body.getWeighing());
 
-//        notSentAttachmentData = attachService.getNotSentData();
-//        allDataResponse = new AllDataResponse(null, null, null, notSentAttachmentData);
-//        body = restTemplate.postForObject(
-//                "https://api-scale.mycoal.uz/remote/localAndServerIds",
-//                allDataResponse, LocalAndServerIds.class
-//        );
+        notSentAttachmentData = attachService.getNotSentData();
+        allDataResponse = new AllDataResponse(null, null, null, notSentAttachmentData);
+        body = restTemplate.postForObject(
+                "https://api-scale.mycoal.uz/remote/localAndServerIds",
+                allDataResponse, LocalAndServerIds.class
+        );
 
-//        if (body == null) {
-//            return;
-//        }
+        if (body == null) {
+            return;
+        }
 
         attachService.dataSent(notSentAttachmentData, body.getAttach());
 

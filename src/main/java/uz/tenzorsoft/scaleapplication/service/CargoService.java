@@ -81,7 +81,7 @@ public class CargoService {
 
     public List<WeighingResponse> getNotSentData() {
         List<WeighingResponse> result = new ArrayList<>();
-        List<CargoEntity> notSentData = cargoRepository.findByIsSentToCloud(false);
+        List<CargoEntity> notSentData = cargoRepository.findTop10ByIsSentToCloud(false);
         for (CargoEntity cargo : notSentData) {
 
             WeighingResponse response = new WeighingResponse(

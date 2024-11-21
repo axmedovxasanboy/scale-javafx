@@ -34,7 +34,7 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
 
     public List<UserSendResponse> getNotSentData() {
         List<UserSendResponse> result = new ArrayList<>();
-        List<UserEntity> notSentData = userRepository.findByIsSentToCloud(false);
+        List<UserEntity> notSentData = userRepository.findTop10ByIsSentToCloud(false);
         for (UserEntity user : notSentData) {
             UserSendResponse response = new UserSendResponse(
                     user.getPhoneNumber(), user.getUsername(), user.getPassword()

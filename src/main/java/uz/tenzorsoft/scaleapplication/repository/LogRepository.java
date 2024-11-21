@@ -10,6 +10,6 @@ import java.util.List;
 public interface LogRepository extends JpaRepository<LogEntity, Long> {
 
 
-    List<LogEntity> findByIdOnServer(Long id);
+    List<LogEntity> findTop10ByIdOnServer(Long id);
 
 }

@@ -81,7 +81,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             return entityToResponse(entity);
 
         } catch (IOException e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, "00009: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00009: (" + getClass().getName() + ") " + e.getMessage()));
             throw new RuntimeException("File could not upload");
         }
     }
@@ -114,16 +114,20 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
 
         if (notSentData.isEmpty()) return result;
 
-        AttachEntity notSentAttach = notSentData.get(0);
-        TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(notSentAttach));
-        AttachmentResponse response = new AttachmentResponse(
-                truck == null ? null : truck.getIdOnServer(), notSentAttach.getOriginalName(),
-                notSentAttach.getSize(), notSentAttach.getType(), notSentAttach.getContentType(), notSentAttach.getPath(), null,
-                truckPhotoService.findAttachStatus(notSentAttach), notSentAttach.getCreatedAt(), getImageBytes(notSentAttach.getPath())
-        );
-        response.setId(notSentAttach.getId());
-        response.setIdOnServer(notSentAttach.getIdOnServer());
-        result.add(response);
+        for (AttachEntity attach : notSentData) {
+            TruckEntity truck = truckService.findByTruckPhoto(truckPhotoService.findByAttach(attach));
+            byte[] imageBytes = getImageBytes(attach.getPath());
+            if (imageBytes.length == 0) continue;
+            AttachmentResponse response = new AttachmentResponse(
+                    truck == null ? null : truck.getIdOnServer(), attach.getOriginalName(),
+                    attach.getSize(), attach.getType(), attach.getContentType(), attach.getPath(), null,
+                    truckPhotoService.findAttachStatus(attach), attach.getCreatedAt(), imageBytes
+            );
+            response.setId(attach.getId());
+            response.setIdOnServer(attach.getIdOnServer());
+            result.add(response);
+            break;
+        }
         return result;
 /*
         for (AttachEntity attach : notSentData) {

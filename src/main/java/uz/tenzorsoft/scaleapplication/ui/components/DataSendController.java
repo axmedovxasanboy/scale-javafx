@@ -23,6 +23,40 @@ public class DataSendController {
 
     public void sendNotSentData() {
         executors.execute(() -> {
+
+/*
+            while(true) {
+                try{
+                    try {
+                        sendDataService.sendNotSentData();
+                    } catch (Exception e) {
+                        logService.save(new LogEntity(5L, Instances.truckNumber, "00036: (" + getClass().getName() + ") " +e.getMessage()));
+                        System.err.println(e.getMessage());
+                    }
+
+                    try {
+                        sendDataService.sendDataToMyCoal();
+                    } catch (Exception e) {
+                        logService.save(new LogEntity(5L, Instances.truckNumber, "00037: (" + getClass().getName() + ") " + e.getMessage()));
+                        System.err.println(e.getMessage());
+                    }
+
+                    try {
+                        sendDataService.sendLogsToServer();
+                    } catch (Exception e) {
+                        logService.save(new LogEntity(5L, Instances.truckNumber, "00038: (" + getClass().getName() + ") " + e.getMessage()));
+                        System.err.println(e.getMessage());
+                    }
+
+                    Thread.sleep(2000);
+
+                }catch (Exception e) {
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00040: (" + getClass().getName() + ") " +e.getMessage()));
+                    System.err.println(e.getMessage());
+                }
+            }
+*/
+
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     CompletableFuture.runAsync(() -> sendDataService.sendNotSentData())

@@ -85,7 +85,7 @@ public class MainController {
     @FXML
     @Getter
     @Setter
-    private Button issueCheckButton;
+    private Button issueCheckButton, deleteButton;
 
     @FXML
     public void initialize() {

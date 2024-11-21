@@ -12,7 +12,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByPhoneNumberAndPassword(String phoneNumber, String password);
 
-    List<UserEntity> findByIsSentToCloud(boolean isSent);
+    List<UserEntity> findTop10ByIsSentToCloud(boolean isSent);
 
     Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 }

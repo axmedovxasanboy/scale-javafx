@@ -114,7 +114,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public List<ActionResponse> getNotSentData() {
         List<ActionResponse> result = new ArrayList<>();
-        List<TruckEntity> notSentData = truckRepository.findByIsSentToCloud(false);
+        List<TruckEntity> notSentData = truckRepository.findTop10ByIsSentToCloud(false);
         for (TruckEntity truck : notSentData) {
             ActionResponse actionResponse = new ActionResponse();
             List<Long> attachIds = truck.getTruckPhotos().stream().map(
@@ -167,7 +167,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public List<TruckEntity> findAll() {
-        return truckRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        return truckRepository.findAllByIsDeleted(false, Sort.by(Sort.Direction.DESC, "id"));
     }
 
     public TableViewData entityToTableViewData(TruckEntity entity) {

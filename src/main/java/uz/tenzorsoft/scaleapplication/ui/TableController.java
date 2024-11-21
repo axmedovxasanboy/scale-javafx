@@ -3,6 +3,7 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
@@ -118,10 +119,26 @@ public class TableController {
                 if (!row.isEmpty()) {
                     mainController.getIssueCheckButton().setDisable(false);
                     TableViewData rowItem = row.getItem();
+                    TruckEntity truck = truckService.findById(rowItem.getId());
                     mainController.getIssueCheckButton().setOnMouseClicked(e -> {
-                        printCheck.printReceipt(truckService.findById(rowItem.getId()));
+                        printCheck.printReceipt(truck);
                         mainController.getIssueCheckButton().setDisable(true);
                     });
+                    Button deleteButton = mainController.getDeleteButton();
+                    if (!truck.getIsFinished()) {
+                        deleteButton.setDisable(false);
+                        deleteButton.setVisible(true);
+                        deleteButton.setOnAction(e -> {
+                            truck.setIsDeleted(true);
+                            truckService.save(truck);
+                            loadData();
+                        });
+                        mainController.setDeleteButton(deleteButton);
+                    } else {
+                        deleteButton.setDisable(true);
+                        deleteButton.setVisible(false);
+                        mainController.setDeleteButton(deleteButton);
+                    }
                     imageController.showImages(rowItem); // Show images based on the selected row data
                 }
             });
@@ -142,7 +159,7 @@ public class TableController {
 
                     Thread.sleep(60000);
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " +e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " + e.getMessage()));
 //                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }

@@ -28,21 +28,29 @@
                 </ScrollPane>
                 <Pane prefHeight="44.0" prefWidth="931.0">
                   <children>
-                    <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER" layoutX="390.0" layoutY="5.0" prefHeight="35.0" prefWidth="294.0" style="-fx-background-color: white;" text="Tarozi monitoringi boshqaruv paneli">
+                    <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER" layoutX="397.0" layoutY="5.0" prefHeight="35.0" prefWidth="138.0" style="-fx-background-color: white;" text="Boshqaruv paneli">
                       <font>
                         <Font size="17.0" />
                       </font>
                     </Label>
+
+                    <Button fx:id="deleteButton" disable="true" layoutX="673.0" layoutY="6.0" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="O'chirish" visible="false">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor></Button>
+
+
                     <!-- Button with Image Icon and Text -->
-                    <Button fx:id="issueCheckButton" layoutX="768.0" layoutY="6.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
+                    <Button fx:id="issueCheckButton" layoutX="780.0" layoutY="6.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
                       <text>Chek Chiqarish</text>
                     </Button>
-                              <DatePicker fx:id="startDate" layoutX="14.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="Start date" />
-                              <DatePicker fx:id="endDate" layoutX="160.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="End date" />
-                              <Label layoutX="123.0" layoutY="13.0" prefHeight="19.0" prefWidth="27.0" text="&gt;&gt;&gt;" />
-                              <Button onMouseClicked="#getFilteredData" layoutX="273.0" layoutY="10.0" mnemonicParsing="false" text="Filter" />
+                    <DatePicker fx:id="startDate" layoutX="14.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="Start date" />
+                    <DatePicker fx:id="endDate" layoutX="160.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="End date" />
+                    <Label layoutX="123.0" layoutY="13.0" prefHeight="19.0" prefWidth="27.0" text="&gt;&gt;&gt;" />
+                    <Button layoutX="273.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#getFilteredData" text="Filter" />
                   </children>
                 </Pane>
+
                 <fx:include source="GridView.fxml" />
 
                 <fx:include source="ImageView.fxml" />
@@ -66,7 +74,7 @@
 
         <fx:include source="UserView.fxml" />
 
-<!--        <fx:include source="TestTab.fxml"/>-->
+        <fx:include source="TestTab.fxml"/>
       </tabs>
     </TabPane>
   </children>
