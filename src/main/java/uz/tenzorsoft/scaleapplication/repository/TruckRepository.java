@@ -41,27 +41,27 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberOrderByCreatedAtDesc(String truckNumber);
 
-    List<TruckEntity> findByTruckNumberAndIsFinishedOrderByCreatedAt(String truckNumber, Boolean finished);
+    List<TruckEntity> findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAt(String truckNumber, Boolean finished, Boolean deleted);
 
     boolean existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedTrue(String truckNumber, LocalDateTime localDateTime);
 
     boolean existsByTruckNumberAndTruckActions_ActionAndIsFinishedFalse(String truckNumber, TruckAction action);
 
-    List<TruckEntity> findByTruckNumberAndIsFinishedOrderByCreatedAtDesc(String truckNumber, boolean isFinished);
+    List<TruckEntity> findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(String truckNumber, boolean isFinished, boolean isDeleted);
 
     Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, boolean isFinished);
 
     boolean existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(String truckNumber, LocalDateTime localDateTime);
 
-    boolean existsByTruckNumber(String truckNumber);
+    boolean existsByTruckNumberAndIsDeleted(String truckNumber, boolean isDeleted);
 
-    boolean existsByIsFinishedFalse();
+    boolean existsByIsFinishedFalseAndIsDeletedFalse();
 
-    boolean existsByTruckNumberAndIsFinished(String truckNumber, boolean isFinished);
+    boolean existsByTruckNumberAndIsFinishedAndIsDeleted(String truckNumber, boolean isFinished, boolean isDeleted);
 
     List<TruckEntity> findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(LocalDateTime start, LocalDateTime end);
 
-    List<TruckEntity> findByIsFinished(Boolean isFinished);
+    List<TruckEntity> findByIsFinishedAndIsDeleted(Boolean isFinished, boolean deleted);
 
     List<TruckEntity> findAllByIsDeleted(boolean isDeleted, Sort sort);
 

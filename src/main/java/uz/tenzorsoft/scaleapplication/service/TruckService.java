@@ -259,7 +259,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
 //            if (currentTruckEntity == null)
 //                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
-            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAt(currentTruck.getTruckNumber(), false).get(0);
+            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAt(currentTruck.getTruckNumber(), false, false).get(0);
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             TruckPhotosEntity entity = truckPhotoRepository.save(
                     new TruckPhotosEntity(attachService.findById(attach.getId()), AttachStatus.EXIT_PHOTO)
@@ -376,28 +376,28 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public List<String> getNotFinishedTrucks() {
-        return truckRepository.findByIsFinished(false).stream().map(TruckEntity::getTruckNumber).toList();
+        return truckRepository.findByIsFinishedAndIsDeleted(false, false).stream().map(TruckEntity::getTruckNumber).toList();
     }
 
     public boolean isEntranceAvailableForCamera1(String truckNumber) {
         if (!isTruckNumberExists(truckNumber)) {
             return true;
         }
-        if (truckRepository.existsByTruckNumberAndIsFinished(truckNumber, false)) {
+        if (truckRepository.existsByTruckNumberAndIsFinishedAndIsDeleted(truckNumber, false, false)) {
             return false;
         }
-        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAtDesc(truckNumber, true);
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, true, false);
         if (list.isEmpty()) return false;
         LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
         return nextEntranceTime.isBefore(LocalDateTime.now());
     }
 
     private boolean isTruckNumberExists(String truckNumber) {
-        return truckRepository.existsByTruckNumber(truckNumber);
+        return truckRepository.existsByTruckNumberAndIsDeleted(truckNumber, false);
     }
 
     public boolean isNotFinishedTrucksExists() {
-        return truckRepository.existsByIsFinishedFalse();
+        return truckRepository.existsByIsFinishedFalseAndIsDeletedFalse();
     }
 
 
@@ -405,7 +405,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         if (!isTruckNumberExists(truckNumber)) {
             return false;
         }
-        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedOrderByCreatedAtDesc(truckNumber, false);
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, false, false);
         if (list.isEmpty()) return false;
         LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
         return nextEntranceTime.isBefore(LocalDateTime.now());
