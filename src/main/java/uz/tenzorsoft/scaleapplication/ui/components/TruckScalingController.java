@@ -204,12 +204,18 @@ public class TruckScalingController {
                                 isScaled = true;
                             }
                             if (!isScaleControlOn) cargoConfirmationStatus = -1;
-                            else cargoConfirmationStatus = 1;
+//                            else cargoConfirmationStatus = 1;
 
                             if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn) {
                                 isCargoConfirmationDialogOpened = true;
                                 cargoConfirmationStatus = showCargoScaleConfirmationDialog(weigh);
+
                                 System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
+                            }
+
+                            if(cargoConfirmationStatus == 2){
+                                isCargoConfirmationDialogOpened = false;
+                                isScaled = false;
                             }
 
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {

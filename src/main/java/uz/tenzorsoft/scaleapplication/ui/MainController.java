@@ -101,11 +101,25 @@ public class MainController {
 
             // Customizing buttons
             ButtonType confirmButton = new ButtonType("Tasdiqlash", ButtonBar.ButtonData.OK_DONE);
+            ButtonType remeasureButton = new ButtonType("Massani qayta o'lchash", ButtonBar.ButtonData.APPLY);
             ButtonType cancelButton = new ButtonType("Bekor qilish", ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(confirmButton, cancelButton);
+            alert.getButtonTypes().setAll(confirmButton, remeasureButton, cancelButton);
 
             Optional<ButtonType> result = alert.showAndWait();
-            futureResult.complete(result.isPresent() && result.get() == confirmButton ? (short) 1 : (short) 0);
+//            futureResult.complete(result.isPresent() && result.get() == confirmButton ? (short) 1 : (short) 0);
+
+            if (result.isPresent()) {
+                if (result.get() == confirmButton) {
+                    futureResult.complete((short) 1);
+                } else if (result.get() == remeasureButton) {
+                    futureResult.complete((short) 2); // Code for remeasure
+                } else {
+                    futureResult.complete((short) 0); // Cancel
+                }
+            } else {
+                futureResult.complete((short) 0); // No selection (treated as cancel)
+            }
+
         });
 
         // Waits until the dialog result is available
