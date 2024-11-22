@@ -126,6 +126,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
             response.setId(attach.getId());
             response.setIdOnServer(attach.getIdOnServer());
             result.add(response);
+            System.out.println("attach id >> " + attach.getId() + ". byte length >> " + imageBytes.length);
             break;
         }
         return result;
@@ -152,6 +153,7 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         try {
             return Files.readAllBytes(Paths.get(path));
         } catch (IOException e) {
+            e.printStackTrace();
             return new byte[]{};
         }
 //
