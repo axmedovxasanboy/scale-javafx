@@ -260,6 +260,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //            if (currentTruckEntity == null)
 //                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
             currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAt(currentTruck.getTruckNumber(), false, false).get(0);
+            currentTruckEntity.getTruckPhotos().removeIf(photo -> photo.getAttachStatus() == AttachStatus.EXIT_PHOTO);
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             TruckPhotosEntity entity = truckPhotoRepository.save(
                     new TruckPhotosEntity(attachService.findById(attach.getId()), AttachStatus.EXIT_PHOTO)
@@ -320,12 +321,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //                .orElse(new TruckEntity());
 //        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
         List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
+        truckPhotos.removeIf(photo -> photo.getAttachStatus().equals(attachStatus));
         AttachEntity attach = attachService.findById(response.getId());
-        for (TruckPhotosEntity photo : truckPhotos) {
-            if (photo.getAttachStatus().equals(attachStatus)) {
-                return;
-            }
-        }
         TruckPhotosEntity photosEntity = new TruckPhotosEntity(
                 attach, attachStatus
         );
@@ -337,6 +334,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public void saveTruckEnteredActions(TruckResponse currentTruck) {
+        currentTruckEntity.getTruckActions().removeIf(action -> action.getAction() == currentTruck.getEnteredStatus());
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getEnteredAt());
         truckActionEntity.setWeight(currentTruck.getEnteredWeight());
@@ -350,6 +348,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public void saveTruckExitedAction(TruckResponse currentTruck) {
+        currentTruckEntity.getTruckActions().removeIf(action -> action.getAction() == currentTruck.getExitedStatus());
         TruckActionEntity truckActionEntity = new TruckActionEntity();
         truckActionEntity.setCreatedAt(currentTruck.getExitedAt());
         truckActionEntity.setWeight(currentTruck.getExitedWeight());

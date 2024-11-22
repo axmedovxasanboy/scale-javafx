@@ -39,6 +39,7 @@ dependencies {
     implementation 'com.ghgande:j2mod:3.2.1'
 
     implementation 'ws.schild:jave-all-deps:2.4.0'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CommandsRequest {
 
+    private Long id;
     private Long scaleId;
     private Boolean openGate1;
     private Boolean closeGate1;

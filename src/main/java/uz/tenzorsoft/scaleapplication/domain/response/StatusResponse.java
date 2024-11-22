@@ -19,4 +19,5 @@ public class StatusResponse {
     private Boolean sensor1;
     private Boolean sensor2;
     private Boolean sensor3;
+    private Long scaleId;
 }

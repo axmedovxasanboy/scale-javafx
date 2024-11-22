@@ -16,5 +16,6 @@ public class UserEntity extends BaseEntity {
     private String username;
     private String password;
     private String phoneNumber;
+    private Long scaleId;
 
 }

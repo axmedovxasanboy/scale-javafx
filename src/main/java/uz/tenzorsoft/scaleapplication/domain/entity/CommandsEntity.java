@@ -1,7 +1,9 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -10,14 +12,16 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "commands", uniqueConstraints = @UniqueConstraint(columnNames = "scale_id"))
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "commands")
 public class CommandsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "scale_id", unique = true)  // Ensuring unique scaleId
+    @Column(name = "scale_id")  // Ensuring unique scaleId
     private Long scaleId;
 
     @Column(name = "open_gate1")
@@ -34,6 +38,8 @@ public class CommandsEntity {
 
     @Column(name = "close_gate2")
     private Boolean closeGate2;
+
+    private Long serverId;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp

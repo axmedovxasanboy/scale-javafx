@@ -11,6 +11,7 @@ public class Instances<T> {
     public static TruckResponse currentTruck = new TruckResponse();
 
     public static String truckNumber = "";
+    public static String WEBSOCKET_URL = "ws://192.168.68.121:9090/ws";
 
     public static boolean isTesting = false;
     public static boolean isConnectedToInternet = false;

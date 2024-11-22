@@ -29,6 +29,7 @@ import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.SendStatuesDataController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
+import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -38,8 +39,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isScaleControlOn;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
@@ -86,6 +86,8 @@ public class MainController {
     @Getter
     @Setter
     private Button issueCheckButton, deleteButton;
+    @Autowired
+    private WebSocketClient webSocketClient;
 
     @FXML
     public void initialize() {
@@ -151,7 +153,9 @@ public class MainController {
         userController.loadUserMenu();
         try {
             scalePort = new Settings(SCALE_PORT).getSerialPort();
+            webSocketClient.connect(Instances.WEBSOCKET_URL);
         } catch (Exception e) {
+            logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             System.err.println(e.getMessage());
         }
         connectionsController.updateConnections();

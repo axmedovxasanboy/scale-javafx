@@ -12,9 +12,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 @SpringBootApplication
+@EnableScheduling
 public class ScaleApplication extends Application {
     private ConfigurableApplicationContext context;
     private Parent rootNode;
@@ -50,6 +53,7 @@ public class ScaleApplication extends Application {
         context.close();
     }
 
+/*
     @Bean
     CommandLineRunner run(WebSocketClient webSocketClient) {
         return args -> {
@@ -67,4 +71,5 @@ public class ScaleApplication extends Application {
             }
         };
     }
+*/
 }

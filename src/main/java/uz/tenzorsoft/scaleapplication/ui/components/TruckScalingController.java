@@ -78,7 +78,6 @@ public class TruckScalingController {
                     truckPosition = 1;
                     isTruckEntered = true;
                     isOnScale = true;
-                    System.out.println("truckPosition = " + truckPosition);
                 }
 
                 if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
@@ -89,7 +88,7 @@ public class TruckScalingController {
                 if ((!sensor2Connection || isOnScale) && (truckPosition == 2) &&
                         (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
                                 currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
-                    System.out.println("Scaling ---- isScaled = " + isOnScale+ "Status "+currentTruck.getEnteredStatus());
+                    System.out.println("Scaling ---- isScaled = " + isScaled+ " Status "+currentTruck.getEnteredStatus());
                     Timer timer = new Timer();
                     timer.schedule((new TimerTask() {
                         @Override

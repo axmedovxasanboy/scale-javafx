@@ -9,12 +9,16 @@ import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.entity.CommandsEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.CheckCommandsDto;
 import uz.tenzorsoft.scaleapplication.service.*;
 
 import java.util.regex.Matcher;
@@ -35,6 +39,7 @@ public class ButtonController {
     private final CameraViewController cameraViewController;
     private final ScaleLogService scaleLogService;
     private final LogService logService;
+    private final RestTemplate restTemplate;
 
     @Autowired
     @Lazy
@@ -64,6 +69,8 @@ public class ButtonController {
     @FXML
     private Button button5;
 
+    private String commandComment = "";
+
     @FXML
     public void initialize() {
         setupButtonPressEffect(button1, "#4CAF50");
@@ -86,6 +93,7 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.openGate1();
         } catch (ModbusException e) {
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
@@ -101,6 +109,8 @@ public class ButtonController {
                 return true;
             }
         } catch (ModbusException e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00018: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
@@ -183,6 +193,8 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.closeGate1();
         } catch (ModbusException e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber,"00024: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -193,6 +205,8 @@ public class ButtonController {
         try {
             if (!isTesting)  return controllerService.openGate2();
         } catch (ModbusException e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " +e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
@@ -208,6 +222,8 @@ public class ButtonController {
                 return true;
             }
         } catch (ModbusException e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber,"00026: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
@@ -218,6 +234,8 @@ public class ButtonController {
         try {
             if (!isTesting) return controllerService.closeGate2();
         } catch (ModbusException e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber,"00027: (" + getClass().getName() + ") " + e.getMessage()));
             // mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
@@ -238,6 +256,35 @@ public class ButtonController {
         controllerService.disconnect();
     }
 
+    public void handleServerCommands(CommandsEntity commands) {
+        if (commands.getOpenGate1()) {
+            openGate1();
+            sendCommandStatus(commands.getServerId(), commandComment);
+        }else if (commands.getOpenGate2()) {
+            openGate2();
+            sendCommandStatus(commands.getServerId(), commandComment);
+        } else if (commands.getCloseGate1()) {
+            closeGate1();
+            sendCommandStatus(commands.getServerId(), commandComment);
+        }else if (commands.getCloseGate2()) {
+            closeGate2();
+            sendCommandStatus(commands.getServerId(), commandComment);
+        }else if(commands.getWeighing()){
+            getTruckWeigh();
+            sendCommandStatus(commands.getServerId(), commandComment);
+        }
+            commandComment = "";
+    }
+
+    private void sendCommandStatus(long commandId, String commandComment) {
+        boolean isFinished = !commandComment.isEmpty();
+        CheckCommandsDto request = new CheckCommandsDto(commandId, commandComment, isFinished);
+        restTemplate.postForEntity(
+                "http://192.168.68.121:9090/commands/checkCommands",
+                request, Void.class
+        );
+    }
+
     public double getTruckWeigh() {
         try {
             scalePort.closePort();
@@ -254,7 +301,9 @@ public class ButtonController {
                 try {
                     System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
                 } catch (Exception e) {
+                    commandComment = e.getMessage();
                     System.err.println(e.getMessage());
+                    return 0.0;
                 }
                 double numericValue = parseWeightData(data);
                 scaleLogService.save(data, String.valueOf(numericValue));
@@ -280,6 +329,7 @@ public class ButtonController {
             }
             return 0.0;
         } catch (Exception e) {
+            commandComment = e.getMessage();
             System.err.println("Unable to parse weight data");
             System.err.println(e.getMessage());
             return 0;

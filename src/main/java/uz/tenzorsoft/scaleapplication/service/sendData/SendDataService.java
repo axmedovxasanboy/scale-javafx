@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
@@ -82,7 +83,7 @@ public class SendDataService {
         try {
             StatusResponse statusResponse = new StatusResponse(
                     isConnected, gate1Connection, gate2Connection, camera1Connection, camera2Connection,
-                    camera3Connection, sensor1Connection, sensor2Connection, sensor3Connection
+                    camera3Connection, sensor1Connection, sensor2Connection, sensor3Connection, currentUser.getScaleId()
             );
 
             RestTemplate restTemplate = new RestTemplate();
