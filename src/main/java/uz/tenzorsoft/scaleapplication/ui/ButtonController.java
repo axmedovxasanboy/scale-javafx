@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.CommandsEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
@@ -280,7 +281,7 @@ public class ButtonController {
         boolean isFinished = !commandComment.isEmpty();
         CheckCommandsDto request = new CheckCommandsDto(commandId, commandComment, isFinished);
         restTemplate.postForEntity(
-                "http://192.168.68.121:9090/commands/checkCommands",
+                Instances.SERVER_URL + "/commands/checkCommands",
                 request, Void.class
         );
     }

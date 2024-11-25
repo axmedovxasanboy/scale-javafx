@@ -56,6 +56,7 @@ public class MainController {
     private final LogService logService;
     private final UserController userController;
     private final ConnectionsController connectionsController;
+    private final WebSocketClient webSocketClient;
 
     @Autowired
     @Lazy
@@ -69,48 +70,13 @@ public class MainController {
     @Autowired
     @Lazy
     private TestController testController;
+    @Autowired
+    @Lazy
+    private ControlPane controlPane;
 
     @FXML
     private Pane scaleAutomationPane;
 
-    @FXML
-    private Button connectButton;
-
-    @FXML
-    private DatePicker startDate;
-
-    @FXML
-    private DatePicker endDate;
-
-    @FXML
-    @Getter
-    @Setter
-    private Button issueCheckButton, deleteButton;
-    @Autowired
-    private WebSocketClient webSocketClient;
-
-    @FXML
-    public void initialize() {
-
-        StringConverter<LocalDate> dateStringConverter = new StringConverter<>() {
-            private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-
-            @Override
-            public String toString(LocalDate date) {
-                return date != null ? date.format(formatter) : "";
-            }
-
-            @Override
-            public LocalDate fromString(String string) {
-                return string != null && !string.isEmpty() ? LocalDate.parse(string, formatter) : null;
-            }
-        };
-
-        startDate.setConverter(dateStringConverter);
-        endDate.setConverter(dateStringConverter);
-        startDate.setValue(LocalDate.now());
-        endDate.setValue(LocalDate.now());
-    }
 
     public void showAlert(Alert.AlertType alertType, String headerText, String message) {
         Alert alert = new Alert(alertType);
@@ -170,7 +136,7 @@ public class MainController {
             buttonController.closeGate1();
             buttonController.closeGate2();
         }
-        controlConnectButton();
+        controlPane.controlConnectButton();
         System.out.println("All tasks are submitted!");
 
     }
@@ -253,30 +219,6 @@ public class MainController {
         return result.orElse("");
     }
 
-    private void controlConnectButton() {
-        executors.execute(() -> {
-            while (true) {
-                try {
-                    Platform.runLater(() -> {
-                        if (!isConnected) {
-                            connectButton.setText("Connect");
-                            connectButton.getStyleClass().removeAll("connect-button-disconnected");
-                            connectButton.getStyleClass().add("connect-button");
-                        } else {
-                            connectButton.setText("Disconnect");
-                            connectButton.getStyleClass().removeAll("connect-button");
-                            connectButton.getStyleClass().add("connect-button-disconnected");
-                        }
-                    });
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
-                    Platform.runLater(() -> showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
-                }
-            }
-        });
-    }
-
     private void loadMainMenu() {
         try {
             fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
@@ -308,7 +250,7 @@ public class MainController {
             mainWindowStage.setScene(new Scene(root));
 
             // Disable the button initially
-            issueCheckButton.setDisable(true);
+            controlPane.getIssueCheckButton().setDisable(true);
 
             // Set up row selection logic
 
@@ -318,33 +260,6 @@ public class MainController {
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
 
-
-    }
-
-    @FXML
-    private void connectToController() {
-        if (isConnected) {
-            buttonController.disconnect();
-            truckPosition = -1;
-        } else {
-            buttonController.connect();
-        }
-    }
-
-    @FXML
-    private void getFilteredData() {
-        LocalDate startDateValue = startDate.getValue();
-        LocalDate endDateValue = endDate.getValue();
-
-        if (startDateValue != null && startDateValue.isAfter(LocalDate.now())) {
-            startDateValue = LocalDate.now();
-            startDate.setValue(startDateValue);
-        }
-        if (endDateValue != null && endDateValue.isAfter(LocalDate.now())) {
-            endDateValue = LocalDate.now();
-            endDate.setValue(endDateValue);
-        }
-        tableController.loadFilter(startDateValue, endDateValue);
 
     }
 

@@ -153,7 +153,6 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
         try {
             return Files.readAllBytes(Paths.get(path));
         } catch (IOException e) {
-            e.printStackTrace();
             return new byte[]{};
         }
 //

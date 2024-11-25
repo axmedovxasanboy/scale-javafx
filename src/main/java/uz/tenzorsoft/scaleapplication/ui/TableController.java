@@ -39,7 +39,7 @@ public class TableController {
 
     @Autowired
     @Lazy
-    private MainController mainController;
+    private ControlPane controlPane;
     @Autowired
     @Lazy
     private ImageController imageController;
@@ -117,14 +117,14 @@ public class TableController {
             TableRow<TableViewData> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty()) {
-                    mainController.getIssueCheckButton().setDisable(false);
+                    controlPane.getIssueCheckButton().setDisable(false);
                     TableViewData rowItem = row.getItem();
                     TruckEntity truck = truckService.findById(rowItem.getId());
-                    mainController.getIssueCheckButton().setOnMouseClicked(e -> {
+                    controlPane.getIssueCheckButton().setOnMouseClicked(e -> {
                         printCheck.printReceipt(truck);
-                        mainController.getIssueCheckButton().setDisable(true);
+                        controlPane.getIssueCheckButton().setDisable(true);
                     });
-                    Button deleteButton = mainController.getDeleteButton();
+                    Button deleteButton = controlPane.getDeleteButton();
                     if (!truck.getIsFinished()) {
                         deleteButton.setDisable(false);
                         deleteButton.setVisible(true);
@@ -133,11 +133,11 @@ public class TableController {
                             truckService.save(truck);
                             loadData();
                         });
-                        mainController.setDeleteButton(deleteButton);
+                        controlPane.setDeleteButton(deleteButton);
                     } else {
                         deleteButton.setDisable(true);
                         deleteButton.setVisible(false);
-                        mainController.setDeleteButton(deleteButton);
+                        controlPane.setDeleteButton(deleteButton);
                     }
                     imageController.showImages(rowItem); // Show images based on the selected row data
                 }

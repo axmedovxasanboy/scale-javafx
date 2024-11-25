@@ -1,9 +1,6 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +17,9 @@ import java.util.List;
 @Entity(name = "trucks")
 public class TruckEntity extends BaseEntity {
     private String truckNumber;
+
+    @ManyToOne
+    private ProductsEntity products;
 
     @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<TruckActionEntity> truckActions = new ArrayList<>();
