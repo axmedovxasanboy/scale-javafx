@@ -1,11 +1,13 @@
 package uz.tenzorsoft.scaleapplication.service;
 
+import javafx.scene.control.Alert;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.ui.MainController;
 
 import javax.print.*;
 import java.io.ByteArrayInputStream;
@@ -21,14 +23,17 @@ public class PrintCheck {
 
 
     private final LogService logService;
+    private final MainController mainController;
 
-    public PrintCheck(LogService logService) {
+    public PrintCheck(LogService logService, MainController mainController) {
         this.logService = logService;
+        this.mainController = mainController;
     }
 
     public void printReceipt(TruckEntity response) {
         PrintService printer = findPrinter(PRINTER_NAME); // Specify your printer name here
         if (printer == null) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Printer topilmadi", "Mavjud bo'lgan printer topilmadi");
             System.out.println(PRINTER_NAME + " printer not found.");
             return;
         }
@@ -46,6 +51,7 @@ public class PrintCheck {
             sendCutCommand(printer);
             System.out.println("Receipt printed and paper cut successfully.");
         } catch (Exception e) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Kvitansiya chop etilishi va qog'oz kesilishi amalga oshmadi", e.getMessage());
             logService.save(new LogEntity(5L, Instances.truckNumber, "00013: (" + getClass().getName() + ") " +e.getMessage()));
             e.printStackTrace();
         }

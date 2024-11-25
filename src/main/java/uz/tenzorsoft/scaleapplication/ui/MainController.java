@@ -50,13 +50,16 @@ public class MainController {
     private final FXMLLoader fxmlLoader;
     private final DataSendController dataSendController;
     private final ExecutorService executors;
-    private final PrintCheck printCheck;
     private final ConfigUtilsService configUtilsService;
     private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
     private final UserController userController;
     private final ConnectionsController connectionsController;
     private final WebSocketClient webSocketClient;
+
+    @Autowired
+    @Lazy
+    private PrintCheck printCheck;
 
     @Autowired
     @Lazy

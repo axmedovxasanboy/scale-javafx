@@ -132,6 +132,6 @@ public class WebSocketClient {
 
     @Scheduled(fixedRate = 500)
     public void sendPeriodicMessage() {
-        sendMessage("/sendCommends" + Instances.currentUser.getScaleId());
+        sendMessage("/sendCommends" + Instances.currentUser.getInternalScaleId());
     }
 }
