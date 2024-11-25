@@ -48,8 +48,9 @@ public class TableService {
                 }
             }
         }
+        data.setProductType(truckEntity.getProducts() == null ? "" : truckEntity.getProducts().getName());
         CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
-        if(cargo == null) return data;
+        if (cargo == null) return data;
         switch (cargo.getCargoStatus()) {
             case PICKUP -> data.setPickupWeight(String.valueOf(cargo.getNetWeight()));
             case DROP -> data.setDropWeight(String.valueOf(cargo.getNetWeight()));

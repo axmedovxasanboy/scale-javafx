@@ -3,10 +3,7 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +89,9 @@ public class TableController {
     @FXML
     private TableColumn<TableViewData, String> dropWeight;
 
+    @FXML
+    private TableColumn<TableViewData, String> productType;
+
 
     @FXML
     public void initialize() {
@@ -112,6 +112,8 @@ public class TableController {
         maxWeight.setCellValueFactory(new PropertyValueFactory<>("MaxWeight"));
         pickupWeight.setCellValueFactory(new PropertyValueFactory<>("PickupWeight"));
         dropWeight.setCellValueFactory(new PropertyValueFactory<>("DropWeight"));
+
+        productType.setCellValueFactory(new PropertyValueFactory<>("ProductType"));
 
         tableData.setRowFactory(tv -> {
             TableRow<TableViewData> row = new TableRow<>();

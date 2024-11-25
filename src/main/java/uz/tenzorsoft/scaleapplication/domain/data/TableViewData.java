@@ -25,5 +25,6 @@ public class TableViewData {
     private String maxWeight;
     private String pickupWeight = "0.0";
     private String dropWeight = "0.0";
+    private String productType = "";
 
 }

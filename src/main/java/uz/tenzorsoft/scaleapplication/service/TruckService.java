@@ -300,20 +300,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return null;
     }
 
-    public TableViewData getTableViewData(TruckResponse truckResponse) {
-        Double enteredWeight = truckResponse.getEnteredWeight();
-        Double exitedWeight = truckResponse.getExitedWeight();
-        return new TableViewData(
-                truckResponse.getId(), truckResponse.getTruckNumber(),
-                getDate(truckResponse.getEnteredAt()), getTime(truckResponse.getEnteredAt()), enteredWeight,
-                truckResponse.getEntranceConfirmedBy(), truckResponse.getTruckNumber(), getDate(truckResponse.getExitedAt()),
-                getTime(truckResponse.getExitedAt()), exitedWeight, truckResponse.getExitConfirmedBy(),
-                String.valueOf(Math.min(enteredWeight, exitedWeight)),
-                String.valueOf(Math.max(enteredWeight, exitedWeight)),
-                enteredWeight > exitedWeight ? String.valueOf(enteredWeight - exitedWeight) : "0.0",
-                enteredWeight <= exitedWeight ? String.valueOf(exitedWeight - enteredWeight) : "0.0"
-        );
-    }
 
     @Transactional
     public void saveTruckAttaches(TruckResponse currentTruck, AttachResponse response, AttachStatus attachStatus) {

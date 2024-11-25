@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -16,7 +17,9 @@
             <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
                         prefHeight="670.0" prefWidth="1374.0">
               <children>
-                <fx:include source="TableView.fxml"/>
+                <ScrollPane fitToHeight="true" layoutX="4.0" layoutY="44.0" prefHeight="612.0" prefWidth="919.0">
+                  <fx:include source="TableView.fxml"/>
+                </ScrollPane>
 
                 <fx:include source="ControlPane.fxml"/>
 
