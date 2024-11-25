@@ -79,7 +79,7 @@ public class UserService implements BaseService<UserEntity, UserResponse, UserRe
     }
 
     public void create(String phoneNumber, String password) {
-        UserEntity user = new UserEntity(phoneNumber, password, phoneNumber, null);
+        UserEntity user = new UserEntity(phoneNumber, password, phoneNumber, null, null, null);
         userRepository.save(user);
         System.out.println("Instances.currentUser = " + Instances.currentUser);
         Instances.currentUser = user;

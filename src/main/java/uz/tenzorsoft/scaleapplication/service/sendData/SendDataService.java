@@ -83,7 +83,7 @@ public class SendDataService {
         try {
             StatusResponse statusResponse = new StatusResponse(
                     isConnected, gate1Connection, gate2Connection, camera1Connection, camera2Connection,
-                    camera3Connection, sensor1Connection, sensor2Connection, sensor3Connection, currentUser.getScaleId()
+                    camera3Connection, sensor1Connection, sensor2Connection, sensor3Connection, currentUser.getInternalScaleId()
             );
 
             RestTemplate restTemplate = new RestTemplate();
@@ -141,7 +141,7 @@ public class SendDataService {
 
             myCoalData.setId(truckEntity.getId());
             myCoalData.setNp(0L);
-            myCoalData.setTarozi_id(5L);
+            myCoalData.setTarozi_id(currentUser.getExternalScaleId());
 //            myCoalData.setRfid("");
             myCoalData.setAvto_number(truckEntity.getTruckNumber());
 //            myCoalData.setFul_name("");
