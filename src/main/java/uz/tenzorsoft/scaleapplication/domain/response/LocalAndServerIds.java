@@ -19,4 +19,5 @@ public class LocalAndServerIds {
     private Map<Long, Long> attach=new HashMap<>();
     private Map<Long, Long> user=new HashMap<>();
     private Map<Long, Long> data=new HashMap<>();
+    private Map<Long, Long> productIds=new HashMap<>();
 }

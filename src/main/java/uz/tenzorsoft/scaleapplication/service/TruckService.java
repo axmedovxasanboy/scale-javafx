@@ -52,6 +52,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private String regexPattern;
     @Value("${number.pattern.regexp.standard}")
     private String regexStandard;
+    @Autowired
+    private ProductService productService;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -239,6 +241,13 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     @Transactional
     public void saveTruck(TruckResponse currentTruck, Integer id, AttachResponse attach) {
         if (id == 1) {
+            // Fetch the selected product from the database
+            ProductsEntity selectedProduct = productService.getSelectedProduct();
+            if (selectedProduct == null) {
+                throw new IllegalStateException("Tanlangan mahsulot topilmadi. Yuk mashinasini saqlashdan oldin mahsulotni tanlang.");
+            }
+
+            currentTruckEntity.setProducts(selectedProduct); // Set the selected product
             currentTruckEntity = new TruckEntity();
             currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();

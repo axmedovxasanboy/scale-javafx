@@ -41,7 +41,7 @@
 
         <fx:include source="UserView.fxml"/>
 
-        <!--        <fx:include source="TestTab.fxml"/>-->
+                <fx:include source="TestTab.fxml"/>
       </tabs>
     </TabPane>
   </children>

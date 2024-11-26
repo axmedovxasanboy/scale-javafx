@@ -12,14 +12,17 @@ import lombok.Setter;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.ProductsEntity;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.ProductService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isAvailableToConnect;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
@@ -71,10 +74,63 @@ public class ControlPane {
         endDate.setConverter(dateStringConverter);
         startDate.setValue(LocalDate.now());
         endDate.setValue(LocalDate.now());
-        // Initialize product list
         products = FXCollections.observableArrayList(productService.getAllProducts());
-        products.add("Add Product");
+
+        // Check if there are any products available
+        if (!products.isEmpty()) {
+            // Set the selected product if one exists and is not deleted
+            ProductsEntity selectedProduct = productService.getSelectedProduct();
+            if (selectedProduct != null && selectedProduct.getIsSelected() && !selectedProduct.getIsDeleted()) {
+                productCombobox.setValue(selectedProduct.getName());  // Set selected product
+            } else {
+                showNoProductsPopup(); // If no product is selected, show the pop-up
+            }
+        } else {
+            showNoProductsPopup(); // If there are no products, show the pop-up
+        }
+
+        // Initialize product list
+        products.add("Mahsulot qo'shish");
         productCombobox.setItems(products);
+
+// Apply a custom cell factory for styling
+        productCombobox.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    // Apply special style for "Mahsulot qo'shish"
+                    if ("Mahsulot qo'shish".equals(item)) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: green; -fx-background-color: #f0f8ff;");
+                    } else {
+                        setStyle(""); // Default style for other items
+                    }
+                }
+            }
+        });
+
+// Ensure the selected item in the ComboBox also uses the custom style
+        productCombobox.setButtonCell(new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    if ("Mahsulot qo'shish".equals(item)) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: green; -fx-background-color: #f0f8ff;");
+                    } else {
+                        setStyle("");
+                    }
+                }
+            }
+        });
 
         // Handle selection
         productCombobox.setOnAction(event -> handleSelection(productCombobox.getValue()));
@@ -82,29 +138,72 @@ public class ControlPane {
     }
 
     private void handleSelection(String selected) {
-        if ("Add Product".equals(selected)) {
+        if ("Mahsulot qo'shish".equals(selected)) {
             addNewProduct();
-        } else if (selected != null) {
-            mainController.showAlert(Alert.AlertType.INFORMATION, "Information", "selected: " + selected);
+        } else if (selected == null || selected.trim().isEmpty()) {
+            showNoProductsPopup();
+        } else {
+            // Update the selected product
+            productService.updateSelectedProduct(selected);
         }
+    }
+
+    private void showNoProductsPopup() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Mahsulotlar mavjud emas");
+        alert.setHeaderText("Hech qanday mahsulot qo'shilmagan.");
+        alert.setContentText("Davom etish uchun mahsulot qo‘shing.");
+
+        // Add custom buttons
+        ButtonType addProductButton = new ButtonType("Mahsulot qo'shish");
+        ButtonType cancelButton = ButtonType.CLOSE; // Default close button
+
+        alert.getButtonTypes().setAll(addProductButton, cancelButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent()) {
+            if (result.get() == addProductButton) {
+                addNewProduct();
+            } else if (result.get() == cancelButton) {
+                closeProgram(); // Close the program if "Cancel" is clicked
+            }
+        }
+    }
+
+    private void closeProgram() {
+        // Close the program gracefully
+        Platform.exit(); // Exits JavaFX application
+        System.exit(0);  // Terminates JVM
     }
 
     private void addNewProduct() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add Product");
-        dialog.setHeaderText("Add a New Product");
-        dialog.setContentText("Enter the product name:");
+        dialog.setTitle("Mahsulot qo'shish");
+        dialog.setHeaderText("Yangi mahsulot qo'shing");
+        dialog.setContentText("Mahsulot nomini kiriting:");
 
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(productName -> {
             if (!productName.trim().isEmpty()) {
-                products.add(products.size() - 1, productService.saveProduct(productName).getName()); // Add before "Add Product"
-                mainController.showAlert(Alert.AlertType.INFORMATION, "Product added", "Product added: " + productName);
+                // Save the new product and mark it as selected
+                ProductsEntity newProduct = productService.saveProduct(productName);
+                productService.updateSelectedProduct(newProduct.getName()); // Mark as selected
+
+                // Refresh the product list
+                products.add(products.size() - 1, newProduct.getName()); // Add before "Mahsulot qo'shish"
+                productCombobox.setValue(newProduct.getName()); // Automatically select the new product
+
+                // First alert for product added
+                mainController.showAlert(Alert.AlertType.INFORMATION, "Mahsulot qo'shildi", "Mahsulot qo'shildi: " + productName);
+
+                // Second alert for product selected
+                mainController.showAlert(Alert.AlertType.INFORMATION, "Ma'lumot", "Tanlandi: " + newProduct.getName());
             } else {
-                mainController.showAlert(Alert.AlertType.ERROR, "Error", "Product name cannot be empty!");
+                mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Mahsulot nomi bo'sh bo'lishi mumkin emas!");
             }
         });
     }
+
 
     public void controlConnectButton() {
         executors.execute(() -> {

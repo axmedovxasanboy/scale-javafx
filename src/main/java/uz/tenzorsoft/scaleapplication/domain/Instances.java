@@ -11,7 +11,7 @@ public class Instances<T> {
     public static TruckResponse currentTruck = new TruckResponse();
 
     public static String truckNumber = "";
-    public static String WEBSOCKET_URL = "ws://api-scale.mycoal.uz/ws";
+    public static String WEBSOCKET_URL = "wss://api-scale.mycoal.uz/ws";
     public static String SERVER_URL = "https://api-scale.mycoal.uz";
 
     public static boolean isTesting = false;
@@ -27,6 +27,7 @@ public class Instances<T> {
     public static boolean sensor3Connection = false;
     public static boolean isWaiting = false;
     public static boolean isScaleControlOn = true;
+    public static boolean isAvailableToConnect = false;
     public static short cargoConfirmationStatus = -1;
 
     public static Configurations configurations;

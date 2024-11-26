@@ -80,6 +80,13 @@ public class DataSendController {
                                     System.err.println(e.getMessage());
                                     return null;
                                 });
+
+                        CompletableFuture.runAsync(() -> sendDataService.sendProductsToServer())
+                                .exceptionally(e -> {
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00038: (" + getClass().getName() + ") " + e.getMessage()));
+                                    System.err.println(e.getMessage());
+                                    return null;
+                                });
                     }
 
                     Thread.sleep(2000);

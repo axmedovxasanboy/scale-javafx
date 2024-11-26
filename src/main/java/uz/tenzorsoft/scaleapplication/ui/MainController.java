@@ -49,13 +49,18 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 public class MainController {
     private final FXMLLoader fxmlLoader;
     private final DataSendController dataSendController;
-    private final ExecutorService executors;
     private final ConfigUtilsService configUtilsService;
     private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
     private final UserController userController;
-    private final ConnectionsController connectionsController;
-    private final WebSocketClient webSocketClient;
+
+    @Autowired
+    @Lazy
+    private WebSocketClient webSocketClient;
+
+    @Autowired
+    @Lazy
+    private ConnectionsController connectionsController;
 
     @Autowired
     @Lazy
@@ -146,11 +151,11 @@ public class MainController {
 
     public static String showNumberInsertDialog() {
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Enter License Plate");
+        dialog.setTitle("Avtomabil raqamini kiriting");
 
         // Add TextField for license plate input
         TextField licensePlateField = new TextField();
-        licensePlateField.setPromptText("Enter License Plate");
+        licensePlateField.setPromptText("Avtomabil raqamini kiriting");
 
         licensePlateField.textProperty().addListener((observable, oldValue, newValue) -> {
             // Replace spaces with dashes and convert lowercase letters to uppercase
@@ -183,18 +188,18 @@ public class MainController {
             return "";
         }
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("License Plate Selection");
-        dialog.setHeaderText("Select a License Plate");
+        dialog.setTitle("Avtomabil raqamini tanlash");
+        dialog.setHeaderText("Avtomabil raqamini tanlang");
 
         // Instruction label
-        Label instructionLabel = new Label("Please select your license plate from the options below:");
+        Label instructionLabel = new Label("Quyidagi variantlardan avtomobil raqamini tanlang:");
 
         ComboBox<String> licensePlateDropdown = new ComboBox<>();
         licensePlateDropdown.getItems().addAll(notFinishedTrucks);
-        licensePlateDropdown.setPromptText("Select License Plate");
+        licensePlateDropdown.setPromptText("Avtomabil raqamini tanlang");
 
         // Bind the Confirm button's disable property to the ComboBox's selection
-        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        ButtonType confirmButtonType = new ButtonType("Tasdiqlash", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
         Button confirmButton = (Button) dialog.getDialogPane().lookupButton(confirmButtonType);
         confirmButton.setDisable(true);

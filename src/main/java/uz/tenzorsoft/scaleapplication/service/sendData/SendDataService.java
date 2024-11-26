@@ -1,14 +1,12 @@
 package uz.tenzorsoft.scaleapplication.service.sendData;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import uz.tenzorsoft.scaleapplication.domain.Instances;
-import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.*;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AllDataResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.LocalAndServerIds;
@@ -38,6 +36,7 @@ public class SendDataService {
     private final AttachService attachService;
     private final TruckActionService truckActionService;
     private final LogService logService;
+    private final ProductService productService;
 
     public void sendNotSentData() {
 
@@ -230,6 +229,55 @@ public class SendDataService {
         Map<Long, Long> data = Objects.requireNonNull(response.getBody()).getData();
         logService.dataSent(notSentLogs, data);
 
+    }
+
+    public void sendProductsToServer() {
+        // Jo'natilmagan mahsulotlarni olish
+        List<ProductsEntity> notSentProducts = productService.getNotSentProducts();
+        if (notSentProducts.isEmpty()) {
+            System.out.println("No products to send.");
+            return;
+        }
+
+        // Birinchi mahsulotni olish va javobni tayyorlash
+        ProductsEntity products = notSentProducts.get(0);
+        ProductResponses response = new ProductResponses(
+                products.getId(),
+                products.getName(),
+                currentUser.getInternalScaleId()
+        );
+        System.out.println("Prepared response: " + response);
+
+        // REST so'rovini yuborish
+        try {
+            // Assuming 'response' is your request body object
+            HttpEntity<ProductResponses> requestEntity = new HttpEntity<>(response);
+
+            ResponseEntity<Map<String, Long>> request = restTemplate.exchange(
+                    "http://192.168.68.123:9090/product/save",
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<Map<String, Long>>() {}
+            );
+
+            // Javobni tekshirish
+            if (request.getStatusCode() == HttpStatus.OK) {
+                Map<String, Long> responseBody = request.getBody();
+                if (responseBody != null) {
+                    System.out.println("Response body: " + responseBody);
+                    // Ma'lumotlarni belgilash: muvaffaqiyatli jo'natildi
+                    productService.dataSent(notSentProducts, responseBody);
+                } else {
+                    System.out.println("Response body is null.");
+                }
+            } else {
+                System.out.println("Request failed with status: " + request.getStatusCode());
+            }
+        } catch (RestClientException e) {
+            // Xatolikni log qilish
+            System.err.println("Error while sending product: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
 

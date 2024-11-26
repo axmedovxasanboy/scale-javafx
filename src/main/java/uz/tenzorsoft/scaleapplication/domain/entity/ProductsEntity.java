@@ -1,10 +1,7 @@
 package uz.tenzorsoft.scaleapplication.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -13,8 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 @Entity(name = "products")
-public class ProductsEntity {
+public class ProductsEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,9 +21,12 @@ public class ProductsEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean isDeleted = false;
 
+    @Column(columnDefinition = "boolean default true")
+    private Boolean isSelected = true;
+
+    private Long scaleId;
+
     @CreationTimestamp
     private LocalDateTime created;
-
-
 
 }

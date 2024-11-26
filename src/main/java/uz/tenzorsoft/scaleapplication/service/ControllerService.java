@@ -4,12 +4,15 @@ import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
+import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.ui.MainController;
 
 import java.io.IOException;
 import java.net.InetAddress;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isAvailableToConnect;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.CONTROLLER_IP;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.CONTROLLER_PORT;
@@ -20,6 +23,8 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 public class ControllerService {
 
     public void connect() throws Exception {
+//        if (!isAvailableToConnect) return;
+
         address = InetAddress.getByName(CONTROLLER_IP);
         connection = new TCPMasterConnection(address);
         connection.setTimeout(3000);
