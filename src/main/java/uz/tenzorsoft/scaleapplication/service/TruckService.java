@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import jakarta.transaction.Transactional;
+import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.sendData.ActionResponse;
 import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckPhotoRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
+import uz.tenzorsoft.scaleapplication.ui.MainController;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +43,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private final CargoService cargoService;
     private final LogService logService;
 
+
+
     @Setter
     @Getter
     private TruckEntity currentTruckEntity = new TruckEntity();
@@ -54,6 +58,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private String regexStandard;
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    @Lazy
+    private MainController mainController;
 
     public List<TableViewData> getTruckData() {
         List<TruckEntity> all = truckRepository.findAll(Sort.by(Sort.Direction.ASC, "id"));
@@ -205,6 +213,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 }
             }
         }
+        data.setProductType(entity.getProducts().getName());
         CargoEntity cargo = cargoService.findByTruckId(entity.getId());
         if (cargo == null) return data;
         switch (cargo.getCargoStatus()) {
@@ -247,8 +256,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 throw new IllegalStateException("Tanlangan mahsulot topilmadi. Yuk mashinasini saqlashdan oldin mahsulotni tanlang.");
             }
 
-            currentTruckEntity.setProducts(selectedProduct); // Set the selected product
             currentTruckEntity = new TruckEntity();
+            currentTruckEntity.setProducts(selectedProduct); // Set the selected product
             currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             TruckPhotosEntity entity = truckPhotoRepository.save(
@@ -378,12 +387,17 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             return true;
         }
         if (truckRepository.existsByTruckNumberAndIsFinishedAndIsDeleted(truckNumber, false, false)) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Bu moshina hali chiqmagan!");
             return false;
         }
         List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, true, false);
         if (list.isEmpty()) return false;
         LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
-        return nextEntranceTime.isBefore(LocalDateTime.now());
+        boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
+        if (!b) {
+            mainController.showAlert(Alert.AlertType.INFORMATION, "Info", "5 daqiqadan keyin kirishi mumkin!");
+        }
+        return b;
     }
 
     private boolean isTruckNumberExists(String truckNumber) {
@@ -397,12 +411,20 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public boolean isEntranceAvailableForCamera2(String truckNumber) {
         if (!isTruckNumberExists(truckNumber)) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Bu moshina raqami bazadan topilmadi: " + truckNumber);
             return false;
         }
         List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, false, false);
-        if (list.isEmpty()) return false;
+        if (list.isEmpty()){
+            mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!");
+            return false;
+        }
         LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
-        return nextEntranceTime.isBefore(LocalDateTime.now());
+        boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
+        if (!b) {
+            mainController.showAlert(Alert.AlertType.INFORMATION, "Info",nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
+        }
+        return b;
     }
 
     public boolean isStandard(String truckNumber) {

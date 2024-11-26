@@ -29,7 +29,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ImageController {
+public class ImageController implements BaseController{
 
     private final TruckService truckService;
     private final LogService logService;
@@ -71,7 +71,7 @@ public class ImageController {
         Image defaultImage = new Image("/images/no-image.jpg");
         TruckEntity truck = truckService.findById(data.getId());
         if (truck == null) {
-            mainController.showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
+            showAlert(Alert.AlertType.ERROR, "Error", "Truck does not exist with id: " + data.getId());
             return;
         }
         for (ImageView image : images) {
@@ -87,6 +87,7 @@ public class ImageController {
                 setupImageClick(images.get(i), image);
 
             } catch (Exception e) {
+                showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                 logService.save(new LogEntity(5L, Instances.truckNumber, "00032: (" + getClass().getName() + ") " +e.getMessage()));
             }
         }

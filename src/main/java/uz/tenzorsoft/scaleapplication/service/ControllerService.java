@@ -46,7 +46,7 @@ public class ControllerService {
 
     public boolean openGate1(int truckPosition) throws ModbusException {
         if (!isConnected) {
-            throw new ModbusException("Not connected to controller");
+            throw new ModbusException("Controllerga ulanmagan");
         }
         ScaleSystem.truckPosition = truckPosition;
         return openGate1();
@@ -55,7 +55,7 @@ public class ControllerService {
 
     public boolean closeGate1() throws ModbusException {
         if (!isConnected) {
-            throw new ModbusException("Not connected to controller");
+            throw new ModbusException("Controllerga ulanmagan");
         }
         writeCoil(COIL_GREEN_LIGHT_1, false);
         writeCoil(COIL_OPEN_GATE_1, false);
@@ -66,7 +66,7 @@ public class ControllerService {
 
     public boolean openGate2() throws ModbusException {
         if (!isConnected) {
-            throw new ModbusException("Not connected to controller");
+            throw new ModbusException("Controllerga ulanmagan");
         }
         writeCoil(COIL_GREEN_LIGHT_2, true);
         writeCoil(COIL_OPEN_GATE_2, true);
@@ -76,7 +76,7 @@ public class ControllerService {
 
     public boolean openGate2(int truckPosition) throws ModbusException {
         if (!isConnected) {
-            throw new ModbusException("Not connected to controller");
+            throw new ModbusException("Controllerga ulanmagan");
         }
         ScaleSystem.truckPosition = truckPosition;
         openGate2();
@@ -85,7 +85,7 @@ public class ControllerService {
 
     public boolean closeGate2() throws ModbusException {
         if (!isConnected) {
-            throw new ModbusException("Not connected to controller");
+            throw new ModbusException("Controllerga ulanmagan");
         }
         writeCoil(COIL_GREEN_LIGHT_2, false);
         writeCoil(COIL_OPEN_GATE_2, false);

@@ -22,7 +22,7 @@ import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 
 @Component
 @RequiredArgsConstructor
-public class MenuBarController {
+public class MenuBarController implements BaseController{
 
     private final ConfigUtilsService configUtilsService;
     private final PrintCheck printCheck;

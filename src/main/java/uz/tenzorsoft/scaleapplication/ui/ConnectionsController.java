@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.image.ImageView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 
 @Component
 @RequiredArgsConstructor
-public class ConnectionsController {
+public class ConnectionsController implements BaseController {
 
     private final ExecutorService executors;
     private final ControllerService controllerService;
@@ -69,10 +70,11 @@ public class ConnectionsController {
 
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
+                    showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00030: (" + getClass().getName() + ") " +e.getMessage()));
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00031: (" + getClass().getName() + ") " +e.getMessage()));
-//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });

@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutorService;
 
 @Component
 @RequiredArgsConstructor
-public class TableController {
+public class TableController implements BaseController {
 
     private final TruckService truckService;
     private final TableService tableService;
@@ -162,7 +162,7 @@ public class TableController {
                     Thread.sleep(60000);
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " + e.getMessage()));
-//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });
@@ -202,7 +202,7 @@ public class TableController {
             tableData.setItems(FXCollections.observableArrayList(data));
         } catch (Exception e) {
             logService.save(new LogEntity(5L, Instances.truckNumber, "00049: (" + getClass().getName() + ") " + e.getMessage()));
-//                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
     }
 

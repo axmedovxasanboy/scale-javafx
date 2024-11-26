@@ -17,7 +17,7 @@ import static uz.tenzorsoft.scaleapplication.domain.Settings.CAMERA_2;
 
 @Component
 @RequiredArgsConstructor
-public class CameraViewController {
+public class CameraViewController implements BaseController {
     private final AttachService attachService;
     private final LogService logService;
 
@@ -64,9 +64,8 @@ public class CameraViewController {
                 System.out.println("Failed to get snapshot, status: " + response.getStatusCode());
             }
         } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00029: (" + getClass().getName() + ") " +e.getMessage()));
-            // Not on FX application error
-            //showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
         }
         return null;
     }

@@ -28,7 +28,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
 @RequiredArgsConstructor
-public class ControlPane {
+public class ControlPane implements BaseController {
     private final ExecutorService executors;
     private final LogService logService;
     private final MainController mainController;
@@ -76,6 +76,7 @@ public class ControlPane {
         endDate.setValue(LocalDate.now());
         products = FXCollections.observableArrayList(productService.getAllProducts());
 
+/*
         // Check if there are any products available
         if (!products.isEmpty()) {
             // Set the selected product if one exists and is not deleted
@@ -88,13 +89,18 @@ public class ControlPane {
         } else {
             showNoProductsPopup(); // If there are no products, show the pop-up
         }
+*/
 
         // Initialize product list
         products.add("Mahsulot qo'shish");
         productCombobox.setItems(products);
+        if (!productService.getAllProducts().isEmpty()) {
+            productCombobox.setValue(productService.getSelectedProduct().getName());
+            isAvailableToConnect = true;
+        }
 
 // Apply a custom cell factory for styling
-        productCombobox.setCellFactory(lv -> new ListCell<String>() {
+        productCombobox.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -140,7 +146,7 @@ public class ControlPane {
     private void handleSelection(String selected) {
         if ("Mahsulot qo'shish".equals(selected)) {
             addNewProduct();
-        } else if (selected == null || selected.trim().isEmpty()) {
+        } else if (selected != null && selected.trim().isEmpty()) {
             showNoProductsPopup();
         } else {
             // Update the selected product
@@ -164,16 +170,8 @@ public class ControlPane {
         if (result.isPresent()) {
             if (result.get() == addProductButton) {
                 addNewProduct();
-            } else if (result.get() == cancelButton) {
-                closeProgram(); // Close the program if "Cancel" is clicked
             }
         }
-    }
-
-    private void closeProgram() {
-        // Close the program gracefully
-        Platform.exit(); // Exits JavaFX application
-        System.exit(0);  // Terminates JVM
     }
 
     private void addNewProduct() {
@@ -183,6 +181,15 @@ public class ControlPane {
         dialog.setContentText("Mahsulot nomini kiriting:");
 
         Optional<String> result = dialog.showAndWait();
+        if (result.isEmpty()) {
+            if (productService.getAllProducts().isEmpty()) {
+                productCombobox.setValue(null);
+                isAvailableToConnect = false;
+                return;
+            }
+            productCombobox.setValue(productService.getSelectedProduct().getName());
+            return;
+        }
         result.ifPresent(productName -> {
             if (!productName.trim().isEmpty()) {
                 // Save the new product and mark it as selected
@@ -194,12 +201,11 @@ public class ControlPane {
                 productCombobox.setValue(newProduct.getName()); // Automatically select the new product
 
                 // First alert for product added
-                mainController.showAlert(Alert.AlertType.INFORMATION, "Mahsulot qo'shildi", "Mahsulot qo'shildi: " + productName);
-
-                // Second alert for product selected
-                mainController.showAlert(Alert.AlertType.INFORMATION, "Ma'lumot", "Tanlandi: " + newProduct.getName());
+                showAlert(Alert.AlertType.INFORMATION, "Mahsulot qo'shildi", "Mahsulot qo'shildi: " + productName);
+                isAvailableToConnect = true;
             } else {
-                mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Mahsulot nomi bo'sh bo'lishi mumkin emas!");
+                showAlert(Alert.AlertType.ERROR, "Xatolik", "Mahsulot nomi bo'sh bo'lishi mumkin emas!");
+                productCombobox.setValue(null);
             }
         });
     }
@@ -222,6 +228,7 @@ public class ControlPane {
                     });
                     Thread.sleep(1000);
                 } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
                     Platform.runLater(() -> mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
                 }
@@ -248,6 +255,10 @@ public class ControlPane {
 
     @FXML
     private void connectToController() {
+        if (!isAvailableToConnect) {
+            showNoProductsPopup();
+            return;
+        }
         if (isConnected) {
             buttonController.disconnect();
             truckPosition = -1;

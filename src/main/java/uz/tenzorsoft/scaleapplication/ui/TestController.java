@@ -28,7 +28,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
 @RequiredArgsConstructor
-public class TestController {
+public class TestController implements BaseController {
 
     private final ExecutorService executors;
     private final AttachService attachService;
@@ -134,7 +134,7 @@ public class TestController {
 //                return;
 //            }
             if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
-                mainController.showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
+                // showAlert(Alert.AlertType.WARNING, "Not available", "Entrance not available: " + truckNumber);
                 return;
             }
             AttachResponse response = attachService.getCameraImgTesting();
@@ -159,11 +159,11 @@ public class TestController {
 //                return;
 //            }
             if (!truckService.isNotFinishedTrucksExists()) {
-                mainController.showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
+                // showAlert(Alert.AlertType.WARNING, "Not found", "All trucks are exited!");
                 return;
             }
             if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                mainController.showAlert(Alert.AlertType.WARNING, "Not found", "Entrance not available: " + truckNumber);
+                // showAlert(Alert.AlertType.WARNING, "Not found", "Entrance not available: " + truckNumber);
                 return;
             }
             AttachResponse response = attachService.getCameraImgTesting();

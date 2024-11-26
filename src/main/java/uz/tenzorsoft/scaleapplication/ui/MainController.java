@@ -46,7 +46,7 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
 @RequiredArgsConstructor
-public class MainController {
+public class MainController implements BaseController {
     private final FXMLLoader fxmlLoader;
     private final DataSendController dataSendController;
     private final ConfigUtilsService configUtilsService;
@@ -86,13 +86,13 @@ public class MainController {
     private Pane scaleAutomationPane;
 
 
-    public void showAlert(Alert.AlertType alertType, String headerText, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(headerText);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+//    public void showAlert(Alert.AlertType alertType, String headerText, String message) {
+//        Alert alert = new Alert(alertType);
+//        alert.setTitle(headerText);
+//        alert.setHeaderText(null);
+//        alert.setContentText(message);
+//        alert.showAndWait();
+//    }
 
     public static short showCargoScaleConfirmationDialog(double mass) {
         CompletableFuture<Short> futureResult = new CompletableFuture<>();
@@ -129,6 +129,7 @@ public class MainController {
             scalePort = new Settings(SCALE_PORT).getSerialPort();
             webSocketClient.connect(Instances.WEBSOCKET_URL);
         } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             System.err.println(e.getMessage());
         }
@@ -139,7 +140,7 @@ public class MainController {
         testController.start();
         sendStatuesDataController.startSending();
         printCheck.listAvailablePrinters();
-        buttonController.connect();
+        if(isAvailableToConnect) buttonController.connect();
         if (isConnected) {
             buttonController.closeGate1();
             buttonController.closeGate2();
@@ -265,6 +266,7 @@ public class MainController {
 
             mainWindowStage.show();
         } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
 
