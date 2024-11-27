@@ -93,7 +93,7 @@ public class WebSocketClient {
     public void onClose(Session session, CloseReason reason) {
         System.out.println("Connection closed: " + reason.getReasonPhrase());
         try {
-            connect("wss://api-scale.mycoal.uz/ws");
+            connect(Instances.WEBSOCKET_URL);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             System.err.println(e.getMessage());
         }
@@ -103,7 +103,7 @@ public class WebSocketClient {
     public void onError(Session session, Throwable throwable) {
         System.err.println("Error: " + throwable.getMessage());
         try {
-            connect("wss://api-scale.mycoal.uz/ws");
+            connect(Instances.WEBSOCKET_URL);
         } catch (URISyntaxException | DeploymentException | IOException e) {
             logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             System.err.println(e.getMessage());
@@ -132,6 +132,7 @@ public class WebSocketClient {
 
     @Scheduled(fixedRate = 500)
     public void sendPeriodicMessage() {
+        if (Instances.currentUser.getId() == null) return;
         sendMessage("/sendCommends" + Instances.currentUser.getInternalScaleId());
     }
 }

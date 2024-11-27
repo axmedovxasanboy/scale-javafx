@@ -6,6 +6,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.*;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AllDataResponse;
@@ -235,7 +236,7 @@ public class SendDataService {
         // Jo'natilmagan mahsulotlarni olish
         List<ProductsEntity> notSentProducts = productService.getNotSentProducts();
         if (notSentProducts.isEmpty()) {
-            System.out.println("No products to send.");
+            // System.out.println("No products to send.");
             return;
         }
 
@@ -254,7 +255,7 @@ public class SendDataService {
             HttpEntity<ProductResponses> requestEntity = new HttpEntity<>(response);
 
             ResponseEntity<Map<String, Long>> request = restTemplate.exchange(
-                    "http://192.168.68.123:9090/product/save",
+                    SERVER_URL + "/product/save",
                     HttpMethod.POST,
                     requestEntity,
                     new ParameterizedTypeReference<Map<String, Long>>() {}
