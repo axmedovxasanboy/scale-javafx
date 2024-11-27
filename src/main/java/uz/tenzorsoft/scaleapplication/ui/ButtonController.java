@@ -92,7 +92,10 @@ public class ButtonController implements BaseController {
 
     public boolean openGate1() {
         try {
-            if (!isTesting) return controllerService.openGate1();
+            if (!isTesting) {
+                controllerService.openGate1();
+                commandComment = "Finished";
+            }
         } catch (ModbusException e) {
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " +e.getMessage()));
@@ -200,7 +203,10 @@ public class ButtonController implements BaseController {
 
     public boolean closeGate1() {
         try {
-            if (!isTesting) return controllerService.closeGate1();
+            if (!isTesting) {
+                controllerService.closeGate1();
+                commandComment = "Finished";
+            }
         } catch (ModbusException e) {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
@@ -241,7 +247,10 @@ public class ButtonController implements BaseController {
 
     public boolean closeGate2() {
         try {
-            if (!isTesting) return controllerService.closeGate2();
+            if (!isTesting) {
+                controllerService.closeGate2();
+                commandComment = "Finished";
+            }
         } catch (ModbusException e) {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
@@ -317,10 +326,13 @@ public class ButtonController implements BaseController {
                 double numericValue = parseWeightData(data);
                 scaleLogService.save(data, String.valueOf(numericValue));
                 System.out.println("Kg: " + numericValue);
+                commandComment = "Finished";
                 return numericValue;
             }
+            commandComment = "bytes read is 0";
 
         } catch (Exception e) {
+            commandComment = e.getMessage();
             return 0.0;
         }
         return 0.0;
