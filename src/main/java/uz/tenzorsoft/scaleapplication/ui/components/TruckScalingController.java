@@ -211,6 +211,8 @@ public class TruckScalingController {
                                 System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                             }
 
+                            if (cargoConfirmationStatus == 2) isScaled = false;
+
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                                 //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
@@ -257,6 +259,8 @@ public class TruckScalingController {
                     }), SCALE_TIMEOUT);
                 }
                 if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 0) {
+                    truckService.getCurrentTruckEntity().setNextEntranceTime(LocalDateTime.now().plusMinutes(2));
+                    truckService.save(truckService.getCurrentTruckEntity());
                     buttonController.openGate2();
                     truckPosition = 2;
                     cargoConfirmationStatus = -1;
