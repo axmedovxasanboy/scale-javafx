@@ -216,7 +216,10 @@ public class TruckScalingController {
                                 System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                             }
 
-                            if (cargoConfirmationStatus == 2) isScaled = false;
+                            if (cargoConfirmationStatus == 2) {
+                                isScaled = false;
+                                isCargoConfirmationDialogOpened = false;
+                            }
 
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
                                 AttachResponse response = cameraViewController.takePicture(CAMERA_2);
