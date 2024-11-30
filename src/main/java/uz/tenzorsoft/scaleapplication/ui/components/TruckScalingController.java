@@ -69,6 +69,7 @@ public class TruckScalingController {
     private boolean isCargoPhotoTaken = false;
     private boolean isCargoConfirmationDialogOpened = false;
     private boolean isTruckExited = false;
+    private boolean isTimeoutChanged = false;
 
     public void start() {
         scheduler.scheduleAtFixedRate(() -> {
@@ -168,6 +169,10 @@ public class TruckScalingController {
                     }, CLOSE_GATE2_TIMEOUT);
                 }
 
+                if(isTimeoutChanged) {
+                    CLOSE_GATE2_TIMEOUT = configurations.getCloseGate2Timeout();
+                }
+
                 /////////////////////////////////////////////////////////////////////////////////////////////
                 /////////////////////////////////////////////////////////////////////////////////////////////
                 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -263,6 +268,8 @@ public class TruckScalingController {
                     truckService.save(truckService.getCurrentTruckEntity());
                     buttonController.openGate2();
                     truckPosition = 2;
+                    CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 2;
+                    isTimeoutChanged = true;
                     cargoConfirmationStatus = -1;
                     isTruckEntered = true;
                     isTruckExited = false;
