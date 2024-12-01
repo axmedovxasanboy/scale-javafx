@@ -162,6 +162,7 @@ public class TruckScalingController {
                                 isTruckEntered = false;
                                 isCargoPhotoTaken = false;
                                 isCargoConfirmationDialogOpened = false;
+                                cargoConfirmationStatus = -1;
                                 isOnScale = false;
                                 weigh = 0.0;
                             }
@@ -207,18 +208,19 @@ public class TruckScalingController {
                                 log.info("Truck weigh: {}", weigh);
                                 isScaled = true;
                             }
-                            if (!isScaleControlOn) cargoConfirmationStatus = -1;
-                            else cargoConfirmationStatus = 1;
+                            if (isScaleControlOn) cargoConfirmationStatus = 1;
+//                            else cargoConfirmationStatus = 1;
 
                             if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn) {
                                 isCargoConfirmationDialogOpened = true;
-                                cargoConfirmationStatus = showCargoScaleConfirmationDialog(weigh);
+                                cargoConfirmationStatus = showCargoScaleConfirmationDialog(truckService.getCurrentTruckEntity(), weigh);
                                 System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                             }
 
                             if (cargoConfirmationStatus == 2) {
                                 isScaled = false;
                                 isCargoConfirmationDialogOpened = false;
+                                weigh = 0.0;
                             }
 
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
@@ -266,14 +268,16 @@ public class TruckScalingController {
                         }
                     }), SCALE_TIMEOUT);
                 }
-                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 0) {
+                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && cargoConfirmationStatus == 0) { // removed isScaled boolean condition
                     truckService.getCurrentTruckEntity().setNextEntranceTime(LocalDateTime.now().plusMinutes(2));
                     truckService.save(truckService.getCurrentTruckEntity());
                     buttonController.openGate2();
                     truckPosition = 2;
+                    isScaled = true; // needed for exiting
                     CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 2;
                     isTimeoutChanged = true;
                     cargoConfirmationStatus = -1;
+                    isCargoConfirmationDialogOpened = true;
                     isTruckEntered = true;
                     isTruckExited = false;
                     currentTruck = new TruckResponse();

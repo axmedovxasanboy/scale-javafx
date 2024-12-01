@@ -12,10 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.util.StringConverter;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.controlsfx.control.ToggleSwitch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -23,6 +20,9 @@ import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.Settings;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
@@ -32,17 +32,13 @@ import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.scalePort;
-import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
 @RequiredArgsConstructor
@@ -94,8 +90,12 @@ public class MainController implements BaseController {
 //        alert.showAndWait();
 //    }
 
-    public static short showCargoScaleConfirmationDialog(double mass) {
+    public static short showCargoScaleConfirmationDialog(TruckEntity currentTruckEntity, double mass) {
         CompletableFuture<Short> futureResult = new CompletableFuture<>();
+        double entranceWeigh = currentTruckEntity.getTruckActions().stream()
+                .filter(action -> action.getAction() == TruckAction.ENTRANCE
+                        || action.getAction() == TruckAction.MANUAL_ENTRANCE).findFirst()
+                .map(TruckActionEntity::getWeight).orElse(0.0);
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -103,8 +103,12 @@ public class MainController implements BaseController {
             alert.setHeaderText(null);
             alert.initStyle(StageStyle.UTILITY);
 
-            // Display mass (non-editable)
-            Label massLabel = new Label("Massa: " + mass + " kg");
+            // Display mass details (non-editable)
+            Label massLabel = new Label(
+                    "Kirishdagi massa: " + entranceWeigh + " kg\n" +
+                            "Sof og'irlik: " + Math.abs(mass - entranceWeigh) + " kg\n" +
+                            "Tarozidagi massa: " + mass
+            );
             alert.getDialogPane().setContent(massLabel);
 
             // Customizing buttons
@@ -129,8 +133,12 @@ public class MainController implements BaseController {
             }
         });
 
-        // Waits until the dialog result is available
-        return futureResult.join();
+        try {
+            return futureResult.get(); // Block until a result is available
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0; // Return cancel in case of an error
+        }
     }
 
 
@@ -153,7 +161,7 @@ public class MainController implements BaseController {
         testController.start();
         sendStatuesDataController.startSending();
         printCheck.listAvailablePrinters();
-        if(isAvailableToConnect) buttonController.connect();
+        if (isAvailableToConnect) buttonController.connect();
         if (isConnected) {
             buttonController.closeGate1();
             buttonController.closeGate2();
@@ -249,7 +257,13 @@ public class MainController implements BaseController {
             ToggleSwitch toggleSwitch = new ToggleSwitch("");
             toggleSwitch.setSelected(true);
             toggleSwitch.setOnMouseClicked(event -> {
-                isScaleControlOn = toggleSwitch.isSelected();
+                boolean selected = toggleSwitch.isSelected();
+                isScaleControlOn = selected;
+                if (selected) {
+                    cargoConfirmationStatus = 1;
+                } else {
+                    cargoConfirmationStatus = -1;
+                }
             });
 
             Label label = new Label("Massani avtomatik tarzda olish");
