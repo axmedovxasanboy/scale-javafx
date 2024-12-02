@@ -105,9 +105,9 @@ public class MainController implements BaseController {
 
             // Display mass details (non-editable)
             Label massLabel = new Label(
-                    "Kirishdagi massa: " + entranceWeigh + " kg\n" +
-                            "Sof og'irlik: " + Math.abs(mass - entranceWeigh) + " kg\n" +
-                            "Tarozidagi massa: " + mass
+                    "Sof og'irlik: " + Math.abs(mass - entranceWeigh) + " kg\n" +
+                            "Kirishdagi massa: " + entranceWeigh + " kg\n" +
+                            "Chiqishdagi massa: " + mass
             );
             alert.getDialogPane().setContent(massLabel);
 
