@@ -211,16 +211,17 @@ public class TruckScalingController {
                             if (isScaleControlOn) cargoConfirmationStatus = 1;
 //                            else cargoConfirmationStatus = 1;
 
-                            if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn) {
+                            if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn && cargoConfirmationStatus == -1) {
                                 isCargoConfirmationDialogOpened = true;
                                 cargoConfirmationStatus = showCargoScaleConfirmationDialog(truckService.getCurrentTruckEntity(), weigh);
                                 System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                             }
 
-                            if (cargoConfirmationStatus == 2) {
+                            if (cargoConfirmationStatus == 2 && isScaled && isCargoConfirmationDialogOpened) {
                                 isScaled = false;
                                 isCargoConfirmationDialogOpened = false;
                                 weigh = 0.0;
+                                cargoConfirmationStatus = -1;
                             }
 
                             if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
@@ -274,7 +275,7 @@ public class TruckScalingController {
                     buttonController.openGate2();
                     truckPosition = 2;
                     isScaled = true; // needed for exiting
-                    CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 2;
+                    CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 3;
                     isTimeoutChanged = true;
                     cargoConfirmationStatus = -1;
                     isCargoConfirmationDialogOpened = true;
