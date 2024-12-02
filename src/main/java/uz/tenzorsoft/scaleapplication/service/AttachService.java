@@ -196,17 +196,17 @@ public class AttachService implements BaseService<AttachEntity, AttachResponse, 
 
 
     public AttachResponse getTestingImages() {
-        File file = new File(projectDirectory + "src/main/resources/images/no-pic-allowed.jpg");
+        File file = new File(projectDirectory + "src/main/resources/images/kirish-tepa.jpg");
         return entityToResponse(attachRepository.save(new AttachEntity(
-                "no image", "no-image", 1024L,
+                "kirish-tepa", "kirish-tepa", 1024L,
                 "jpg", "image/jpeg", file.getAbsolutePath()
         )));
     }
 
     public AttachResponse getCameraImgTesting() {
-        File file = new File(projectDirectory + "src/main/resources/images/camera1-no-image.png");
+        File file = new File(projectDirectory + "src/main/resources/images/kirish.jpg");
         return entityToResponse(attachRepository.save(new AttachEntity(
-                "camera 1 image", "camera-1", 2048L,
+                "kirish", "kirish", 2048L,
                 "jpg", "image/jpeg", file.getAbsolutePath()
         )));
     }

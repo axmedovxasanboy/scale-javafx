@@ -2,6 +2,7 @@ package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
+
+import java.util.Objects;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
@@ -55,6 +58,16 @@ public class MenuBarController implements BaseController{
     @FXML
     private void onPrinterMenuSelected() {
         showPrinterPopup();
+    }
+
+    @FXML
+    private void onAboutMenuSelected() {
+        aboutMenuSelected();
+    }
+
+    @FXML
+    private void onInstructionSelected() {
+        showInstructionPopup();
     }
 
 
@@ -103,8 +116,8 @@ public class MenuBarController implements BaseController{
         passwordBox.setAlignment(Pos.CENTER_LEFT);
 
         // Buttons
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -173,8 +186,8 @@ public class MenuBarController implements BaseController{
         TextField camera3Field = new TextField(CAMERA_3);
 
         // Buttons
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -245,8 +258,8 @@ public class MenuBarController implements BaseController{
         TextField timeoutField = new TextField(CONTROLLER_CONNECT_TIMEOUT.toString());
 
         // Buttons
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -314,8 +327,8 @@ public class MenuBarController implements BaseController{
         TextField secondShlagbaumField = new TextField("" + CLOSE_GATE2_TIMEOUT);
 
         // Buttons
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -378,8 +391,8 @@ public class MenuBarController implements BaseController{
         TextField portField = new TextField(SCALE_PORT);
 
         // Buttons
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -439,8 +452,8 @@ public class MenuBarController implements BaseController{
 
         // Buttons
         Button testButton = new Button("Test");
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
 
         saveButton.setDisable(true); // Disabled by default
 
@@ -484,6 +497,128 @@ public class MenuBarController implements BaseController{
         popupStage.setScene(popupScene);
         popupStage.show();
     }
+
+    public void aboutMenuSelected() {
+        Stage aboutStage = new Stage();
+        aboutStage.initModality(Modality.APPLICATION_MODAL);
+        aboutStage.setTitle("About");
+
+        // Company information
+        String companyInfo = """
+            Ishlab chiqaruvchi: Tenzor Soft MCHJ
+            Manzil: Toshkent sh. Yashnaobod t. Maxtumquli 87-uy
+            Telefon: 95 460 10 10
+            Veb-sayt: www.tenzorsoft.com
+            Email: info@tenzorsoft.com
+            """;
+
+        Label infoLabel = new Label(companyInfo);
+        infoLabel.setWrapText(true);
+
+        // Close button
+        Button closeButton = new Button("Close");
+        closeButton.setOnAction(event -> aboutStage.close());
+        closeButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 15;");
+
+        // Layout
+        VBox layout = new VBox(10, infoLabel, closeButton);
+        layout.setPadding(new Insets(15));
+        layout.setAlignment(Pos.CENTER);
+
+        Scene scene = new Scene(layout, 400, 200);
+        aboutStage.setScene(scene);
+        aboutStage.show();
+    }
+
+
+    private void showInstructionPopup() {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Yo'riqnoma");
+
+        // Main container for the instructions
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        VBox content = new VBox();
+        content.setSpacing(20);
+
+        // Adding instruction sections
+        addSection(content, "Assalomu alaykum. Platformaga xush kelibsiz.\nBizni tanlab adashmaganingiz aniq!\n\nBu yerda platformani ishlatish bo’yicha batafsil “Yo’riqnoma” bilan tanishib chiqishingiz mumkin.", "/images/red-light.png");
+
+        addSection(content, "Platformaga registratsiya qilib kirganingizda sizda mana shunday ekran chiqadi.", "registration_screen.png");
+
+        addSection(content, "Platformani ishlatish uchun oldin Controllerga ulangan bo’lishi kerak. 1-kirganingizda platforma Controllerga ulanmagan bo’ladi. Buni ulash uchun oldin bitta tovar qo’shishingiz kerak bo’ladi. Tovar qo’shilmaguncha Controllerga ulanib bo’lmaydi. Tovar qo’shish uchun o’ng taraf tepada, sensorlar ustidagi qutichani bosishingiz kerak bo’ladi.", "/images/closed-eye.png");
+
+        addSection(content, "Mahsulot qo’shishni bosganda shunaqa oyna chiqadi. Shu yerda siz qaysi tovarni tarozidan olib-chiqib ketmoqchi bo’lsangiz o’sha tovarni qo’shishingiz kerak.", "/images/mycoal-logo.png");
+
+        addSection(content, "Masalam, aytaylik, “Komir” degan tovar qo’shmoqchimiz. Bo’sh yozadigan joyga “Komir” deb yozib turib, OK tugmasini bosamiz.", "example_product_entry.png");
+
+        addSection(content, "Tovar qo’shilganligi haqida sizga ma’lumot beriladi va endi siz Controllerga ulansangiz bo’ladi. Buning uchun Connect tugmasini bosishingiz kifoya.", "/images/coal-distribution.png");
+
+        addSection(content, "Controllerga ulangandan keyin hamma narsa ishlashni boshlaydi. Endi bemalol mashinalar kirib-chiqsa bo’ladi.", "/images/kirish.jpg");
+
+        // Example of images in one row
+        addRowImages(content, new String[] {"car_entry1.png", "car_entry2.png", "car_entry3.png"},
+                "Avtomobil kirganda uni rasmlarini ham hammasini platformada ko’rishingiz mumkin (o’ng tomon pasda). Rasm ustidan bosilsa, o’sha rasm ekranga katta bo’lib ko’rinib turadi.");
+
+        // Adding scrollable content to the popup
+        scrollPane.setContent(content);
+
+        // Setting up the scene
+        Scene scene = new Scene(scrollPane, 800, 600);
+        popupStage.setScene(scene);
+        popupStage.show();
+    }
+
+    // Helper function to add sections with optional image
+    private void addSection(VBox container, String text, String imagePath) {
+        VBox section = new VBox();
+        section.setSpacing(10);
+
+        Label label = new Label(text);
+        label.setWrapText(true);
+
+        section.getChildren().add(label);
+
+        if (imagePath != null) {
+            ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath))));
+            imageView.setFitWidth(400);
+            imageView.setPreserveRatio(true);
+            section.getChildren().add(imageView);
+        }
+
+        Separator separator = new Separator();
+        section.getChildren().add(separator);
+
+        container.getChildren().add(section);
+    }
+
+    // Helper function to add images in a row with description
+    private void addRowImages(VBox container, String[] imagePaths, String description) {
+        VBox section = new VBox();
+        section.setSpacing(10);
+
+        Label label = new Label(description);
+        label.setWrapText(true);
+        section.getChildren().add(label);
+
+        HBox imageRow = new HBox();
+        imageRow.setSpacing(10);
+
+        for (String path : imagePaths) {
+            ImageView imageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream(path))));
+            imageView.setFitWidth(150);
+            imageView.setPreserveRatio(true);
+            imageRow.getChildren().add(imageView);
+        }
+
+        section.getChildren().add(imageRow);
+        Separator separator = new Separator();
+        section.getChildren().add(separator);
+
+        container.getChildren().add(section);
+    }
+
 
 
 }

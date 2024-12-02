@@ -78,7 +78,7 @@ public class TruckScalingController {
                 if (!sensor1Connection && truckPosition == 0) {
                     truckPosition = 1;
                     isTruckEntered = true;
-                    isOnScale = true;
+//                    isOnScale = true;
                 }
 
                 if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
@@ -163,7 +163,7 @@ public class TruckScalingController {
                                 isCargoPhotoTaken = false;
                                 isCargoConfirmationDialogOpened = false;
                                 cargoConfirmationStatus = -1;
-                                isOnScale = false;
+//                                isOnScale = false;
                                 weigh = 0.0;
                             }
                         }
@@ -185,7 +185,7 @@ public class TruckScalingController {
                 }
 
                 if (truckPosition == 6 && sensor3Connection && !sensor2Connection) {
-                    isOnScale = true;
+//                    isOnScale = true;
                     truckPosition = 5;
                     buttonController.closeGate2();
                 }
@@ -306,7 +306,7 @@ public class TruckScalingController {
                                 isTruckExited = false;
                                 isCargoPhotoTaken = false;
                                 isCargoConfirmationDialogOpened = false;
-                                isOnScale = false;
+//                                isOnScale = false;
                                 cargoConfirmationStatus = -1;
                                 truckPosition = -1;
                                 weigh = 0.0;
