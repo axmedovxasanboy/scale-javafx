@@ -177,7 +177,7 @@ public class MainController implements BaseController {
 
         // Add TextField for license plate input
         TextField licensePlateField = new TextField();
-        licensePlateField.setPromptText("Avtomabil raqamini kiriting");
+        licensePlateField.setPromptText("Avtomobil raqamini kiriting");
 
         licensePlateField.textProperty().addListener((observable, oldValue, newValue) -> {
             // Replace spaces with dashes and convert lowercase letters to uppercase
@@ -210,15 +210,15 @@ public class MainController implements BaseController {
             return "";
         }
         Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Avtomabil raqamini tanlash");
-        dialog.setHeaderText("Avtomabil raqamini tanlang");
+        dialog.setTitle("Avtomobil raqamini tanlash");
+        dialog.setHeaderText("Avtomobil raqamini tanlang");
 
         // Instruction label
         Label instructionLabel = new Label("Quyidagi variantlardan avtomobil raqamini tanlang:");
 
         ComboBox<String> licensePlateDropdown = new ComboBox<>();
         licensePlateDropdown.getItems().addAll(notFinishedTrucks);
-        licensePlateDropdown.setPromptText("Avtomabil raqamini tanlang");
+        licensePlateDropdown.setPromptText("Avtomobil raqamini tanlang");
 
         // Bind the Confirm button's disable property to the ComboBox's selection
         ButtonType confirmButtonType = new ButtonType("Tasdiqlash", ButtonBar.ButtonData.OK_DONE);

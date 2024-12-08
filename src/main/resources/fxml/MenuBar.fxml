@@ -20,7 +20,7 @@
         <MenuItem mnemonicParsing="false" text="Printer" onAction="#onPrinterMenuSelected"/>
       </items>
     </Menu>
-    <Menu mnemonicParsing="false" text="Help">
+    <Menu mnemonicParsing="false" text="Yordam">
       <items>
         <MenuItem mnemonicParsing="false" text="Platforma haqida" onAction="#onAboutMenuSelected"/>
         <MenuItem mnemonicParsing="false" text="Yo'riqnoma" onAction="#onInstructionSelected"/>
