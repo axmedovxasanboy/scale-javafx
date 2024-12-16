@@ -4,6 +4,7 @@
 <?import javafx.scene.control.TableView?>
 
 
+
 <TableView fx:id="tableData" editable="true" prefHeight="594.0" prefWidth="919.0" style="-fx-background-color: #f0f0f0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.TableController">
   <columns>
     <TableColumn fx:id="id" minWidth="0.0" prefWidth="50.0" resizable="false" text="No" />

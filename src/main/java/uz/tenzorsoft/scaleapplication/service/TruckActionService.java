@@ -14,5 +14,4 @@ public class TruckActionService {
     public TruckActionEntity save(TruckActionEntity truckActionEntity) {
         return truckActionRepository.save(truckActionEntity);
     }
-
 }

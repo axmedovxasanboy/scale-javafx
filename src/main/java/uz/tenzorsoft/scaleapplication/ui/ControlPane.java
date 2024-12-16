@@ -3,24 +3,39 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.ProductsEntity;
+import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
+import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.ProductService;
+import uz.tenzorsoft.scaleapplication.service.TruckActionService;
+import uz.tenzorsoft.scaleapplication.service.TruckService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isAvailableToConnect;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
@@ -35,6 +50,10 @@ public class ControlPane implements BaseController {
     private final TableController tableController;
     private final ButtonController buttonController;
     private final ProductService productService;
+    private final TruckActionService truckActionService;
+    private final TruckService truckService;
+    private final TruckRepository truckRepository;
+    private final TruckActionRepository truckActionRepository;
     @FXML
     private Button connectButton;
 
@@ -52,7 +71,137 @@ public class ControlPane implements BaseController {
     @FXML
     @Getter
     @Setter
-    private Button issueCheckButton, deleteButton;
+    private Button issueCheckButton, deleteButton, editButton;
+
+    @FXML
+    private AnchorPane hisobotlarPane;
+    @FXML
+    private DatePicker fromDatePicker;
+    @FXML
+    private DatePicker toDatePicker;
+    @FXML
+    private TextArea reportTextArea;
+
+
+    @FXML
+    private void openHisobotlarWindow() {
+        hisobotlarPane.setVisible(true);
+    }
+
+    @FXML
+    private void closeHisobotlarPane() {
+        hisobotlarPane.setVisible(false);
+    }
+
+    @FXML
+    private void clearFromDate() {
+        fromDatePicker.setValue(null);
+        generateReport();
+    }
+
+    @FXML
+    private void clearToDate() {
+        toDatePicker.setValue(null);
+        generateReport();
+    }
+
+    @FXML
+    private void generateReport() {
+        LocalDate fromDate = fromDatePicker.getValue();
+        LocalDate toDate = toDatePicker.getValue();
+
+        try {
+            String report = generateReport(fromDate, toDate);
+            reportTextArea.setText(report); // Assuming `reportTextArea` is a TextArea in your UI
+        } catch (IllegalArgumentException e) {
+            reportTextArea.setText("Xatolik: " + e.getMessage()); // Display error message in UI
+        }
+    }
+
+    // Overloaded version
+    public String generateReport(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null && toDate != null) {
+            fromDate = LocalDate.MIN; // Consider all records up to 'toDate'
+        } else if (fromDate != null && toDate == null) {
+            toDate = fromDate; // Restrict to the single day specified by 'fromDate'
+        } else if (fromDate == null && toDate == null) {
+            throw new IllegalArgumentException("Kamida bitta sana kiritilishi kerak.");
+        }
+
+        if (fromDate.isAfter(LocalDate.now()) || toDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Hozirgacha bo'lgan muddatni tanlang.");
+        }
+
+        if (fromDate.isAfter(toDate)) {
+            throw new IllegalArgumentException("Tugash sanasi boshlanish sanasidan katta bo'lmasligi kerak.");
+        }
+
+
+        // Fetch data
+        List<Object[]> truckCounts = truckRepository.findTruckCountsByDate(fromDate, toDate);
+        List<Object[]> truckWeights = truckActionRepository.findTruckWeightsByDate(fromDate, toDate);
+
+        long totalEntranceCount = 0;
+        double totalEntranceWeight = 0.0;
+        long totalExitCount = 0;
+        double totalExitWeight = 0.0;
+
+        // Process truck counts
+        if (truckCounts != null) {
+            for (Object[] record : truckCounts) {
+                String action = record[0].toString();
+                Long count = ((Number) record[1]).longValue();
+
+                if ("ENTRANCE".equalsIgnoreCase(action)) {
+                    totalEntranceCount += count;
+                } else if ("EXIT".equalsIgnoreCase(action)) {
+                    totalExitCount += count;
+                }
+            }
+        }
+
+        // Process truck weights
+        if (truckWeights != null) {
+            for (Object[] record : truckWeights) {
+                String action = record[0].toString();
+                Double weight = ((Number) record[1]).doubleValue();
+
+                if ("ENTRANCE".equalsIgnoreCase(action)) {
+                    totalEntranceWeight += weight;
+                } else if ("EXIT".equalsIgnoreCase(action)) {
+                    totalExitWeight += weight;
+                }
+            }
+        }
+
+        // Determine the date range description
+        String dateRange;
+        if (fromDate.equals(toDate)) {
+            dateRange = fromDate.toString(); // Single-day report
+        } else if (fromDate.equals(LocalDate.MIN)) {
+            dateRange = "Up to " + toDate; // Report for all records up to 'toDate'
+        } else {
+            dateRange = fromDate + " - " + toDate; // Standard range report
+        }
+
+        // Generate summary report
+        return String.format("""
+                        Hisobot [%s]
+
+                                Kirim:
+                        Kirishlar soni: %d
+                        Yuk hajmi: %.2f kg
+                                    
+                                Chiqim:
+                        Chiqishlar soni: %d
+                        Yuk hajmi: %.2f kg
+                        """,
+                dateRange,
+                totalEntranceCount, totalEntranceWeight,
+                totalExitCount, totalExitWeight
+        );
+    }
+
 
     @FXML
     public void initialize() {
@@ -141,6 +290,8 @@ public class ControlPane implements BaseController {
         // Handle selection
         productCombobox.setOnAction(event -> handleSelection(productCombobox.getValue()));
 
+        editButton.setDisable(true);
+        editButton.setVisible(false);
     }
 
     private void handleSelection(String selected) {

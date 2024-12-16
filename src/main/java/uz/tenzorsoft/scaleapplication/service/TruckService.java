@@ -44,7 +44,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private final LogService logService;
 
 
-
     @Setter
     @Getter
     private TruckEntity currentTruckEntity = new TruckEntity();
@@ -411,18 +410,46 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public boolean isEntranceAvailableForCamera2(String truckNumber) {
         if (!isTruckNumberExists(truckNumber)) {
-            mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Bu moshina raqami bazadan topilmadi: " + truckNumber);
-            return false;
+            if (!truckRepository.existsByIsFinishedFalseAndIsDeletedFalse()) {
+                mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Hamma moshinalar chiqib ketgan!");
+                return false;
+            }
+
+            Map<String, String> updatedTruckNumber = mainController.showTruckNotFoundPopupWithSelection(truckNumber, getNotFinishedTrucks());
+            if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
+                return false;
+            }
+            String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
+            String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
+
+
+
+            if (!selectedTruckNumber.equals(editedTruckNumber)) {
+                List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(selectedTruckNumber, false, false);
+                if (list.isEmpty()) {
+                    mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", selectedTruckNumber + " raqam topilmadi");
+                    return false;
+                }
+                TruckEntity truckToUpdate = list.get(0);
+                truckToUpdate.setOriginalTruckNumber(truckToUpdate.getTruckNumber());
+                truckToUpdate.setTruckNumber(editedTruckNumber); // Update the truck number
+                truckRepository.save(truckToUpdate); // Save the updated truck
+            }
+
+            // Use the edited truck number for the following checks
+            truckNumber = editedTruckNumber; // Update the truck number to the new one
+
         }
         List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, false, false);
-        if (list.isEmpty()){
+        if (list.isEmpty()) {
             mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!");
             return false;
         }
+        Instances.truckNumber = truckNumber;
         LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
         boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
         if (!b) {
-            mainController.showAlert(Alert.AlertType.INFORMATION, "Info",nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
+            mainController.showAlert(Alert.AlertType.INFORMATION, "Info", nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
         }
         return b;
     }
@@ -458,5 +485,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         }
 
         return truckRepository.findAllByIsDeletedFalseAndCreatedAtBetweenOrderByCreatedAtDesc(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
+    }
+
+    public TruckEntity saveTruck(TruckEntity truck) {
+        return truckRepository.save(truck);
     }
 }

@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -32,9 +33,12 @@ import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
@@ -249,6 +253,59 @@ public class MainController implements BaseController {
         return result.orElse("");
     }
 
+    public Map<String, String> showTruckNotFoundPopupWithSelection(String incorrectTruckNumber, List<String> notExitedTruckNumbers) {
+        Dialog<Map<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Xato raqam");
+        dialog.setHeaderText("Kiritilgan avtomobil raqami noto'g'ri: " + incorrectTruckNumber);
+        dialog.setContentText("Quyida avtomobillar ro'yxati keltirilgan. Tanlash yoki o'zgartirishni amalga oshiring.");
+
+        Label instructionLabel = new Label("To'g'ri avtomobil raqamini tanlang yoki o'zgartiring:");
+        ComboBox<String> licensePlateDropdown = new ComboBox<>();
+        licensePlateDropdown.getItems().addAll(notExitedTruckNumbers);
+        licensePlateDropdown.setPromptText("Avtomobil raqamini tanlang");
+
+        TextField textField = new TextField(incorrectTruckNumber);
+        textField.setPromptText("Avtomobil raqamini kiriting");
+
+        licensePlateDropdown.valueProperty().addListener((obs, oldVal, newVal) -> {
+            textField.setText(newVal);
+        });
+
+        ButtonType confirmButtonType = new ButtonType("Tasdiqlash", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        // Get the confirm button from the dialog
+        Button confirmButton = (Button) dialog.getDialogPane().lookupButton(confirmButtonType);
+        confirmButton.setDisable(true); // Initially disabled
+
+        // Enable the button only when a selection is made or text is entered
+        confirmButton.disableProperty().bind(
+                Bindings.createBooleanBinding(
+                        () -> licensePlateDropdown.getValue() == null || licensePlateDropdown.getValue().trim().isEmpty(),
+                        licensePlateDropdown.valueProperty()
+                )
+        );
+
+        VBox content = new VBox(10, instructionLabel, licensePlateDropdown, textField);
+        content.setStyle("-fx-padding: 10;");
+        dialog.getDialogPane().setContent(content);
+
+        // Result converter
+        dialog.setResultConverter(button -> {
+            if (button == confirmButtonType) {
+                Map<String, String> result = new HashMap<>();
+                result.put("dropDownValue", licensePlateDropdown.getValue());
+                result.put("textFieldValue", textField.getText().trim());
+                return result;
+            }
+            return null;
+        });
+
+        Optional<Map<String, String>> result = dialog.showAndWait();
+        return result.orElse(null);
+    }
+
+
     private void loadMainMenu() {
         try {
             fxmlLoader.setLocation(getClass().getResource("/fxml/main.fxml"));
@@ -299,5 +356,4 @@ public class MainController implements BaseController {
 
 
     }
-
 }

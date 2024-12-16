@@ -169,7 +169,7 @@ public class TestController implements BaseController {
             AttachResponse response = attachService.getCameraImgTesting();
             Long attachId = response.getId();
             currentTruck.getAttaches().add(new AttachIdWithStatus(attachId, AttachStatus.EXIT_PHOTO));
-            currentTruck.setTruckNumber(truckNumber);
+            currentTruck.setTruckNumber(Instances.truckNumber);
             currentTruck.setExitedStatus(TruckAction.EXIT);
             truckService.saveTruck(currentTruck, 2, response);
             gate2Switch.setSelected(true);

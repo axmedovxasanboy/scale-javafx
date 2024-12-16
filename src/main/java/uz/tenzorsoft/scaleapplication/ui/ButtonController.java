@@ -169,19 +169,12 @@ public class ButtonController implements BaseController {
             isWaiting = true;
             String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
             if (!truckNumber.isEmpty()) {
-                // "RAQAMSIZ"
-//                if (!truckService.isValidTruckNumber(truckNumber) && !truckService.isStandard(truckNumber)) {
-//                    // mainController.showAlert(Alert.AlertType.WARNING, "Not match", "Raqam mos kelmadi: " + truckNumber);
-//                    return;
-//                }
                 if (!truckService.isNotFinishedTrucksExists()) {
                     logService.save(new LogEntity(5L, truckNumber, "00021: (" + getClass().getName() + ") " +"All trucks are exited!"));
-                    // showAlert(Alert.AlertType.WARNING, "Topilmadi", "Barcha avtomobillar chiqib ketgan!");
                     return false;
                 }
                 if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
                     logService.save(new LogEntity(5L, truckNumber, "00022: (" + getClass().getName() + ") " +"Entrance not available"));
-                    // showAlert(Alert.AlertType.WARNING, "Topilmadi", truckNumber + " kirishi mumkin emas");
                     return false;
                 }
                 currentTruck.setTruckNumber(truckNumber);

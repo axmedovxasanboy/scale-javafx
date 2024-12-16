@@ -5,27 +5,75 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <Pane prefHeight="51.0" prefWidth="1307.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.ControlPane">
 
   <children>
-    <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER" layoutX="407.0" layoutY="5.0" prefHeight="35.0" prefWidth="138.0" style="-fx-background-color: white;" text="Boshqaruv paneli">
+    <Label alignment="CENTER" blendMode="DARKEN" contentDisplay="CENTER" layoutX="359.0" layoutY="5.0" prefHeight="35.0" prefWidth="138.0" style="-fx-background-color: white;" text="Boshqaruv paneli">
       <font>
         <Font size="17.0" />
       </font>
     </Label>
 
-    <Button fx:id="deleteButton" disable="true" layoutX="672.0" layoutY="6.0" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="O'chirish" visible="false">
+    <!-- Updated: Hisobotlar Button comes first -->
+    <Button fx:id="hisobotlarButton" layoutX="632.0" layoutY="6.0" onAction="#openHisobotlarWindow" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Hisobotlar">
       <cursor>
         <Cursor fx:constant="HAND" />
-      </cursor></Button>
+      </cursor>
+    </Button>
 
+    <!-- Background Overlay -->
+    <Rectangle fx:id="backgroundOverlay" fill="#00000080" height="600.0" layoutX="0.0" layoutY="0.0" visible="false" width="800.0" />
+
+    <AnchorPane fx:id="hisobotlarPane" layoutX="50.0" layoutY="50.0" prefHeight="500.0" prefWidth="700.0" style="-fx-border-color: #2196F3; -fx-border-width: 2; -fx-background-color: white; -fx-background-radius: 10;" visible="false">
+      <children>
+        <Label layoutX="280.0" layoutY="14.0" style="-fx-font-size: 22; -fx-font-weight: bold;" text="Hisobotlar" />
+        <Label layoutX="60.0" layoutY="57.0" style="-fx-font-size: 14;" text="Dan:" />
+        <DatePicker fx:id="fromDatePicker" layoutX="100.0" layoutY="55.0" prefWidth="150.0" />
+        <Button layoutX="260.0" layoutY="55.0" onAction="#clearFromDate" text="Tozalash" />
+
+        <Label layoutX="343.0" layoutY="57.0" style="-fx-font-size: 14;" text="Gacha:" />
+        <DatePicker fx:id="toDatePicker" layoutX="390.0" layoutY="55.0" prefWidth="150.0" />
+        <Button layoutX="550.0" layoutY="55.0" onAction="#clearToDate" text="Tozalash" />
+
+        <Button layoutX="290.0" layoutY="110.0" onAction="#generateReport" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Hisobot yaratish" />
+        <TextArea fx:id="reportTextArea" editable="false" layoutX="50.0" layoutY="160.0" prefHeight="300.0" prefWidth="600.0" style="-fx-font-size: 16; -fx-text-alignment: center; -fx-control-inner-background: #f9f9f9;" wrapText="true" />
+        <Button layoutX="620.0" layoutY="10.0" onAction="#closeHisobotlarPane" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Yopish" />
+      </children>
+    </AnchorPane>
+
+    <!-- Updated: O'chirish Button comes second -->
+    <Button fx:id="deleteButton" disable="true" layoutX="522.0" layoutY="7.0" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="O'chirish" visible="false">
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
 
     <!-- Button with Image Icon and Text -->
-    <Button fx:id="issueCheckButton" layoutX="782.0" layoutY="6.0" prefHeight="30.0" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
+    <Button fx:id="issueCheckButton" layoutX="741.0" layoutY="6.0" prefHeight="30.0" prefWidth="129.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
       <text>Chek Chiqarish</text>
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+    </Button>
+    <Button fx:id="editButton" layoutX="879.0" layoutY="6.0" prefHeight="30.0" prefWidth="19.0">
+      <cursor>
+        <Cursor fx:constant="HAND" />
+      </cursor>
+      <graphic>
+        <ImageView fitHeight="20" fitWidth="20" pickOnBounds="true" preserveRatio="true">
+          <image>
+            <Image url="@../images/edit.png" />
+          </image>
+        </ImageView>
+      </graphic>
     </Button>
     <DatePicker fx:id="startDate" layoutX="14.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="Start date" />
     <DatePicker fx:id="endDate" layoutX="157.0" layoutY="10.0" prefHeight="25.0" prefWidth="100.0" promptText="End date" />

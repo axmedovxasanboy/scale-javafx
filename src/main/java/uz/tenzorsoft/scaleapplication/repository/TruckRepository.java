@@ -9,6 +9,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -64,5 +65,13 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
     List<TruckEntity> findByIsFinishedAndIsDeleted(Boolean isFinished, boolean deleted);
 
     List<TruckEntity> findAllByIsDeleted(boolean isDeleted, Sort sort);
+
+    @Query("SELECT ta.action, COUNT(t.truckNumber), CAST(ta.createdAt AS date) " +
+            "FROM trucks t JOIN t.truckActions ta " +
+            "WHERE CAST(ta.createdAt AS date) BETWEEN :startDate AND :endDate " +
+            "GROUP BY ta.action, CAST(ta.createdAt AS date)")
+    List<Object[]> findTruckCountsByDate(LocalDate startDate, LocalDate endDate);
+
+
 
 }

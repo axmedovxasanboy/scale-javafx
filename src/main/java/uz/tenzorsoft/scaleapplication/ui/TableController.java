@@ -3,8 +3,10 @@ package uz.tenzorsoft.scaleapplication.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.GridPane;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 @Component
@@ -119,33 +122,99 @@ public class TableController implements BaseController {
             TableRow<TableViewData> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (!row.isEmpty()) {
-                    controlPane.getIssueCheckButton().setDisable(false);
-                    TableViewData rowItem = row.getItem();
-                    TruckEntity truck = truckService.findById(rowItem.getId());
-                    controlPane.getIssueCheckButton().setOnMouseClicked(e -> {
-                        printCheck.printReceipt(truck);
-                        controlPane.getIssueCheckButton().setDisable(true);
-                    });
-                    Button deleteButton = controlPane.getDeleteButton();
-                    if (!truck.getIsFinished()) {
-                        deleteButton.setDisable(false);
-                        deleteButton.setVisible(true);
-                        deleteButton.setOnAction(e -> {
-                            truck.setIsDeleted(true);
-                            truckService.save(truck);
-                            loadData();
-                        });
-                        controlPane.setDeleteButton(deleteButton);
-                    } else {
-                        deleteButton.setDisable(true);
-                        deleteButton.setVisible(false);
-                        controlPane.setDeleteButton(deleteButton);
-                    }
-                    imageController.showImages(rowItem); // Show images based on the selected row data
+                    printCheckAndSetDeleteButton(row);
+                    editTruckNumberButtonVisibility(row);
                 }
             });
             return row;
         });
+    }
+
+    private void editTruckNumberButtonVisibility(TableRow<TableViewData> row) {
+        TruckEntity truck = truckService.findById(row.getItem().getId());
+        if(truck == null){
+            showAlert(Alert.AlertType.ERROR, "Xatolik", "Moshina topilmadi");
+            return;
+        }
+        Button editButton = controlPane.getEditButton();
+
+        if (!truck.getIsFinished()) {
+            editButton.setDisable(false);
+            editButton.setVisible(true);
+            editButton.setOnAction(e -> {
+                truckService.save(truck);
+                loadData();
+            });
+            controlPane.setEditButton(editButton);
+        } else {
+            editButton.setDisable(true);
+            editButton.setVisible(false);
+            controlPane.setEditButton(editButton);
+        }
+        editButton.setOnMouseClicked(e -> {
+            openEditPopup(truck);
+            row.setItem(tableService.entityToTableData(truck));
+        });
+    }
+
+    private void openEditPopup(TruckEntity truck) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Edit Truck Information");
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField truckNumberField = new TextField(truck.getTruckNumber());
+        truckNumberField.setPromptText("Truck Number");
+
+        grid.add(new Label("Truck Number:"), 0, 0);
+        grid.add(truckNumberField, 1, 0);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType saveButtonType = new ButtonType("O'zgartirish", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButtonType = new ButtonType("Bekor qilish", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, cancelButtonType);
+
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                truck.setOriginalTruckNumber(truck.getTruckNumber());
+                truck.setTruckNumber(truckNumberField.getText());
+                truckService.saveTruck(truck);
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+    }
+
+    private void printCheckAndSetDeleteButton(TableRow<TableViewData> row) {
+        controlPane.getIssueCheckButton().setDisable(false);
+        TableViewData rowItem = row.getItem();
+        TruckEntity truck = truckService.findById(rowItem.getId());
+        controlPane.getIssueCheckButton().setOnMouseClicked(e -> {
+            printCheck.printReceipt(truck);
+            controlPane.getIssueCheckButton().setDisable(true);
+        });
+        Button deleteButton = controlPane.getDeleteButton();
+        if (!truck.getIsFinished()) {
+            deleteButton.setDisable(false);
+            deleteButton.setVisible(true);
+            deleteButton.setOnAction(e -> {
+                truck.setIsDeleted(true);
+                truckService.save(truck);
+                loadData();
+            });
+            controlPane.setDeleteButton(deleteButton);
+        } else {
+            deleteButton.setDisable(true);
+            deleteButton.setVisible(false);
+            controlPane.setDeleteButton(deleteButton);
+        }
+        imageController.showImages(rowItem); // Show images based on the selected row data
     }
 
     public void loadData() {

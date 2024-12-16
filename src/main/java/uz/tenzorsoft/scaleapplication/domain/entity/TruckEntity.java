@@ -18,6 +18,8 @@ import java.util.List;
 public class TruckEntity extends BaseEntity {
     private String truckNumber;
 
+    private String originalTruckNumber;
+
     @ManyToOne
     private ProductsEntity products;
 
