@@ -10,6 +10,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
@@ -76,12 +77,16 @@ public class TruckScalingController {
             try {
                 System.out.println("truckPosition = " + truckPosition);
                 if (!sensor1Connection && truckPosition == 0) {
+                    // truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.NEW);
                     truckPosition = 1;
                     isTruckEntered = true;
 //                    isOnScale = true;
+
                 }
 
                 if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
+                    // Save status as PROCESSING
+                    truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.PROCESSING);
                     truckPosition = 2;
                     buttonController.closeGate1();
                 }
@@ -89,7 +94,7 @@ public class TruckScalingController {
                 if ((!sensor2Connection || isOnScale) && (truckPosition == 2) &&
                         (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
                                 currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
-                    System.out.println("Scaling ---- isScaled = " + isScaled+ " Status "+currentTruck.getEnteredStatus());
+                    System.out.println("Scaling ---- isScaled = " + isScaled + " Status " + currentTruck.getEnteredStatus());
                     Timer timer = new Timer();
                     timer.schedule((new TimerTask() {
                         @Override
@@ -107,7 +112,7 @@ public class TruckScalingController {
                             }
 
                             if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
-                                try{
+                                try {
                                     AttachResponse response = cameraViewController.takePicture(CAMERA_2);
                                     //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
                                     truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
@@ -120,21 +125,25 @@ public class TruckScalingController {
                                 System.out.println("Opening gate 2");
                                 buttonController.openGate2(); // Open Gate 2
 //                                if (weigh > 0) {
-                                    currentTruck.setEnteredWeight(weigh);
+                                currentTruck.setEnteredWeight(weigh);
 
-                                    log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
-                                    currentTruck.setEnteredAt(LocalDateTime.now());
-                                    currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                    truckService.saveTruckEnteredActions(currentTruck);
-                                    try {
-                                        truckService.saveCurrentTruck(currentTruck, false);
-                                    } catch (Exception e) {
-                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00042: (" + getClass().getName() + ") " +e.getMessage()));
-                                        e.printStackTrace();
-                                    }
-                                    tableController.updateTableRow(truckService.getCurrentTruckEntity());
-                                    isTruckEntered = true;
-                                    currentTruck = new TruckResponse();
+                                log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
+                                currentTruck.setEnteredAt(LocalDateTime.now());
+                                currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
+                                truckService.saveTruckEnteredActions(currentTruck);
+
+                                // Save status as COMPLETE
+                                truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+
+                                try {
+                                    truckService.saveCurrentTruck(currentTruck, false);
+                                } catch (Exception e) {
+                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00042: (" + getClass().getName() + ") " + e.getMessage()));
+                                    e.printStackTrace();
+                                }
+                                tableController.updateTableRow(truckService.getCurrentTruckEntity());
+                                isTruckEntered = true;
+                                currentTruck = new TruckResponse();
 //                                } else {
 //                                    isScaled = false;
 //                                }
@@ -170,7 +179,7 @@ public class TruckScalingController {
                     }, CLOSE_GATE2_TIMEOUT);
                 }
 
-                if(isTimeoutChanged) {
+                if (isTimeoutChanged) {
                     CLOSE_GATE2_TIMEOUT = configurations.getCloseGate2Timeout();
                 }
 
@@ -254,7 +263,7 @@ public class TruckScalingController {
 //                                    timer1.schedule(new TimerTask() {
 //                                        @Override
 //                                        public void run() {
-                                            printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                    printCheck.printReceipt(truckService.getCurrentTruckEntity());
 //                                        }
 //                                    }, 50);
                                 } catch (Exception e) {
@@ -317,7 +326,7 @@ public class TruckScalingController {
                 }
 
             } catch (Exception e) {
-                logService.save(new LogEntity(5L, Instances.truckNumber, "00046: (" + getClass().getName() + ") " +e.getMessage()));
+                logService.save(new LogEntity(5L, Instances.truckNumber, "00046: (" + getClass().getName() + ") " + e.getMessage()));
                 e.printStackTrace();
             }
         }, 0, 500, TimeUnit.MILLISECONDS);

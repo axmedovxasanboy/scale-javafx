@@ -8,6 +8,7 @@ import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 import java.time.LocalDateTime;
 
@@ -26,8 +27,8 @@ public class TableService {
         double exitedWeight = 0.0;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
-            if (action.getAction() == null) {
-                continue;
+            if (action.getAction() == null || action.getAction() == TruckAction.NO_ACTION) {
+                continue; // Skip invalid or no-action entries
             }
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
@@ -36,7 +37,7 @@ public class TableService {
                     data.setEnteredWeight(action.getWeight() == null ? 0.0 : action.getWeight());
                     enteredWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setEnteredTime(getTime(action.getCreatedAt()));
-                    data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
+                    data.setEnteredOnDuty(action.getOnDuty() == null ? "unknown" : action.getOnDuty().getPhoneNumber());
                 }
                 case EXIT, MANUAL_EXIT -> {
                     data.setExitedTruckNumber(truckEntity.getTruckNumber());
@@ -45,6 +46,9 @@ public class TableService {
                     exitedWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
+                }
+                default -> {
+
                 }
             }
         }

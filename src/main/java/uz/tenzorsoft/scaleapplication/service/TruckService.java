@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.*;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.request.TruckRequest;
@@ -77,7 +78,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         if (truckEntity.getId() != null) {
             TruckActionEntity truckAction = new TruckActionEntity(
-                    truck.getExitedWeight(), TruckAction.EXIT, userService.findByPhoneNumber(truck.getExitConfirmedBy()), false
+                    truck.getExitedWeight(), TruckAction.EXIT, ActionStatus.NEW, userService.findByPhoneNumber(truck.getExitConfirmedBy()), false
             );
             truckEntity.getTruckActions().add(truckAction);
             return truckRepository.save(truckEntity);
@@ -85,10 +86,10 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         List<TruckActionEntity> truckActions = new ArrayList<>();
         truckActions.add(new TruckActionEntity(truck.getEnteredWeight(),
-                TruckAction.ENTRANCE, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
+                TruckAction.ENTRANCE, ActionStatus.NEW, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
         );
         truckActions.add(new TruckActionEntity(truck.getExitedWeight(),
-                TruckAction.EXIT, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
+                TruckAction.EXIT, ActionStatus.NEW, userService.findByPhoneNumber(truck.getEntranceConfirmedBy()), false)
         );
 
         truckActionRepository.saveAll(truckActions);
@@ -268,6 +269,11 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //                    break;
 //                }
 //            }
+            TruckActionEntity enteredAction = new TruckActionEntity();
+            enteredAction.setAction(currentTruck.getEnteredStatus());
+            enteredAction.setOnDuty(Instances.currentUser);
+            truckActionRepository.save(enteredAction);
+            currentTruckEntity.setTruckActions(List.of(enteredAction));
             currentTruckEntity.setTruckPhotos(truckPhotos);
             currentTruckEntity.setIsFinished(false);
             truckRepository.save(currentTruckEntity);
@@ -288,6 +294,11 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //                    break;
 //                }
 //            }
+            TruckActionEntity exitedAction = new TruckActionEntity();
+            exitedAction.setAction(currentTruck.getEnteredStatus());
+            exitedAction.setOnDuty(Instances.currentUser);
+            truckActionRepository.save(exitedAction);
+            currentTruckEntity.setTruckActions(List.of(exitedAction));
             currentTruckEntity.getTruckPhotos().addAll(truckPhotos);
 
             truckRepository.save(currentTruckEntity);
@@ -363,6 +374,35 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
     }
+
+    public void saveTruckStatus(TruckAction currentTruckAction, ActionStatus status) {
+        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
+            if(action.getAction() == currentTruckAction) {
+                action.setActionStatus(status);
+                truckActionRepository.save(action);
+                break;
+            }
+        }
+/*
+        // Check if the status already exists for the truck
+        boolean statusExists = currentTruckEntity.getTruckActions().stream()
+                .anyMatch(action -> action.getActionStatus() == status);
+
+        if (!statusExists) {
+            TruckActionEntity truckActionEntity = new TruckActionEntity();
+            truckActionEntity.setCreatedAt(LocalDateTime.now());
+            truckActionEntity.setWeight(currentTruck.getEnteredWeight());
+            truckActionEntity.setActionStatus(status);
+            truckActionEntity.setOnDuty(Instances.currentUser);
+            truckActionRepository.save(truckActionEntity);
+            currentTruckEntity.getTruckActions().add(truckActionEntity);
+            currentTruckEntity.setIsSentToCloud(false);
+            truckRepository.save(currentTruckEntity);
+        }
+*/
+
+    }
+
 
     public List<TruckEntity> findNotSentDataToMyCoal() {
         return truckRepository.findByIsSentToMyCoalAndIsFinished(false, true);

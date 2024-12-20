@@ -31,6 +31,7 @@ public class TruckEntity extends BaseEntity {
     private LocalDateTime nextEntranceTime;
 
     private Boolean isFinished = false;
+
     private Boolean isSentToMyCoal = false;
 
 }

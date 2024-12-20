@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 @AllArgsConstructor
@@ -20,6 +21,9 @@ public class TruckActionEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private TruckAction action = TruckAction.NO_ACTION;
+
+    @Enumerated(EnumType.STRING)
+    private ActionStatus actionStatus = ActionStatus.NEW;
 
     @ManyToOne
     private UserEntity onDuty;

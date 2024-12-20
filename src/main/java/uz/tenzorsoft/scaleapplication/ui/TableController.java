@@ -224,7 +224,10 @@ public class TableController implements BaseController {
                     List<TableViewData> data = new ArrayList<>();
                     List<TruckEntity> all = truckService.findAll();
                     for (TruckEntity truck : all) {
-                        data.add(tableService.entityToTableData(truck));
+                        TableViewData tableData = tableService.entityToTableData(truck);
+                        if (tableData != null) { // Only add non-null results
+                            data.add(tableData);
+                        }
                     }
                     tableData.setItems(FXCollections.observableArrayList(data));
 

@@ -18,5 +18,4 @@ public interface TruckActionRepository extends JpaRepository<TruckActionEntity, 
     List<Object[]> findTruckWeightsByDate(LocalDate startDate, LocalDate endDate);
 
 
-
 }
