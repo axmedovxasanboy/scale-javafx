@@ -1,6 +1,5 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
-import javafx.scene.control.Alert;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
@@ -11,6 +10,7 @@ import uz.tenzorsoft.scaleapplication.service.sendData.SendDataService;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnectedToInternet;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isTesting;
 
 @Component
@@ -59,9 +59,10 @@ public class DataSendController {
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
+                    if (!isConnectedToInternet) continue;
                     CompletableFuture.runAsync(() -> sendDataService.sendNotSentData())
                             .exceptionally(e -> {
-                                logService.save(new LogEntity(5L, Instances.truckNumber, "00036: (" + getClass().getName() + ") " +e.getMessage()));
+                                logService.save(new LogEntity(5L, Instances.truckNumber, "00036: (" + getClass().getName() + ") " + e.getMessage()));
                                 System.err.println(e.getMessage());
                                 return null;
                             });
@@ -93,9 +94,9 @@ public class DataSendController {
 
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt(); // Tarmoqni xavfsiz to'xtatish
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00039: (" + getClass().getName() + ") " +"Thread interrupted: " + e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00039: (" + getClass().getName() + ") " + "Thread interrupted: " + e.getMessage()));
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00040: (" + getClass().getName() + ") " +e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00040: (" + getClass().getName() + ") " + e.getMessage()));
                     System.err.println(e.getMessage());
                 }
             }

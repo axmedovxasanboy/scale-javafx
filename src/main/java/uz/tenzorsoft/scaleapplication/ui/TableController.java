@@ -132,7 +132,7 @@ public class TableController implements BaseController {
 
     private void editTruckNumberButtonVisibility(TableRow<TableViewData> row) {
         TruckEntity truck = truckService.findById(row.getItem().getId());
-        if(truck == null){
+        if (truck == null) {
             showAlert(Alert.AlertType.ERROR, "Xatolik", "Moshina topilmadi");
             return;
         }
@@ -143,7 +143,7 @@ public class TableController implements BaseController {
             editButton.setVisible(true);
             editButton.setOnAction(e -> {
                 truckService.save(truck);
-                loadData();
+                loadDataNow();
             });
             controlPane.setEditButton(editButton);
         } else {
@@ -154,6 +154,7 @@ public class TableController implements BaseController {
         editButton.setOnMouseClicked(e -> {
             openEditPopup(truck);
             row.setItem(tableService.entityToTableData(truck));
+            loadDataNow();
         });
     }
 
@@ -206,7 +207,7 @@ public class TableController implements BaseController {
             deleteButton.setOnAction(e -> {
                 truck.setIsDeleted(true);
                 truckService.save(truck);
-                loadData();
+                loadDataNow();
             });
             controlPane.setDeleteButton(deleteButton);
         } else {
@@ -217,20 +218,29 @@ public class TableController implements BaseController {
         imageController.showImages(rowItem); // Show images based on the selected row data
     }
 
+    public void loadDataNow() {
+        try {
+            List<TableViewData> data = new ArrayList<>();
+            List<TruckEntity> all = truckService.findAll();
+            for (TruckEntity truck : all) {
+                TableViewData tableData = tableService.entityToTableData(truck);
+                if (tableData != null) { // Only add non-null results
+                    data.add(tableData);
+                }
+            }
+            tableData.setItems(FXCollections.observableArrayList(data));
+
+        } catch (Exception e) {
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " + e.getMessage()));
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+    }
+
     public void loadData() {
         executors.execute(() -> {
             while (true) {
+                loadDataNow();
                 try {
-                    List<TableViewData> data = new ArrayList<>();
-                    List<TruckEntity> all = truckService.findAll();
-                    for (TruckEntity truck : all) {
-                        TableViewData tableData = tableService.entityToTableData(truck);
-                        if (tableData != null) { // Only add non-null results
-                            data.add(tableData);
-                        }
-                    }
-                    tableData.setItems(FXCollections.observableArrayList(data));
-
                     Thread.sleep(60000);
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " + e.getMessage()));
@@ -269,7 +279,8 @@ public class TableController implements BaseController {
             List<TableViewData> data = new ArrayList<>();
             List<TruckEntity> filteredData = truckService.filterWithDate(startDateValue, endDateValue);
             for (TruckEntity truck : filteredData) {
-                data.add(tableService.entityToTableData(truck));
+                TableViewData tableViewData = tableService.entityToTableData(truck);
+                if (tableViewData != null) data.add(tableViewData);
             }
             tableData.setItems(FXCollections.observableArrayList(data));
         } catch (Exception e) {

@@ -16,6 +16,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.AttachStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
@@ -286,11 +287,21 @@ public class TestController implements BaseController {
     public void closeGate1() {
         buttonController.closeGate1();
         truckPosition = -1;
+        currentTruck = new TruckResponse();
+        truckScalingController.reinitialize();
+        cargoConfirmationStatus = -1;
+        isWaiting = false;
+        truckNumber = "";
     }
 
     public void closeGate2() {
         buttonController.closeGate2();
         truckPosition = -1;
+        currentTruck = new TruckResponse();
+        truckScalingController.reinitialize();
+        cargoConfirmationStatus = -1;
+        isWaiting = false;
+        truckNumber = "";
     }
 
     public void getWeight() {

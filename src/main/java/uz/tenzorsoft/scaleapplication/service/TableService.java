@@ -8,6 +8,7 @@ import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 import java.time.LocalDateTime;
@@ -25,10 +26,14 @@ public class TableService {
         data.setId(truckEntity.getId());
         double enteredWeight = 0.0;
         double exitedWeight = 0.0;
+        boolean isActionAvailable = false;
+
+        if (truckEntity.getTruckActions() == null || truckEntity.getTruckActions().isEmpty()) return null;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
-            if (action.getAction() == null || action.getAction() == TruckAction.NO_ACTION) {
-                continue; // Skip invalid or no-action entries
+            if (action.getActionStatus() != null && action.getActionStatus() != ActionStatus.COMPLETE) continue;
+            if (truckEntity.getId() == 363 || truckEntity.getId() == 364 || truckEntity.getId() == 365){
+                System.out.println("363,364,365");
             }
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
@@ -38,6 +43,7 @@ public class TableService {
                     enteredWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredOnDuty(action.getOnDuty() == null ? "unknown" : action.getOnDuty().getPhoneNumber());
+                    isActionAvailable = true;
                 }
                 case EXIT, MANUAL_EXIT -> {
                     data.setExitedTruckNumber(truckEntity.getTruckNumber());
@@ -45,13 +51,12 @@ public class TableService {
                     data.setExitedWeight(action.getWeight() == null ? 0.0 : action.getWeight());
                     exitedWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     data.setExitedTime(getTime(action.getCreatedAt()));
-                    data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());
-                }
-                default -> {
-
+                    data.setExitedOnDuty(action.getOnDuty() == null ? "unknown" : action.getOnDuty().getPhoneNumber());
+                    isActionAvailable = true;
                 }
             }
         }
+        if (!isActionAvailable) return null;
         data.setProductType(truckEntity.getProducts() == null ? "" : truckEntity.getProducts().getName());
         CargoEntity cargo = cargoService.findByTruckId(truckEntity.getId());
         if (cargo == null) return data;

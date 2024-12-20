@@ -22,12 +22,14 @@ import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.ProductsEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.ProductService;
 import uz.tenzorsoft.scaleapplication.service.TruckActionService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
+import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -37,8 +39,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isAvailableToConnect;
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 
 @Component
@@ -54,6 +55,7 @@ public class ControlPane implements BaseController {
     private final TruckService truckService;
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
+    private final TruckScalingController truckScalingController;
     @FXML
     private Button connectButton;
 
@@ -191,11 +193,11 @@ public class ControlPane implements BaseController {
                                 Kirim:
                         Kirishlar soni: %d
                         Yuk hajmi: %.2f kg
-                                    
+                                   \s
                                 Chiqim:
                         Chiqishlar soni: %d
                         Yuk hajmi: %.2f kg
-                        """,
+                       \s""",
                 dateRange,
                 totalEntranceCount, totalEntranceWeight,
                 totalExitCount, totalExitWeight
@@ -381,7 +383,7 @@ public class ControlPane implements BaseController {
                 } catch (Exception e) {
                     showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
-                    Platform.runLater(() -> mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage()));
+                    mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });
@@ -413,6 +415,11 @@ public class ControlPane implements BaseController {
         if (isConnected) {
             buttonController.disconnect();
             truckPosition = -1;
+            currentTruck = new TruckResponse();
+            truckScalingController.reinitialize();
+            cargoConfirmationStatus = -1;
+            isWaiting = false;
+            truckNumber = "";
         } else {
             buttonController.connect();
         }

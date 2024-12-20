@@ -52,283 +52,297 @@ public class TruckScalingController {
     private final ExecutorService executors;
     private final LogService logService;
 
-    private TruckActionEntity enteredAction = new TruckActionEntity();
-    private TruckPhotosEntity enteredPhoto = new TruckPhotosEntity();
-
-    private TruckActionEntity exitedAction = new TruckActionEntity();
-    private TruckPhotosEntity exitedPhoto = new TruckPhotosEntity();
-
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private boolean isTruckEntered = false;
-    private boolean isOnScale = false;
-    @Setter
-    @Getter
-    private boolean isScaled = false;
+
+    private boolean isTruckEntered = false, isTruckExited = false,
+            isOnScale = false, isScaled = false, isCargoPhotoTaken = false,
+            isCargoConfirmationDialogOpened = false, isTimeoutChanged = false;
     @Setter
     @Getter
     private double weigh = 0.0;
-    private boolean isCargoPhotoTaken = false;
-    private boolean isCargoConfirmationDialogOpened = false;
-    private boolean isTruckExited = false;
-    private boolean isTimeoutChanged = false;
 
     public void start() {
-        scheduler.scheduleAtFixedRate(() -> {
-            try {
-                System.out.println("truckPosition = " + truckPosition);
-                if (!sensor1Connection && truckPosition == 0) {
-                    // truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.NEW);
-                    truckPosition = 1;
-                    isTruckEntered = true;
+//        scheduler.scheduleAtFixedRate(() -> {
+        executors.execute(() -> {
+            while (true) {
+                try {
+                    System.out.println("truckPosition = " + truckPosition);
+                    if (!sensor1Connection && truckPosition == 0) {
+                        // truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.NEW);
+                        truckPosition = 1;
+                        isTruckEntered = true;
 //                    isOnScale = true;
 
-                }
+                    }
 
-                if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
-                    // Save status as PROCESSING
-                    truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.PROCESSING);
-                    truckPosition = 2;
-                    buttonController.closeGate1();
-                }
+                    if (truckPosition == 1 && sensor1Connection && (!sensor2Connection || isOnScale)) {
+                        // Save status as PROCESSING
+                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.PROCESSING);
+                        truckPosition = 2;
+                        buttonController.closeGate1();
+                    }
 
-                if ((!sensor2Connection || isOnScale) && (truckPosition == 2) &&
-                        (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
-                                currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
-                    System.out.println("Scaling ---- isScaled = " + isScaled + " Status " + currentTruck.getEnteredStatus());
-                    Timer timer = new Timer();
-                    timer.schedule((new TimerTask() {
-                        @Override
-                        public void run() {
-                            double holder = buttonController.getTruckWeigh();
-                            double helper = holder != 0 ? holder : weigh;
-                            if (helper > 0.0) System.out.println("helper weigh = " + helper);
+                    if ((!sensor2Connection || isOnScale) && (truckPosition == 2) &&
+                            (currentTruck.getEnteredStatus() == TruckAction.ENTRANCE ||
+                                    currentTruck.getEnteredStatus() == TruckAction.MANUAL_ENTRANCE)) {
+                        System.out.println("Scaling ---- isScaled = " + isScaled + " Status " + currentTruck.getEnteredStatus());
+                        Timer timer = new Timer();
+                        timer.schedule((new TimerTask() {
+                            @Override
+                            public void run() {
+                                double holder = buttonController.getTruckWeigh();
+                                double helper = holder != 0 ? holder : weigh;
+                                if (helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
-                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                weigh = helper;
-                            } else if (weigh == helper && helper != 0) {
-                                log.info("Truck weigh: {}", weigh);
-                                isScaled = true;
-                            }
-
-                            if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
-                                try {
-                                    AttachResponse response = cameraViewController.takePicture(CAMERA_2);
-                                    //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
-                                    truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
-                                    isCargoPhotoTaken = true;
-
-                                } catch (Exception e) {
-                                    System.out.println(e.getMessage());
+                                if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
+                                    weigh = helper;
+                                } else if (weigh == helper && helper != 0) {
+                                    log.info("Truck weigh: {}", weigh);
+                                    isScaled = true;
                                 }
 
-                                System.out.println("Opening gate 2");
-                                buttonController.openGate2(); // Open Gate 2
+                                if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
+                                    try {
+                                        AttachResponse response = cameraViewController.takePicture(CAMERA_2);
+                                        //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
+                                        truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
+                                        isCargoPhotoTaken = true;
+                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+
+                                    } catch (Exception e) {
+                                        System.out.println(e.getMessage());
+                                    }
+
+                                    System.out.println("Opening gate 2");
+                                    buttonController.openGate2(); // Open Gate 2
 //                                if (weigh > 0) {
-                                currentTruck.setEnteredWeight(weigh);
+                                    currentTruck.setEnteredWeight(weigh);
 
-                                log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
-                                currentTruck.setEnteredAt(LocalDateTime.now());
-                                currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                truckService.saveTruckEnteredActions(currentTruck);
+                                    log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
+                                    currentTruck.setEnteredAt(LocalDateTime.now());
+                                    currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
+                                    truckService.saveTruckEnteredActions(currentTruck);
 
-                                // Save status as COMPLETE
-                                truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+                                    // Save status as COMPLETE
 
-                                try {
-                                    truckService.saveCurrentTruck(currentTruck, false);
-                                } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00042: (" + getClass().getName() + ") " + e.getMessage()));
-                                    e.printStackTrace();
-                                }
-                                tableController.updateTableRow(truckService.getCurrentTruckEntity());
-                                isTruckEntered = true;
-                                currentTruck = new TruckResponse();
+                                    try {
+                                        truckService.saveCurrentTruck(currentTruck, false);
+                                    } catch (Exception e) {
+                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00042: (" + getClass().getName() + ") " + e.getMessage()));
+                                        e.printStackTrace();
+                                    }
+                                    tableController.updateTableRow(truckService.getCurrentTruckEntity());
+                                    isTruckEntered = true;
 //                                } else {
 //                                    isScaled = false;
 //                                }
+                                }
                             }
-                        }
-                    }), SCALE_TIMEOUT);
-                }
+                        }), SCALE_TIMEOUT);
+                    }
 
-                if (truckPosition == 2 && sensor2Connection && !sensor3Connection && isScaled) {
-                    truckPosition = 3;
-                    System.out.println("truckPosition = " + truckPosition);
-                }
+                    if (truckPosition == 2 && sensor2Connection && !sensor3Connection && isScaled) {
+                        truckPosition = 3;
+                        System.out.println("truckPosition = " + truckPosition);
+                    }
 
-                if (truckPosition == 3 && sensor2Connection && sensor3Connection && isScaled) {
-                    System.out.println("Gate 2 is closing");
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            System.out.println("isTruckEntered = " + isTruckEntered);
-                            if (isTruckEntered) {
-                                truckPosition = -1;
-                                isScaled = false;
-                                buttonController.closeGate2();
-                                isTruckEntered = false;
-                                isCargoPhotoTaken = false;
-                                isCargoConfirmationDialogOpened = false;
-                                cargoConfirmationStatus = -1;
+                    if (truckPosition == 3 && sensor2Connection && sensor3Connection && isScaled) {
+                        System.out.println("Gate 2 is closing");
+                        Timer timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                System.out.println("isTruckEntered = " + isTruckEntered);
+                                if (isTruckEntered) {
+                                    currentTruck = new TruckResponse();
+                                    truckPosition = -1;
+                                    isScaled = false;
+                                    buttonController.closeGate2();
+                                    isTruckEntered = false;
+                                    isCargoPhotoTaken = false;
+                                    isCargoConfirmationDialogOpened = false;
+                                    cargoConfirmationStatus = -1;
 //                                isOnScale = false;
-                                weigh = 0.0;
+                                    weigh = 0.0;
+                                }
                             }
-                        }
-                    }, CLOSE_GATE2_TIMEOUT);
-                }
+                        }, CLOSE_GATE2_TIMEOUT);
+                    }
 
-                if (isTimeoutChanged) {
-                    CLOSE_GATE2_TIMEOUT = configurations.getCloseGate2Timeout();
-                }
+                    if (isTimeoutChanged) {
+                        CLOSE_GATE2_TIMEOUT = configurations.getCloseGate2Timeout();
+                    }
 
-                /////////////////////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////////////////
-                /////////////////////////////////////////////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////////////////////////////////////////////
+                    /////////////////////////////////////////////////////////////////////////////////////////////
 
-                if (!sensor3Connection && truckPosition == 7) {
-                    isTruckExited = true;
-                    truckPosition = 6;
-                }
+                    if (!sensor3Connection && truckPosition == 7) {
+                        isTruckExited = true;
+                        truckPosition = 6;
+                    }
 
-                if (truckPosition == 6 && sensor3Connection && !sensor2Connection) {
+                    if (truckPosition == 6 && sensor3Connection && !sensor2Connection) {
 //                    isOnScale = true;
-                    truckPosition = 5;
-                    buttonController.closeGate2();
-                }
+                        truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.PROCESSING);
+                        truckPosition = 5;
+                        buttonController.closeGate2();
+                    }
 
-                if ((!sensor2Connection || isOnScale) && truckPosition == 5 &&
-                        (currentTruck.getExitedStatus() == TruckAction.EXIT ||
-                                currentTruck.getExitedStatus() == TruckAction.MANUAL_EXIT)) {
-                    Timer timer = new Timer();
-                    timer.schedule((new TimerTask() {
-                        @Override
-                        public void run() {
-                            double holder = buttonController.getTruckWeigh();
-                            double helper = holder != 0 ? holder : weigh;
-                            if (helper > 0.0) System.out.println("helper weigh = " + helper);
+                    if ((!sensor2Connection || isOnScale) && truckPosition == 5 &&
+                            (currentTruck.getExitedStatus() == TruckAction.EXIT ||
+                                    currentTruck.getExitedStatus() == TruckAction.MANUAL_EXIT)) {
+                        Timer timer = new Timer();
+                        timer.schedule((new TimerTask() {
+                            @Override
+                            public void run() {
+                                double holder = buttonController.getTruckWeigh();
+                                double helper = holder != 0 ? holder : weigh;
+                                if (helper > 0.0) System.out.println("helper weigh = " + helper);
 
 
-                            if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
-                                weigh = helper;
-                            } else if (weigh == helper && helper != 0 && !isScaled) {
-                                log.info("Truck weigh: {}", weigh);
-                                isScaled = true;
-                            }
-                            if (isScaleControlOn) cargoConfirmationStatus = 1;
+                                if (weigh != helper && helper != 0.0 /*&& !isTesting*/) {
+                                    weigh = helper;
+                                } else if (weigh == helper && helper != 0 && !isScaled) {
+                                    log.info("Truck weigh: {}", weigh);
+                                    isScaled = true;
+                                }
+                                if (isScaleControlOn) cargoConfirmationStatus = 1;
 //                            else cargoConfirmationStatus = 1;
 
-                            if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn && cargoConfirmationStatus == -1) {
-                                isCargoConfirmationDialogOpened = true;
-                                cargoConfirmationStatus = showCargoScaleConfirmationDialog(truckService.getCurrentTruckEntity(), weigh);
-                                System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
-                            }
-
-                            if (cargoConfirmationStatus == 2 && isScaled && isCargoConfirmationDialogOpened) {
-                                isScaled = false;
-                                isCargoConfirmationDialogOpened = false;
-                                weigh = 0.0;
-                                cargoConfirmationStatus = -1;
-                            }
-
-                            if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
-                                AttachResponse response = cameraViewController.takePicture(CAMERA_2);
-                                //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
-                                truckService.saveTruckAttaches(currentTruck, response, AttachStatus.EXIT_CARGO_PHOTO);
-                                isCargoPhotoTaken = true;
-                                currentTruck.setExitedWeight(weigh);
-                                log.info("Truck weigh: {}", currentTruck.getExitedWeight());
-                                currentTruck.setExitedAt(LocalDateTime.now());
-                                System.out.println("currentUser.getPhoneNumber() = " + currentUser.getPhoneNumber());
-                                isTruckExited = true;
-                                currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
-                                truckService.saveTruckExitedAction(currentTruck);
-                                TruckEntity truck = null;
-                                try {
-                                    truck = truckService.saveCurrentTruck(currentTruck, true);
-                                } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00043: (" + getClass().getName() + ") " + e.getMessage()));
-                                    e.printStackTrace();
+                                if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn && cargoConfirmationStatus == -1) {
+                                    isCargoConfirmationDialogOpened = true;
+                                    cargoConfirmationStatus = showCargoScaleConfirmationDialog(truckService.getCurrentTruckEntity(), weigh);
+                                    System.out.println("cargoConfirmationStatus = " + cargoConfirmationStatus);
                                 }
-                                try {
-                                    cargoService.saveCargo(truck);
-                                } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00044: (" + getClass().getName() + ") " + e.getMessage()));
-                                    e.printStackTrace();
+
+                                if (cargoConfirmationStatus == 2 && isScaled && isCargoConfirmationDialogOpened) {
+                                    isScaled = false;
+                                    isCargoConfirmationDialogOpened = false;
+                                    weigh = 0.0;
+                                    cargoConfirmationStatus = -1;
                                 }
-                                try {
+
+                                if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
+                                    try {
+                                        AttachResponse response = cameraViewController.takePicture(CAMERA_2);
+                                        //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
+                                        truckService.saveTruckAttaches(currentTruck, response, AttachStatus.EXIT_CARGO_PHOTO);
+                                        isCargoPhotoTaken = true;
+                                        truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
+
+                                    } catch (Exception e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                    currentTruck.setExitedWeight(weigh);
+                                    log.info("Truck weigh: {}", currentTruck.getExitedWeight());
+                                    currentTruck.setExitedAt(LocalDateTime.now());
+                                    System.out.println("currentUser.getPhoneNumber() = " + currentUser.getPhoneNumber());
+                                    isTruckExited = true;
+                                    currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
+                                    truckService.saveTruckExitedAction(currentTruck);
+                                    truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
+                                    TruckEntity truck = null;
+                                    try {
+                                        truck = truckService.saveCurrentTruck(currentTruck, true);
+                                    } catch (Exception e) {
+                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00043: (" + getClass().getName() + ") " + e.getMessage()));
+                                        e.printStackTrace();
+                                    }
+                                    try {
+                                        cargoService.saveCargo(truck);
+                                    } catch (Exception e) {
+                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00044: (" + getClass().getName() + ") " + e.getMessage()));
+                                        e.printStackTrace();
+                                    }
+                                    try {
 //                                    Timer timer1 = new Timer();
 //                                    timer1.schedule(new TimerTask() {
 //                                        @Override
 //                                        public void run() {
-                                    printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                        printCheck.printReceipt(truckService.getCurrentTruckEntity());
 //                                        }
 //                                    }, 50);
-                                } catch (Exception e) {
-                                    logService.save(new LogEntity(5L, Instances.truckNumber, "00045: (" + getClass().getName() + ") " + e.getMessage()));
-                                    e.printStackTrace();
-                                    System.out.println(e.getMessage());
+                                    } catch (Exception e) {
+                                        logService.save(new LogEntity(5L, Instances.truckNumber, "00045: (" + getClass().getName() + ") " + e.getMessage()));
+                                        e.printStackTrace();
+                                        System.out.println(e.getMessage());
+                                    }
+                                    tableController.updateTableRow(truckService.getCurrentTruckEntity());
+
+                                    currentTruck = new TruckResponse();
                                 }
-                                tableController.updateTableRow(truckService.getCurrentTruckEntity());
-
-                                currentTruck = new TruckResponse();
                             }
-                        }
-                    }), SCALE_TIMEOUT);
-                }
-                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && cargoConfirmationStatus == 0) { // removed isScaled boolean condition
-                    truckService.getCurrentTruckEntity().setNextEntranceTime(LocalDateTime.now().plusMinutes(2));
-                    truckService.save(truckService.getCurrentTruckEntity());
-                    buttonController.openGate2();
-                    truckPosition = 2;
-                    isScaled = true; // needed for exiting
-                    CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 3;
-                    isTimeoutChanged = true;
-                    cargoConfirmationStatus = -1;
-                    isCargoConfirmationDialogOpened = true;
-                    isTruckEntered = true;
-                    isTruckExited = false;
-                    currentTruck = new TruckResponse();
-                    System.out.println("Gate 2 is opening");
-                }
+                        }), SCALE_TIMEOUT);
+                    }
+                    if (truckPosition == 5 && (!sensor2Connection || isOnScale) && cargoConfirmationStatus == 0) { // removed isScaled boolean condition
+                        truckService.getCurrentTruckEntity().setNextEntranceTime(LocalDateTime.now().plusMinutes(2));
+                        truckService.save(truckService.getCurrentTruckEntity());
+                        buttonController.openGate2();
+                        truckPosition = 2;
+                        isScaled = true; // needed for exiting
+                        CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 3;
+                        isTimeoutChanged = true;
+                        cargoConfirmationStatus = -1;
+                        isCargoConfirmationDialogOpened = true;
+                        isTruckEntered = true;
+                        isTruckExited = false;
+                        currentTruck = new TruckResponse();
+                        System.out.println("Gate 2 is opening");
+                    }
 
-                if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1 && gate1Connection) {
-                    System.out.println("Opening gate 1");
-                    buttonController.openGate1();
-                }
+                    if (truckPosition == 5 && (!sensor2Connection || isOnScale) && isScaled && cargoConfirmationStatus == 1 && gate1Connection) {
+                        System.out.println("Opening gate 1");
+                        buttonController.openGate1();
+                    }
 
-                if (truckPosition == 5 && sensor2Connection && !sensor1Connection && isScaled && cargoConfirmationStatus == 1 && !gate1Connection) {
-                    isTruckExited = true;
-                    truckPosition = 4;
-                }
+                    if (truckPosition == 5 && sensor2Connection && !sensor1Connection && isScaled && cargoConfirmationStatus == 1 && !gate1Connection) {
+                        isTruckExited = true;
+                        truckPosition = 4;
+                    }
 
-                if (truckPosition == 4 && sensor2Connection && sensor1Connection && isScaled && cargoConfirmationStatus == 1) {
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (isTruckExited) {
-                                isScaled = false;
-                                buttonController.closeGate1();
-                                isTruckExited = false;
-                                isCargoPhotoTaken = false;
-                                isCargoConfirmationDialogOpened = false;
+                    if (truckPosition == 4 && sensor2Connection && sensor1Connection && isScaled && cargoConfirmationStatus == 1) {
+                        Timer timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (isTruckExited) {
+                                    isScaled = false;
+                                    buttonController.closeGate1();
+                                    isTruckExited = false;
+                                    isCargoPhotoTaken = false;
+                                    isCargoConfirmationDialogOpened = false;
 //                                isOnScale = false;
-                                cargoConfirmationStatus = -1;
-                                truckPosition = -1;
-                                weigh = 0.0;
-                                truckService.setCurrentTruckEntity(new TruckEntity());
+                                    cargoConfirmationStatus = -1;
+                                    truckPosition = -1;
+                                    weigh = 0.0;
+                                    truckService.setCurrentTruckEntity(new TruckEntity());
+                                }
                             }
-                        }
-                    }, CLOSE_GATE1_TIMEOUT);
-                }
+                        }, CLOSE_GATE1_TIMEOUT);
+                    }
 
-            } catch (Exception e) {
-                logService.save(new LogEntity(5L, Instances.truckNumber, "00046: (" + getClass().getName() + ") " + e.getMessage()));
-                e.printStackTrace();
+                    Thread.sleep(500);
+
+                } catch (Exception e) {
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00046: (" + getClass().getName() + ") " + e.getMessage()));
+                    e.printStackTrace();
+                }
+//        }, 0, 500, TimeUnit.MILLISECONDS);
             }
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        });
+    }
+
+    public void reinitialize() {
+        isTruckEntered = false;
+        isTruckExited = false;
+        isOnScale = false;
+        isScaled = false;
+        isCargoPhotoTaken = false;
+        isCargoConfirmationDialogOpened = false;
+        isTimeoutChanged = false;
+        weigh = 0.0;
     }
 }

@@ -28,7 +28,7 @@ public class TruckEntity extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
-    private LocalDateTime nextEntranceTime;
+    private LocalDateTime nextEntranceTime = LocalDateTime.now();
 
     private Boolean isFinished = false;
 

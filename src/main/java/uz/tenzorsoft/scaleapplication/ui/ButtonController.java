@@ -6,7 +6,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.CheckCommandsDto;
 import uz.tenzorsoft.scaleapplication.service.*;
+import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,31 +47,21 @@ public class ButtonController implements BaseController {
 
     @Autowired
     @Lazy
-    private MainController mainController;
+    private TableController tableController;
     @Autowired
     @Lazy
-    private TableController tableController;
+    private TruckScalingController truckScalingController;
 
     @FXML
-    private ImageView gate1;
+    private ImageView gate1, gate2;
 
     @FXML
-    private ImageView gate2;
+    private Button button1, button2, button4, button5;
 
     @FXML
-    private Button button1;
-
-    @FXML
-    private Button button2;
-
-    @FXML
+    @Setter
+    @Getter
     private Button button3;
-
-    @FXML
-    private Button button4;
-
-    @FXML
-    private Button button5;
 
     private String commandComment = "";
 

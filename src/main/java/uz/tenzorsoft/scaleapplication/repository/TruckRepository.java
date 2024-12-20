@@ -50,6 +50,14 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
 
     List<TruckEntity> findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(String truckNumber, boolean isFinished, boolean isDeleted);
 
+    @Query("SELECT t FROM trucks t " +
+            "JOIN t.truckActions ta " +
+            "WHERE t.truckNumber = :truckNumber " +
+            "AND t.isFinished = false AND t.isDeleted = false " +
+            "AND ta.actionStatus = 'COMPLETE' " +
+            "AND ta.action = :truckAction")
+    List<TruckEntity> findByTruckNumberAndActionStatus(String truckNumber, TruckAction truckAction);
+
     Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, boolean isFinished);
 
     boolean existsByTruckNumberAndNextEntranceTimeIsBeforeAndIsFinishedFalse(String truckNumber, LocalDateTime localDateTime);
