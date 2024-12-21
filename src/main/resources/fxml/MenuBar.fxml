@@ -26,5 +26,10 @@
         <MenuItem mnemonicParsing="false" text="Yo'riqnoma" onAction="#onInstructionSelected"/>
       </items>
     </Menu>
+    <Menu mnemonicParsing="false" text="Hisobot">
+      <items>
+        <MenuItem fx:id="hisobotMenuItem" mnemonicParsing="false" text="Hisobot" onAction="#onHisobotMenuSelected"/>
+      </items>
+    </Menu>
   </menus>
 </MenuBar>

@@ -26,6 +26,7 @@ import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import uz.tenzorsoft.scaleapplication.ui.MainController;
 import uz.tenzorsoft.scaleapplication.ui.TableController;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -430,22 +431,45 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public boolean isEntranceAvailableForCamera1(String truckNumber) {
+        // Check if the truck number exists in the system
         if (!isTruckNumberExists(truckNumber)) {
             return true;
         }
-        if (truckRepository.existsByTruckNumberAndIsFinishedAndIsDeleted(truckNumber, false, false)) {
-            mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Bu moshina hali chiqmagan!");
+
+        // Check if the truck is currently in the system and not yet finished
+        List<TruckEntity> ongoingTrucks = truckRepository.findByTruckNumberAndActionStatus(
+                truckNumber,
+                List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                false, // isFinished = false (not finished)
+                false  // isDeleted = false (not deleted)
+        );
+
+        if (!ongoingTrucks.isEmpty()) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", "Bu mashinasi hali chiqmagan!");
             return false;
         }
-        List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, true, false);
-        if (list.isEmpty()) return false;
-        LocalDateTime nextEntranceTime = list.get(0).getNextEntranceTime();
-        boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
-        if (!b) {
-            mainController.showAlert(Alert.AlertType.INFORMATION, "Info", "5 daqiqadan keyin kirishi mumkin!");
+
+        // Fetch the most recent truck action to verify re-entry time
+        List<TruckEntity> completedTrucks = truckRepository.findByTruckNumberAndActionStatus(
+                truckNumber,
+                List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                true,  // isFinished = true (completed)
+                false  // isDeleted = false
+        );
+
+        if (!completedTrucks.isEmpty()) {
+            TruckEntity lastTruck = completedTrucks.get(0);
+            if (lastTruck.getNextEntranceTime().isAfter(LocalDateTime.now())) {
+                mainController.showAlert(Alert.AlertType.INFORMATION, "Info", "Yuk mashinasi 5 daqiqadan keyin yana kirishi mumkin!");
+                return false;
+            }
         }
-        return b;
+
+        // Truck is allowed to enter
+        return true;
     }
+
+
 
     private boolean isTruckNumberExists(String truckNumber) {
         return truckRepository.existsByTruckNumberAndIsDeleted(truckNumber, false);
@@ -489,7 +513,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             truckNumber = editedTruckNumber; // Update the truck number to the new one
 
         }
-        List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(truckNumber, TruckAction.ENTRANCE);
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE), false, false);
         if (list.isEmpty()) {
             mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!");
             return false;

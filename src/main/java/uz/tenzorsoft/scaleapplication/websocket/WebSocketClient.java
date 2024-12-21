@@ -44,12 +44,6 @@ public class WebSocketClient {
                 CommandsRequest commands = parseCommandsRequest(message);
                 commandsService.saveOrUpdateCommands(commands);
             }
-//            else if (message.startsWith("Started") || message.startsWith("Completed")) {
-//                System.out.println(message);
-//            } else {
-//                logService.save(new LogEntity(5L, Instances.truckNumber, "Unrecognized message format: " + message));
-//                System.err.println("Unrecognized message format: " + message);
-//            }
         } catch (Exception e) {
             logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             System.err.println("Error processing message: " + e.getMessage());
@@ -63,12 +57,6 @@ public class WebSocketClient {
         CommandsRequest commands = new CommandsRequest();
         try {
             commands = objectMapper.readValue(jsonValue, CommandsRequest.class);
-//            commands.setScaleId(Long.parseLong(extractValue(message, "scaleId")));
-//            commands.setOpenGate1(Boolean.parseBoolean(extractValue(message, "openGate1")));
-//            commands.setCloseGate1(Boolean.parseBoolean(extractValue(message, "closeGate1")));
-//            commands.setWeighing(Boolean.parseBoolean(extractValue(message, "weighing")));
-//            commands.setOpenGate2(Boolean.parseBoolean(extractValue(message, "openGate2")));
-//            commands.setCloseGate2(Boolean.parseBoolean(extractValue(message, "closeGate2")));
         } catch (JsonProcessingException e) {
             logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
             System.err.println(e.getMessage());

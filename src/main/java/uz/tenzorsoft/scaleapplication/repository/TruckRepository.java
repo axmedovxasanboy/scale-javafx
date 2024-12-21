@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckPhotosEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 
 import java.time.LocalDate;
@@ -53,10 +54,18 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
     @Query("SELECT t FROM trucks t " +
             "JOIN t.truckActions ta " +
             "WHERE t.truckNumber = :truckNumber " +
-            "AND t.isFinished = false AND t.isDeleted = false " +
+            "AND t.isFinished = :isFinished " +
+            "AND t.isDeleted = :isDeleted " +
             "AND ta.actionStatus = 'COMPLETE' " +
-            "AND ta.action = :truckAction")
-    List<TruckEntity> findByTruckNumberAndActionStatus(String truckNumber, TruckAction truckAction);
+            "AND ta.action IN :truckActions " +
+            "ORDER BY t.nextEntranceTime DESC")
+    List<TruckEntity> findByTruckNumberAndActionStatus(
+            String truckNumber,
+            List<TruckAction> truckActions,
+            Boolean isFinished,
+            Boolean isDeleted);
+
+
 
     Optional<TruckEntity> findByTruckNumberAndIsFinished(String truckNumber, boolean isFinished);
 
@@ -80,6 +89,16 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
             "GROUP BY ta.action, CAST(ta.createdAt AS date)")
     List<Object[]> findTruckCountsByDate(LocalDate startDate, LocalDate endDate);
 
+
+    @Query("""
+    SELECT ta.action, COUNT(ta)
+    FROM truck_actions ta
+    WHERE ta.actionStatus = :status AND ta.createdAt BETWEEN :fromDate AND :toDate
+    GROUP BY ta.action
+""")
+    List<Object[]> findTruckCountsByDateAndStatus(@Param("fromDate") LocalDateTime fromDate,
+                                                  @Param("toDate") LocalDateTime toDate,
+                                                  @Param("status") ActionStatus status);
 
 
 }

@@ -2,15 +2,19 @@ package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.FontWeight;
@@ -19,13 +23,21 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
+import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
+import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 
 import java.awt.*;
 import java.io.*;
+import java.time.LocalDate;
+import java.util.List;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
@@ -36,6 +48,9 @@ public class MenuBarController implements BaseController {
 
     private final ConfigUtilsService configUtilsService;
     private final PrintCheck printCheck;
+    private final TruckRepository truckRepository;
+    private final TruckActionRepository truckActionRepository;
+    private final ControlPane controlPane;
 
     @FXML
     private void onDatabaseMenuSelected() {
@@ -76,6 +91,114 @@ public class MenuBarController implements BaseController {
     private void onInstructionSelected() {
         showInstructionPopup();
     }
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
+
+    @FXML
+    private void onHisobotMenuSelected() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ReportDialog.fxml"));
+            loader.setControllerFactory(applicationContext::getBean); // Assuming Spring context integration
+            Parent root = loader.load();
+
+            Stage stage = new Stage();
+            stage.setTitle("Hisobotlar");
+            stage.setScene(new Scene(root, 700, 500)); // Increased size
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    // Overloaded version
+    public String generateReport(LocalDate fromDate, LocalDate toDate) {
+        if (fromDate == null && toDate != null) {
+            fromDate = LocalDate.MIN; // Consider all records up to 'toDate'
+        } else if (fromDate != null && toDate == null) {
+            toDate = fromDate; // Restrict to the single day specified by 'fromDate'
+        } else if (fromDate == null && toDate == null) {
+            throw new IllegalArgumentException("Kamida bitta sana kiritilishi kerak.");
+        }
+
+        if (fromDate.isAfter(LocalDate.now()) || toDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Hozirgacha bo'lgan muddatni tanlang.");
+        }
+
+        if (fromDate.isAfter(toDate)) {
+            throw new IllegalArgumentException("Tugash sanasi boshlanish sanasidan katta bo'lmasligi kerak.");
+        }
+
+
+        // Fetch data
+        java.util.List<Object[]> truckCounts = truckRepository.findTruckCountsByDate(fromDate, toDate);
+        List<Object[]> truckWeights = truckActionRepository.findTruckWeightsByDate(fromDate, toDate);
+
+        long totalEntranceCount = 0;
+        double totalEntranceWeight = 0.0;
+        long totalExitCount = 0;
+        double totalExitWeight = 0.0;
+
+        // Process truck counts
+        if (truckCounts != null) {
+            for (Object[] record : truckCounts) {
+                String action = record[0].toString();
+                Long count = ((Number) record[1]).longValue();
+
+                if ("ENTRANCE".equalsIgnoreCase(action)) {
+                    totalEntranceCount += count;
+                } else if ("EXIT".equalsIgnoreCase(action)) {
+                    totalExitCount += count;
+                }
+            }
+        }
+
+        // Process truck weights
+        if (truckWeights != null) {
+            for (Object[] record : truckWeights) {
+                String action = record[0].toString();
+                Double weight = ((Number) record[1]).doubleValue();
+
+                if ("ENTRANCE".equalsIgnoreCase(action)) {
+                    totalEntranceWeight += weight;
+                } else if ("EXIT".equalsIgnoreCase(action)) {
+                    totalExitWeight += weight;
+                }
+            }
+        }
+
+        // Determine the date range description
+        String dateRange;
+        if (fromDate.equals(toDate)) {
+            dateRange = fromDate.toString(); // Single-day report
+        } else if (fromDate.equals(LocalDate.MIN)) {
+            dateRange = "Up to " + toDate; // Report for all records up to 'toDate'
+        } else {
+            dateRange = fromDate + " - " + toDate; // Standard range report
+        }
+
+        // Generate summary report
+        return String.format("""
+                        Hisobot [%s]
+
+                                Kirim:
+                        Kirishlar soni: %d
+                        Yuk hajmi: %.2f kg
+                                   \s
+                                Chiqim:
+                        Chiqishlar soni: %d
+                        Yuk hajmi: %.2f kg
+                       \s""",
+                dateRange,
+                totalEntranceCount, totalEntranceWeight,
+                totalExitCount, totalExitWeight
+        );
+    }
+
 
 
     private void showDatabasePopup() {

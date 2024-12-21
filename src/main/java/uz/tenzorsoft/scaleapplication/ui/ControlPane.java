@@ -73,9 +73,13 @@ public class ControlPane implements BaseController {
     @FXML
     @Getter
     @Setter
-    private Button issueCheckButton, deleteButton, editButton;
+    private Button issueCheckButton, deleteButton, editButton, button3;
+
+/*
 
     @FXML
+    @Getter
+    @Setter
     private AnchorPane hisobotlarPane;
     @FXML
     private DatePicker fromDatePicker;
@@ -203,7 +207,7 @@ public class ControlPane implements BaseController {
                 totalExitCount, totalExitWeight
         );
     }
-
+*/
 
     @FXML
     public void initialize() {
