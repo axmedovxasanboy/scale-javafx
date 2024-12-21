@@ -19,33 +19,6 @@
       </font>
     </Label>
 
-<!--    &lt;!&ndash; Updated: Hisobotlar Button comes first &ndash;&gt;-->
-<!--    <Button fx:id="hisobotlarButton" layoutX="874.0" layoutY="7.0" onAction="#openHisobotlarWindow" prefHeight="30.0" prefWidth="101.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Hisobotlar">-->
-<!--      <cursor>-->
-<!--        <Cursor fx:constant="HAND" />-->
-<!--      </cursor>-->
-<!--    </Button>-->
-
-<!--    &lt;!&ndash; Background Overlay &ndash;&gt;-->
-<!--    <Rectangle fx:id="backgroundOverlay" fill="#00000080" height="600.0" layoutX="0.0" layoutY="0.0" visible="false" width="800.0" />-->
-
-<!--    <AnchorPane fx:id="hisobotlarPane" layoutX="50.0" layoutY="50.0" prefHeight="500.0" prefWidth="700.0" style="-fx-border-color: #2196F3; -fx-border-width: 2; -fx-background-color: white; -fx-background-radius: 10;" visible="false">-->
-<!--      <children>-->
-<!--        <Label layoutX="280.0" layoutY="14.0" style="-fx-font-size: 22; -fx-font-weight: bold;" text="Hisobotlar" />-->
-<!--        <Label layoutX="60.0" layoutY="57.0" style="-fx-font-size: 14;" text="Dan:" />-->
-<!--        <DatePicker fx:id="fromDatePicker" layoutX="100.0" layoutY="55.0" prefWidth="150.0" />-->
-<!--        <Button layoutX="260.0" layoutY="55.0" onAction="#clearFromDate" text="Tozalash" />-->
-
-<!--        <Label layoutX="343.0" layoutY="57.0" style="-fx-font-size: 14;" text="Gacha:" />-->
-<!--        <DatePicker fx:id="toDatePicker" layoutX="390.0" layoutY="55.0" prefWidth="150.0" />-->
-<!--        <Button layoutX="550.0" layoutY="55.0" onAction="#clearToDate" text="Tozalash" />-->
-
-<!--        <Button layoutX="290.0" layoutY="110.0" onAction="#generateReport" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="Hisobot yaratish" />-->
-<!--        <TextArea fx:id="reportTextArea" editable="false" layoutX="50.0" layoutY="160.0" prefHeight="300.0" prefWidth="600.0" style="-fx-font-size: 16; -fx-text-alignment: center; -fx-control-inner-background: #f9f9f9;" wrapText="true" />-->
-<!--        <Button layoutX="620.0" layoutY="10.0" onAction="#closeHisobotlarPane" style="-fx-background-color: #f44336; -fx-text-fill: white;" text="Yopish" />-->
-<!--      </children>-->
-<!--    </AnchorPane>-->
-
     <!-- Updated: O'chirish Button comes second -->
     <Button fx:id="deleteButton" disable="true" layoutX="517.0" layoutY="7.0" prefHeight="30.0" prefWidth="28.0" style="-fx-background-color: #f44336;" visible="false">
       <graphic>
@@ -62,7 +35,7 @@
 
 
     <!-- Button with Image Icon and Text -->
-    <Button fx:id="issueCheckButton" layoutX="699.0" layoutY="7.0" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;">
+    <Button fx:id="issueCheckButton" layoutX="699.0" layoutY="7.0" prefHeight="30.0" prefWidth="100.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;">
       <text>Chek Chiqarish</text>
       <cursor>
         <Cursor fx:constant="HAND" />
@@ -74,7 +47,7 @@
         <Cursor fx:constant="HAND" />
       </cursor>
     </Button>
-    <Button fx:id="button3" layoutX="808.0" layoutY="7.0" prefHeight="30.0" prefWidth="111.0" style="-fx-background-color: #cfe605; -fx-text-fill: white;" text="Massani o'lchash">
+    <Button fx:id="button3" disable="true" layoutX="808.0" layoutY="7.0" prefHeight="30.0" prefWidth="111.0" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Massani o'lchash" onMouseClicked="#rescaleTruckWeigh">
       <cursor>
         <Cursor fx:constant="HAND" />
       </cursor>

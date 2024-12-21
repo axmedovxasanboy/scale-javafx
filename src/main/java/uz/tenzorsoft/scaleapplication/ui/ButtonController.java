@@ -58,21 +58,14 @@ public class ButtonController implements BaseController {
     @FXML
     private Button button1, button2, button4, button5;
 
-    @FXML
-    @Setter
-    @Getter
-    private Button button3;
-
     private String commandComment = "";
 
     @FXML
     public void initialize() {
         setupButtonPressEffect(button1, "#4CAF50");
         setupButtonPressEffect(button2, "#4CAF50");
-        setupButtonPressEffect(button3, "#C5C900");
         setupButtonPressEffect(button4, "#D32F2F");
         setupButtonPressEffect(button5, "#D32F2F");
-        button3.setDisable(true);
     }
 
     private void setupButtonPressEffect(Button button, String pressedColor) {
@@ -343,9 +336,5 @@ public class ButtonController implements BaseController {
             System.err.println(e.getMessage());
             return 0;
         }
-    }
-
-    public void rescaleTruckWeigh() {
-        truckScalingController.setRescaleAttributes();
     }
 }

@@ -15,6 +15,8 @@ import javafx.util.StringConverter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
@@ -55,7 +57,10 @@ public class ControlPane implements BaseController {
     private final TruckService truckService;
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
-    private final TruckScalingController truckScalingController;
+
+    @Autowired
+    @Lazy
+    private TruckScalingController truckScalingController;
     @FXML
     private Button connectButton;
 
@@ -427,6 +432,10 @@ public class ControlPane implements BaseController {
         } else {
             buttonController.connect();
         }
+    }
+
+    public void rescaleTruckWeigh() {
+        truckScalingController.setRescaleAttributes();
     }
 
 }

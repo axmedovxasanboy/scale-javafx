@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
+import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,9 +21,7 @@ import uz.tenzorsoft.scaleapplication.service.CargoService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
-import uz.tenzorsoft.scaleapplication.ui.ButtonController;
-import uz.tenzorsoft.scaleapplication.ui.CameraViewController;
-import uz.tenzorsoft.scaleapplication.ui.TableController;
+import uz.tenzorsoft.scaleapplication.ui.*;
 
 import java.time.LocalDateTime;
 import java.util.Timer;
@@ -53,6 +52,8 @@ public class TruckScalingController {
     private final LogService logService;
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final ControlPane controlPane;
+    private final MainController mainController;
 
     private boolean isTruckEntered = false, isTruckExited = false,
             isOnScale = false, isScaled = false, isCargoPhotoTaken = false,
@@ -124,7 +125,7 @@ public class TruckScalingController {
                                     currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
                                     truckService.saveTruckEnteredActions(currentTruck);
                                     if (isScaled) {
-                                        buttonController.getButton3().setDisable(false);
+                                        controlPane.getButton3().setDisable(false);
                                     }
 
                                     // Save status as COMPLETE
@@ -148,6 +149,7 @@ public class TruckScalingController {
                     if (truckPosition == 2 && sensor2Connection && !sensor3Connection && isScaled) {
                         truckPosition = 3;
                         System.out.println("truckPosition = " + truckPosition);
+                        controlPane.getButton3().setDisable(true);
                     }
 
                     if (truckPosition == 3 && sensor2Connection && sensor3Connection && isScaled) {
@@ -215,7 +217,7 @@ public class TruckScalingController {
                                 if (isScaleControlOn) cargoConfirmationStatus = 1;
 //                            else cargoConfirmationStatus = 1;
 
-                                if (isScaled) buttonController.getButton3().setDisable(false);
+                                if (isScaled) controlPane.getButton3().setDisable(false);
 
                                 if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn && cargoConfirmationStatus == -1) {
                                     isCargoConfirmationDialogOpened = true;
@@ -305,6 +307,7 @@ public class TruckScalingController {
                     if (truckPosition == 5 && sensor2Connection && !sensor1Connection && isScaled && cargoConfirmationStatus == 1 && !gate1Connection) {
                         isTruckExited = true;
                         truckPosition = 4;
+                        controlPane.getButton3().setDisable(true);
                     }
 
                     if (truckPosition == 4 && sensor2Connection && sensor1Connection && isScaled && cargoConfirmationStatus == 1) {
@@ -351,7 +354,10 @@ public class TruckScalingController {
     }
 
     public void setRescaleAttributes() {
-        if (truckPosition != 2 && truckPosition != 5) return;
+        if (truckPosition != 2 && truckPosition != 5) {
+            mainController.showAlert(Alert.AlertType.INFORMATION, "Ma'lumot", "Moshina belgilangan pozitsiyada emas!");
+            return;
+        }
         if (truckPosition == 2) {
             isScaled = false;
             isTruckEntered = false;
