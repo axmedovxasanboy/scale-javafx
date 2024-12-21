@@ -105,7 +105,7 @@ public class MenuBarController implements BaseController {
 
             Stage stage = new Stage();
             stage.setTitle("Hisobotlar");
-            stage.setScene(new Scene(root, 700, 500)); // Increased size
+            stage.setScene(new Scene(root, 700, 700)); // Increased size
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
         } catch (IOException e) {

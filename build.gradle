@@ -50,6 +50,9 @@ dependencies {
 
     implementation 'com.fazecast:jSerialComm:2.9.0'
 
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
+
+
 }
 
 tasks.named('test') {
