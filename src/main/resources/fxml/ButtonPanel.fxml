@@ -24,7 +24,7 @@
       </cursor>
     </Button>
 
-    <Button fx:id="button3" onMouseClicked="#getTruckWeigh" layoutX="9.0" layoutY="57.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="357.0" style="-fx-background-color: #f6fa42; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
+    <Button fx:id="button3" onMouseClicked="#rescaleTruckWeigh" layoutX="9.0" layoutY="57.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="357.0" style="-fx-background-color: #f6fa42; -fx-border-color: black; -fx-border-radius: 7; -fx-background-radius: 10; -fx-border-width: 0.8;" text="Massani o'lchash">
       <font>
         <Font name="Yu Gothic UI Semilight" size="13.5" />
       </font>

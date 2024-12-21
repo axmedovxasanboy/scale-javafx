@@ -123,6 +123,9 @@ public class TruckScalingController {
                                     currentTruck.setEnteredAt(LocalDateTime.now());
                                     currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
                                     truckService.saveTruckEnteredActions(currentTruck);
+                                    if (isScaled) {
+                                        buttonController.getButton3().setDisable(false);
+                                    }
 
                                     // Save status as COMPLETE
 
@@ -212,6 +215,8 @@ public class TruckScalingController {
                                 if (isScaleControlOn) cargoConfirmationStatus = 1;
 //                            else cargoConfirmationStatus = 1;
 
+                                if (isScaled) buttonController.getButton3().setDisable(false);
+
                                 if (!isCargoConfirmationDialogOpened && isScaled && !isScaleControlOn && cargoConfirmationStatus == -1) {
                                     isCargoConfirmationDialogOpened = true;
                                     cargoConfirmationStatus = showCargoScaleConfirmationDialog(truckService.getCurrentTruckEntity(), weigh);
@@ -272,7 +277,6 @@ public class TruckScalingController {
                                     }
                                     tableController.updateTableRow(truckService.getCurrentTruckEntity());
 
-                                    currentTruck = new TruckResponse();
                                 }
                             }
                         }), SCALE_TIMEOUT);
@@ -344,5 +348,23 @@ public class TruckScalingController {
         isCargoConfirmationDialogOpened = false;
         isTimeoutChanged = false;
         weigh = 0.0;
+    }
+
+    public void setRescaleAttributes() {
+        if (truckPosition != 2 && truckPosition != 5) return;
+        if (truckPosition == 2) {
+            isScaled = false;
+            isTruckEntered = false;
+            isCargoPhotoTaken = false;
+            cargoConfirmationStatus = -1;
+            weigh = 0.0;
+        }
+        if (truckPosition == 5) {
+            isScaled = false;
+            isTruckExited = false;
+            isCargoPhotoTaken = false;
+            isCargoConfirmationDialogOpened = false;
+            weigh = 0.0;
+        }
     }
 }

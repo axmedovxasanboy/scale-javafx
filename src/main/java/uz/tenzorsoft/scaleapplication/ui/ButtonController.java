@@ -72,6 +72,7 @@ public class ButtonController implements BaseController {
         setupButtonPressEffect(button3, "#C5C900");
         setupButtonPressEffect(button4, "#D32F2F");
         setupButtonPressEffect(button5, "#D32F2F");
+        button3.setDisable(true);
     }
 
     private void setupButtonPressEffect(Button button, String pressedColor) {
@@ -291,6 +292,7 @@ public class ButtonController implements BaseController {
 
     public double getTruckWeigh() {
         try {
+            if (isTesting) return (int) ((Math.random() * 10) + 100);
             scalePort.closePort();
             scalePort.openPort();
 
@@ -341,5 +343,9 @@ public class ButtonController implements BaseController {
             System.err.println(e.getMessage());
             return 0;
         }
+    }
+
+    public void rescaleTruckWeigh() {
+        truckScalingController.setRescaleAttributes();
     }
 }
