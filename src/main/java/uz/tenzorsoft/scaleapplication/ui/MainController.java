@@ -351,9 +351,7 @@ public class MainController implements BaseController {
             mainWindowStage.show();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
-
 
     }
 }

@@ -109,8 +109,6 @@ public class TruckScalingController {
                                         //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.ENTRANCE_CARGO_PHOTO));
                                         truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
                                         isCargoPhotoTaken = true;
-                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
-
                                     } catch (Exception e) {
                                         System.out.println(e.getMessage());
                                     }
@@ -123,6 +121,7 @@ public class TruckScalingController {
                                     log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                                     currentTruck.setEnteredAt(LocalDateTime.now());
                                     currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
+                                    truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
                                     truckService.saveTruckEnteredActions(currentTruck);
                                     if (isScaled) {
                                         controlPane.getButton3().setDisable(false);
@@ -150,6 +149,7 @@ public class TruckScalingController {
                         truckPosition = 3;
                         System.out.println("truckPosition = " + truckPosition);
                         controlPane.getButton3().setDisable(true);
+                        truckService.setCurrentTruckEntity(new TruckEntity());
                     }
 
                     if (truckPosition == 3 && sensor2Connection && sensor3Connection && isScaled) {
@@ -238,7 +238,6 @@ public class TruckScalingController {
                                         //currentTruck.getAttaches().add(new AttachIdWithStatus(response.getId(), AttachStatus.EXIT_CARGO_PHOTO));
                                         truckService.saveTruckAttaches(currentTruck, response, AttachStatus.EXIT_CARGO_PHOTO);
                                         isCargoPhotoTaken = true;
-                                        truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
 
                                     } catch (Exception e) {
                                         System.out.println(e.getMessage());
@@ -250,6 +249,7 @@ public class TruckScalingController {
                                     isTruckExited = true;
                                     currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
                                     truckService.saveTruckExitedAction(currentTruck);
+                                    truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
                                     truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
                                     TruckEntity truck = null;
                                     try {
@@ -308,6 +308,7 @@ public class TruckScalingController {
                         isTruckExited = true;
                         truckPosition = 4;
                         controlPane.getButton3().setDisable(true);
+                        truckService.setCurrentTruckEntity(new TruckEntity());
                     }
 
                     if (truckPosition == 4 && sensor2Connection && sensor1Connection && isScaled && cargoConfirmationStatus == 1) {
@@ -325,7 +326,6 @@ public class TruckScalingController {
                                     cargoConfirmationStatus = -1;
                                     truckPosition = -1;
                                     weigh = 0.0;
-                                    truckService.setCurrentTruckEntity(new TruckEntity());
                                 }
                             }
                         }, CLOSE_GATE1_TIMEOUT);

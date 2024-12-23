@@ -392,7 +392,6 @@ public class ControlPane implements BaseController {
                 } catch (Exception e) {
                     showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
-                    mainController.showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });

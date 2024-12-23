@@ -124,7 +124,8 @@ public class ButtonController implements BaseController {
 //                }
                 if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
                     logService.save(new LogEntity(5L, truckNumber, "00019: (" + getClass().getName() + ") " + "Entrance not available"));
-                    showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
+                    // showAlert(Alert.AlertType.WARNING, "Not available", truckNumber + " kirishi mumkin emas");
+                    // commented because show alert will be displayed already
                     return false;
                 }
                 currentTruck.setTruckNumber(truckNumber);
