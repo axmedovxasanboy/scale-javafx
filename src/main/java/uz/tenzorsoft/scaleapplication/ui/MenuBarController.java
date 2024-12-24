@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.ui;
 
 import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
@@ -28,15 +29,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import uz.tenzorsoft.scaleapplication.domain.data.TableViewData;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.repository.TruckActionRepository;
 import uz.tenzorsoft.scaleapplication.repository.TruckRepository;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
+import uz.tenzorsoft.scaleapplication.service.ExcelService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
 
 import java.awt.*;
 import java.io.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
@@ -51,6 +55,8 @@ public class MenuBarController implements BaseController {
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
     private final ControlPane controlPane;
+    @Autowired
+    private TableController tableController;
 
     @FXML
     private void onDatabaseMenuSelected() {
@@ -113,92 +119,43 @@ public class MenuBarController implements BaseController {
         }
     }
 
+    @FXML
+    private void onHisobotExcelMenuSelected() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ReportExcel.fxml"));
+            Parent root = loader.load();
+            ReportExcelController controller = loader.getController();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Export to Excel");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
 
+            if (controller.isConfirmed()) {
+                // Fetch filtered data
+                List<TableViewData> filteredData = tableController.getFilteredData();
 
-    // Overloaded version
-    public String generateReport(LocalDate fromDate, LocalDate toDate) {
-        if (fromDate == null && toDate != null) {
-            fromDate = LocalDate.MIN; // Consider all records up to 'toDate'
-        } else if (fromDate != null && toDate == null) {
-            toDate = fromDate; // Restrict to the single day specified by 'fromDate'
-        } else if (fromDate == null && toDate == null) {
-            throw new IllegalArgumentException("Kamida bitta sana kiritilishi kerak.");
-        }
+                // Open FileChooser for user to save the file
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Save Excel File");
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel Files", "*.xlsx"));
 
-        if (fromDate.isAfter(LocalDate.now()) || toDate.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Hozirgacha bo'lgan muddatni tanlang.");
-        }
+                File file = fileChooser.showSaveDialog(stage);
 
-        if (fromDate.isAfter(toDate)) {
-            throw new IllegalArgumentException("Tugash sanasi boshlanish sanasidan katta bo'lmasligi kerak.");
-        }
+                if (file != null) {
+                    // Define report title
+                    String reportTitle = "Baxt Komir Ombori";
 
+                    // Export data to the chosen file
+                    ExcelService.export(filteredData, file, reportTitle, null);
 
-        // Fetch data
-        java.util.List<Object[]> truckCounts = truckRepository.findTruckCountsByDate(fromDate, toDate);
-        List<Object[]> truckWeights = truckActionRepository.findTruckWeightsByDate(fromDate, toDate);
-
-        long totalEntranceCount = 0;
-        double totalEntranceWeight = 0.0;
-        long totalExitCount = 0;
-        double totalExitWeight = 0.0;
-
-        // Process truck counts
-        if (truckCounts != null) {
-            for (Object[] record : truckCounts) {
-                String action = record[0].toString();
-                Long count = ((Number) record[1]).longValue();
-
-                if ("ENTRANCE".equalsIgnoreCase(action)) {
-                    totalEntranceCount += count;
-                } else if ("EXIT".equalsIgnoreCase(action)) {
-                    totalExitCount += count;
+                    showAlert(Alert.AlertType.INFORMATION, "Muvaffaqiyatli", "Maʼlumotlar muvaffaqiyatli eksport qilindi!");
                 }
             }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
-
-        // Process truck weights
-        if (truckWeights != null) {
-            for (Object[] record : truckWeights) {
-                String action = record[0].toString();
-                Double weight = ((Number) record[1]).doubleValue();
-
-                if ("ENTRANCE".equalsIgnoreCase(action)) {
-                    totalEntranceWeight += weight;
-                } else if ("EXIT".equalsIgnoreCase(action)) {
-                    totalExitWeight += weight;
-                }
-            }
-        }
-
-        // Determine the date range description
-        String dateRange;
-        if (fromDate.equals(toDate)) {
-            dateRange = fromDate.toString(); // Single-day report
-        } else if (fromDate.equals(LocalDate.MIN)) {
-            dateRange = "Up to " + toDate; // Report for all records up to 'toDate'
-        } else {
-            dateRange = fromDate + " - " + toDate; // Standard range report
-        }
-
-        // Generate summary report
-        return String.format("""
-                        Hisobot [%s]
-
-                                Kirim:
-                        Kirishlar soni: %d
-                        Yuk hajmi: %.2f kg
-                                   \s
-                                Chiqim:
-                        Chiqishlar soni: %d
-                        Yuk hajmi: %.2f kg
-                       \s""",
-                dateRange,
-                totalEntranceCount, totalEntranceWeight,
-                totalExitCount, totalExitWeight
-        );
     }
-
 
 
     private void showDatabasePopup() {

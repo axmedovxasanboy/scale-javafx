@@ -29,6 +29,7 @@
     <Menu mnemonicParsing="false" text="Hisobot">
       <items>
         <MenuItem fx:id="hisobotMenuItem" mnemonicParsing="false" text="Hisobot" onAction="#onHisobotMenuSelected"/>
+        <MenuItem fx:id="hisobotExcelMenuItem" mnemonicParsing="false" text="Excelga chop etish" onAction="#onHisobotExcelMenuSelected"/>
       </items>
     </Menu>
   </menus>

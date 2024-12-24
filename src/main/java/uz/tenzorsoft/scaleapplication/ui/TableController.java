@@ -7,7 +7,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -36,6 +38,14 @@ public class TableController implements BaseController {
     private final ExecutorService executors;
     private final PrintCheck printCheck;
     private final LogService logService;
+
+    @Getter
+    @Setter
+    private LocalDate startDate;
+
+    @Getter
+    @Setter
+    private LocalDate endDate;
 
     @Autowired
     @Lazy
@@ -275,6 +285,10 @@ public class TableController implements BaseController {
     }
 
     public void loadFilter(LocalDate startDateValue, LocalDate endDateValue) {
+
+        this.startDate = startDateValue;
+        this.endDate = endDateValue;
+
         try {
             List<TableViewData> data = new ArrayList<>();
             List<TruckEntity> filteredData = truckService.filterWithDate(startDateValue, endDateValue);
@@ -287,6 +301,10 @@ public class TableController implements BaseController {
             logService.save(new LogEntity(5L, Instances.truckNumber, "00049: (" + getClass().getName() + ") " + e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
+    }
+
+    public List<TableViewData> getFilteredData() {
+        return new ArrayList<>(tableData.getItems());
     }
 
 }

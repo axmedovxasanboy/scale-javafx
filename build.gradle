@@ -52,6 +52,9 @@ dependencies {
 
     implementation 'org.apache.pdfbox:pdfbox:2.0.29'
 
+    implementation 'org.apache.poi:poi:5.2.3' // For basic Excel support
+    implementation 'org.apache.poi:poi-ooxml:5.2.3' // For advanced Excel support (XLSX)
+
 
 }
 
