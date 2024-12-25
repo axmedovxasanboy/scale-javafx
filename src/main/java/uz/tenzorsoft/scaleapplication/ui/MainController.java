@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
@@ -305,6 +306,33 @@ public class MainController implements BaseController {
         return result.orElse(null);
     }
 
+    public Map<String, String> showTruckNotFoundPopupWithSelectionSafe(String incorrectTruckNumber, List<String> notExitedTruckNumbers) {
+        AtomicReference<Map<String, String>> resultRef = new AtomicReference<>();
+
+        // Use a CountDownLatch to wait until the dialog interaction completes
+        CountDownLatch latch = new CountDownLatch(1);
+
+        // Schedule the dialog to run on the JavaFX Application Thread
+        isWaiting = true;
+        Platform.runLater(() -> {
+            try {
+                Map<String, String> result = showTruckNotFoundPopupWithSelection(incorrectTruckNumber, notExitedTruckNumbers);
+                resultRef.set(result);
+            } finally {
+                latch.countDown(); // Signal that the dialog has completed
+            }
+        });
+
+        try {
+            // Wait for the dialog to complete
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null; // Return null if interrupted
+        }
+
+        return resultRef.get();
+    }
 
     private void loadMainMenu() {
         try {

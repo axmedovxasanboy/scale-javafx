@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication.service;
 
 import jakarta.transaction.Transactional;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isWaiting;
 
 @Service
 @RequiredArgsConstructor
@@ -380,7 +383,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             }
         }
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(1));
         truckRepository.save(currentTruckEntity);
     }
 
@@ -481,41 +484,49 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
 
     public boolean isEntranceAvailableForCamera2(String truckNumber) {
-        if (!isTruckNumberExists(truckNumber)) {
+        //if (!isTruckNumberExists(truckNumber)) {
             if (!truckRepository.existsByIsFinishedFalseAndIsDeletedFalse()) {
                 mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Hamma moshinalar chiqib ketgan!");
                 return false;
             }
 
-            Map<String, String> updatedTruckNumber = mainController.showTruckNotFoundPopupWithSelection(truckNumber, getNotFinishedTrucks());
-            if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
-                return false;
-            }
-            String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
-            String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
-
-
-
-            if (!selectedTruckNumber.equals(editedTruckNumber)) {
-                List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(selectedTruckNumber, false, false);
-                if (list.isEmpty()) {
-                    mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", selectedTruckNumber + " raqam topilmadi");
+            if (isTruckNumberExists(truckNumber)) {
+                List<TruckEntity> trucks = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, false, false);
+                if (!trucks.isEmpty()) return true;
+                Map<String, String> updatedTruckNumber = mainController.showTruckNotFoundPopupWithSelectionSafe(truckNumber, getNotFinishedTrucks());
+                if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
+                    isWaiting = false;
                     return false;
                 }
-                TruckEntity truckToUpdate = list.get(0);
-                truckToUpdate.setOriginalTruckNumber(truckToUpdate.getTruckNumber());
-                truckToUpdate.setTruckNumber(editedTruckNumber); // Update the truck number
-                truckRepository.save(truckToUpdate); // Save the updated truck
-                tableController.loadDataNow();
+                String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
+                String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
+
+                if (!selectedTruckNumber.equals(editedTruckNumber)) {
+                    List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(selectedTruckNumber, false, false);
+                    if (list.isEmpty()) {
+                        mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", selectedTruckNumber + " raqam topilmadi");
+                        isWaiting = false;
+                        return false;
+                    }
+                    TruckEntity truckToUpdate = list.get(0);
+                    truckToUpdate.setOriginalTruckNumber(truckToUpdate.getTruckNumber());
+                    truckToUpdate.setTruckNumber(editedTruckNumber); // Update the truck number
+                    truckRepository.save(truckToUpdate); // Save the updated truck
+                    tableController.loadDataNow();
+                    isWaiting = false;
+                }
+
+                // Use the edited truck number for the following checks
+                truckNumber = editedTruckNumber; // Update the truck number to the new one
+                return true;
             }
 
-            // Use the edited truck number for the following checks
-            truckNumber = editedTruckNumber; // Update the truck number to the new one
 
-        }
+        //}
         List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE), false, false);
         if (list.isEmpty()) {
             mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!");
+            isWaiting = false;
             return false;
         }
 
@@ -527,8 +538,77 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         if (!b) {
             mainController.showAlert(Alert.AlertType.INFORMATION, "Info", nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
         }
+        isWaiting = b;
         return b;
     }
+
+
+
+/*
+    public boolean isEntranceAvailableForCamera2(String truckNumber) {
+        if (!truckRepository.existsByIsFinishedFalseAndIsDeletedFalse()) {
+            Platform.runLater(() -> mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Hamma moshinalar chiqib ketgan!"));
+            return false;
+        }
+
+
+        final Map<String, String>[] updatedTruckNumberHolder = new Map[1];
+        Platform.runLater(() -> {
+            updatedTruckNumberHolder[0] = mainController.showTruckNotFoundPopupWithSelection(truckNumber, getNotFinishedTrucks());
+        });
+
+        // Wait for Platform.runLater() to complete
+        while (updatedTruckNumberHolder[0] == null) {
+            try {
+                Thread.sleep(50); // Small delay to prevent tight looping
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+
+        Map<String, String> updatedTruckNumber = updatedTruckNumberHolder[0];
+        if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
+            return false;
+        }
+
+        String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
+        String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
+
+        if (!selectedTruckNumber.equals(editedTruckNumber)) {
+            List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(selectedTruckNumber, false, false);
+            if (list.isEmpty()) {
+                Platform.runLater(() -> mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", selectedTruckNumber + " raqam topilmadi"));
+                return false;
+            }
+
+            TruckEntity truckToUpdate = list.get(0);
+            truckToUpdate.setOriginalTruckNumber(truckToUpdate.getTruckNumber());
+            truckToUpdate.setTruckNumber(editedTruckNumber);
+            truckRepository.save(truckToUpdate);
+            Platform.runLater(() -> tableController.loadDataNow());
+        }
+
+        truckNumber = editedTruckNumber;
+
+        List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE), false, false);
+        if (list.isEmpty()) {
+            Platform.runLater(() -> mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!"));
+            return false;
+        }
+
+        TruckEntity truckEntity = list.get(0);
+        Instances.truckNumber = truckNumber;
+
+        LocalDateTime nextEntranceTime = truckEntity.getNextEntranceTime();
+        boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
+        if (!b) {
+            Platform.runLater(() -> mainController.showAlert(Alert.AlertType.INFORMATION, "Info", nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!"));
+        }
+        return b;
+    }
+*/
+
 
     public boolean isStandard(String truckNumber) {
         return regexChecker(truckNumber, regexStandard);

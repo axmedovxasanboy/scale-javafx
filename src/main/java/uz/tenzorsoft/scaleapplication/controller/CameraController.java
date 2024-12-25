@@ -63,7 +63,7 @@ public class CameraController implements BaseController {
             System.out.println("Camera id: " + cameraId);
             System.out.println("multipartRequest.getFileMap().size() = " + multipartRequest.getFileMap().size());
 
-            if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || currentUser.getId() == null /*|| !isConnected*/) {
+            if (multipartRequest.getFileMap().size() < 3 || truckPosition != -1 || currentUser.getId() == null /*|| !isConnected*/ || isWaiting) {
                 return ResponseEntity.ok("NOT_MATCH");
             }
             AttachResponse attachResponse = new AttachResponse();
