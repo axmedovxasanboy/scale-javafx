@@ -99,17 +99,17 @@ public class TestController implements BaseController {
         boolean enableSensors = isTesting;
 
         // Enable or disable sensor switches based on "Test" switch
-        sensor1Switch.setDisable(!enableSensors);
-        sensor2Switch.setDisable(!enableSensors);
-        sensor3Switch.setDisable(!enableSensors);
+//        sensor1Switch.setDisable(!enableSensors);
+//        sensor2Switch.setDisable(!enableSensors);
+//        sensor3Switch.setDisable(!enableSensors);
         weighInputField.setDisable(!enableSensors);
 
         // Set switch state depending on test mode
         if (isTesting) {
             // Turn on sensors automatically if "Test" is on
-            sensor1Switch.setSelected(true);
-            sensor2Switch.setSelected(true);
-            sensor3Switch.setSelected(true);
+//            sensor1Switch.setSelected(true);
+//            sensor2Switch.setSelected(true);
+//            sensor3Switch.setSelected(true);
             truckNumberFieldCamera1.setDisable(false);
             truckNumberFieldCamera2.setDisable(false);
             truckPositionField.setDisable(false);
@@ -118,9 +118,9 @@ public class TestController implements BaseController {
             weighButton.setDisable(false);
         } else {
             // Turn off all switches if "Test" is off
-            sensor1Switch.setSelected(false);
-            sensor2Switch.setSelected(false);
-            sensor3Switch.setSelected(false);
+//            sensor1Switch.setSelected(false);
+//            sensor2Switch.setSelected(false);
+//            sensor3Switch.setSelected(false);
             gate1Switch.setSelected(false);
             gate2Switch.setSelected(false);
             truckPositionField.setText(""); // Clear truck position
@@ -200,21 +200,21 @@ public class TestController implements BaseController {
     }
 
     public void setSensor1StatusLabel() {
-        if (isTesting) {
+        if (isTesting || true) {
             sensor1Switch.setSelected(!sensor1Switch.isSelected());
             sensor1Connection = sensor1Switch.isSelected();
         }
     }
 
     public void setSensor2StatusLabel() {
-        if (isTesting) {
+        if (isTesting || true) {
             sensor2Switch.setSelected(!sensor2Switch.isSelected());
             sensor2Connection = sensor2Switch.isSelected();
         }
     }
 
     public void setSensor3StatusLabel() {
-        if (isTesting) {
+        if (isTesting || true) {
             sensor3Switch.setSelected(!sensor3Switch.isSelected());
             sensor3Connection = sensor3Switch.isSelected();
         }

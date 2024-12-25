@@ -32,9 +32,7 @@ public class TableService {
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
             if (action.getActionStatus() != null && action.getActionStatus() != ActionStatus.COMPLETE) continue;
-            if (truckEntity.getId() == 363 || truckEntity.getId() == 364 || truckEntity.getId() == 365){
-                System.out.println("363,364,365");
-            }
+
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
                     data.setEnteredTruckNumber(truckEntity.getTruckNumber());
