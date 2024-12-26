@@ -170,7 +170,7 @@ public class TableController implements BaseController {
 
     private void openEditPopup(TruckEntity truck) {
         Dialog<Void> dialog = new Dialog<>();
-        dialog.setTitle("Edit Truck Information");
+        dialog.setTitle("Moshina raqamini o'zgartirish");
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -178,9 +178,9 @@ public class TableController implements BaseController {
         grid.setPadding(new Insets(20, 150, 10, 10));
 
         TextField truckNumberField = new TextField(truck.getTruckNumber());
-        truckNumberField.setPromptText("Truck Number");
+        truckNumberField.setPromptText("Moshina raqami");
 
-        grid.add(new Label("Truck Number:"), 0, 0);
+        grid.add(new Label("Moshina raqami:"), 0, 0);
         grid.add(truckNumberField, 1, 0);
 
         dialog.getDialogPane().setContent(grid);
