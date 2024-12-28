@@ -31,9 +31,9 @@ public class TableService {
         if (truckEntity.getTruckActions() == null || truckEntity.getTruckActions().isEmpty()) return null;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
-            if (action.getActionStatus() == null && action.getWeight() == 0) continue;
+            if (action.getActionStatus() != ActionStatus.COMPLETE && action.getWeight() == 0) continue;
 
-            if (action.getActionStatus() != ActionStatus.COMPLETE) continue;
+//            if (action.getActionStatus() != ActionStatus.COMPLETE) continue;
 
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
