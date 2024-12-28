@@ -126,7 +126,7 @@ public class TruckScalingController {
                                         log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                                         currentTruck.setEnteredAt(LocalDateTime.now());
                                         currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+                                        //truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
                                         truckService.saveTruckEnteredActions(currentTruck);
                                     }
                                     // Save status as COMPLETE
@@ -251,8 +251,7 @@ public class TruckScalingController {
                                         isTruckExited = true;
                                         currentTruck.setExitConfirmedBy(currentUser.getPhoneNumber());
                                         truckService.saveTruckExitedAction(currentTruck);
-                                        truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
-                                        truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
+                                        //truckService.saveTruckStatus(currentTruck.getExitedStatus(), ActionStatus.COMPLETE);
                                         TruckEntity truck = null;
                                         try {
                                             truck = truckService.saveCurrentTruck(currentTruck, true);
@@ -353,6 +352,7 @@ public class TruckScalingController {
         isCargoPhotoTaken = false;
         isCargoConfirmationDialogOpened = false;
         isTimeoutChanged = false;
+        isWaiting = false;
         weigh = 0.0;
     }
 

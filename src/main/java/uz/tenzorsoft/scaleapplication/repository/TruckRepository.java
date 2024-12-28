@@ -58,7 +58,7 @@ public interface TruckRepository extends JpaRepository<TruckEntity, Long> {
             "AND t.isDeleted = :isDeleted " +
             "AND ta.actionStatus = 'COMPLETE' " +
             "AND ta.action IN :truckActions " +
-            "ORDER BY t.nextEntranceTime DESC")
+            "ORDER BY t.createdAt DESC")
     List<TruckEntity> findByTruckNumberAndActionStatus(
             String truckNumber,
             List<TruckAction> truckActions,

@@ -6,6 +6,8 @@ import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -35,13 +37,12 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static uz.tenzorsoft.scaleapplication.domain.Instances.isWaiting;
-
 @Service
 @RequiredArgsConstructor
 public class TruckService implements BaseService<TruckEntity, TruckResponse, TruckRequest> {
 
 
+    private static final Logger log = LoggerFactory.getLogger(TruckService.class);
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
     private final TruckPhotoRepository truckPhotoRepository;
@@ -290,7 +291,14 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false).orElse(null);
 //            if (currentTruckEntity == null)
 //                throw new RuntimeException("Truck not found with truck number: " + currentTruck.getTruckNumber());
-            currentTruckEntity = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAt(currentTruck.getTruckNumber(), false, false).get(0);
+            List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(
+                    currentTruck.getTruckNumber(), List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                    false, false);
+            if (list.isEmpty()) {
+                log.error("unable to find trucks with number: {}", currentTruck.getTruckNumber());
+                return;
+            }
+            currentTruckEntity = list.get(0);
             currentTruckEntity.getTruckPhotos().removeIf(photo -> photo.getAttachStatus() == AttachStatus.EXIT_PHOTO);
             List<TruckPhotosEntity> truckPhotos = new ArrayList<>();
             TruckPhotosEntity entity = truckPhotoRepository.save(
@@ -364,6 +372,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 action.setOnDuty(Instances.currentUser);
                 action.setActionStatus(ActionStatus.COMPLETE);
                 truckActionRepository.save(action);
+                break;
             }
         }
         currentTruckEntity.setIsSentToCloud(false);
@@ -380,16 +389,17 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                 action.setOnDuty(Instances.currentUser);
                 action.setActionStatus(ActionStatus.COMPLETE);
                 truckActionRepository.save(action);
+                break;
             }
         }
         currentTruckEntity.setIsSentToCloud(false);
-        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(1));
+        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
     }
 
     public void saveTruckStatus(TruckAction currentTruckAction, ActionStatus status) {
         for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
-            if(action.getAction() == currentTruckAction) {
+            if (action.getAction() == currentTruckAction) {
                 action.setActionStatus(status);
                 truckActionRepository.save(action);
                 break;
@@ -430,7 +440,18 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     }
 
     public List<String> getNotFinishedTrucks() {
-        return truckRepository.findByIsFinishedAndIsDeleted(false, false).stream().map(TruckEntity::getTruckNumber).toList();
+        List<TruckEntity> trucks = truckRepository.findByIsFinishedAndIsDeleted(false, false);
+        List<String> result = new ArrayList<>();
+        for (TruckEntity truck : trucks) {
+            for (TruckActionEntity action : truck.getTruckActions()) {
+                if ((action.getAction() == TruckAction.ENTRANCE ||
+                        action.getAction() == TruckAction.MANUAL_ENTRANCE) &&
+                        (action.getActionStatus() == null || action.getActionStatus() == ActionStatus.COMPLETE)) {
+                    result.add(truck.getTruckNumber());
+                }
+            }
+        }
+        return result;
     }
 
     public boolean isEntranceAvailableForCamera1(String truckNumber) {
@@ -441,10 +462,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         // Check if the truck is currently in the system and not yet finished
         List<TruckEntity> ongoingTrucks = truckRepository.findByTruckNumberAndActionStatus(
-                truckNumber,
-                List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
-                false, // isFinished = false (not finished)
-                false  // isDeleted = false (not deleted)
+                truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                false,
+                false
         );
 
         if (!ongoingTrucks.isEmpty()) {
@@ -454,10 +474,9 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
         // Fetch the most recent truck action to verify re-entry time
         List<TruckEntity> completedTrucks = truckRepository.findByTruckNumberAndActionStatus(
-                truckNumber,
-                List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
-                true,  // isFinished = true (completed)
-                false  // isDeleted = false
+                truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                true,
+                false
         );
 
         if (!completedTrucks.isEmpty()) {
@@ -468,10 +487,8 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
             }
         }
 
-        // Truck is allowed to enter
         return true;
     }
-
 
 
     private boolean isTruckNumberExists(String truckNumber) {
@@ -485,61 +502,58 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 
     public boolean isEntranceAvailableForCamera2(String truckNumber) {
         //if (!isTruckNumberExists(truckNumber)) {
-            if (!truckRepository.existsByIsFinishedFalseAndIsDeletedFalse()) {
-                mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Hamma moshinalar chiqib ketgan!");
-                return false;
-            }
-
-            if (isTruckNumberExists(truckNumber)) {
-                List<TruckEntity> trucks = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(truckNumber, false, false);
-                if (!trucks.isEmpty()) return true;
-                Map<String, String> updatedTruckNumber = mainController.showTruckNotFoundPopupWithSelectionSafe(truckNumber, getNotFinishedTrucks());
-                if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
-                    isWaiting = false;
-                    return false;
-                }
-                String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
-                String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
-
-                if (!selectedTruckNumber.equals(editedTruckNumber)) {
-                    List<TruckEntity> list = truckRepository.findByTruckNumberAndIsFinishedAndIsDeletedOrderByCreatedAtDesc(selectedTruckNumber, false, false);
-                    if (list.isEmpty()) {
-                        mainController.showAlert(Alert.AlertType.ERROR, "Xatolik", selectedTruckNumber + " raqam topilmadi");
-                        isWaiting = false;
-                        return false;
-                    }
-                    TruckEntity truckToUpdate = list.get(0);
-                    truckToUpdate.setOriginalTruckNumber(truckToUpdate.getTruckNumber());
-                    truckToUpdate.setTruckNumber(editedTruckNumber); // Update the truck number
-                    truckRepository.save(truckToUpdate); // Save the updated truck
-                    tableController.loadDataNow();
-                    isWaiting = false;
-                }
-
-                // Use the edited truck number for the following checks
-                truckNumber = editedTruckNumber; // Update the truck number to the new one
-                return true;
-            }
-
-
-        //}
-        List<TruckEntity> list = truckRepository.findByTruckNumberAndActionStatus(truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE), false, false);
-        if (list.isEmpty()) {
-            mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Bu moshina kirmagan (tarasi yo'q)!");
-            isWaiting = false;
+        if (!truckRepository.existsByIsFinishedFalseAndIsDeletedFalse()) {
+            mainController.showAlert(Alert.AlertType.WARNING, "Xatolik", "Hamma moshinalar chiqib ketgan!");
             return false;
         }
 
-        TruckEntity truckEntity = list.get(0);
+        //if (isTruckNumberExists(truckNumber)) {
+        List<TruckEntity> trucks = truckRepository.findByTruckNumberAndActionStatus(
+                truckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                false, false
+        );
+        if (trucks.isEmpty()) {
+            Map<String, String> updatedTruckNumber = mainController.showTruckNotFoundPopupWithSelectionSafe(truckNumber, getNotFinishedTrucks());
+            if (updatedTruckNumber == null || updatedTruckNumber.isEmpty()) {
+                return false;
+            }
 
-        Instances.truckNumber = truckNumber;
-        LocalDateTime nextEntranceTime = truckEntity.getNextEntranceTime();
-        boolean b = nextEntranceTime.isBefore(LocalDateTime.now());
-        if (!b) {
-            mainController.showAlert(Alert.AlertType.INFORMATION, "Info", nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
+            String editedTruckNumber = updatedTruckNumber.get("textFieldValue");
+            String selectedTruckNumber = updatedTruckNumber.get("dropDownValue");
+
+            TruckEntity truckToUpdate = truckRepository.findByTruckNumberAndActionStatus(
+                    selectedTruckNumber, List.of(TruckAction.ENTRANCE, TruckAction.MANUAL_ENTRANCE),
+                    false, false
+            ).get(0);
+
+            if (!selectedTruckNumber.equals(editedTruckNumber)) {
+                truckToUpdate.setTruckNumber(editedTruckNumber);
+                truckToUpdate.setOriginalTruckNumber(selectedTruckNumber);
+                truckRepository.save(truckToUpdate);
+                tableController.loadDataNow();
+            }
+
+            if (truckToUpdate.getNextEntranceTime().isAfter(LocalDateTime.now())) {
+                LocalDateTime nextEntranceTime = truckToUpdate.getNextEntranceTime();
+                mainController.showAlert(Alert.AlertType.INFORMATION, "Info",
+                        nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
+                return false;
+            }
+
+            Instances.truckNumber = truckToUpdate.getTruckNumber();
+            return true;
         }
-        isWaiting = b;
-        return b;
+
+        TruckEntity truckEntity = trucks.get(0);
+
+        Instances.truckNumber = truckEntity.getTruckNumber();
+        LocalDateTime nextEntranceTime = truckEntity.getNextEntranceTime();
+        boolean canEnter = nextEntranceTime.isBefore(LocalDateTime.now());
+        if (!canEnter) {
+            mainController.showAlert(Alert.AlertType.INFORMATION, "Info",
+                    nextEntranceTime.getHour() + ":" + nextEntranceTime.getMinute() + ":" + nextEntranceTime.getSecond() + " dan keyin kirishi mumkin!");
+        }
+        return canEnter;
     }
 
 
@@ -608,11 +622,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
         return b;
     }
 */
-
-
-    public boolean isStandard(String truckNumber) {
-        return regexChecker(truckNumber, regexStandard);
-    }
 
     private boolean regexChecker(String str, String regex) {
         if (str == null) return false;

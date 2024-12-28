@@ -84,11 +84,12 @@ public class CameraController implements BaseController {
                         if (fileName.equals("anpr.xml")) {
                             truckNumber = extractNumberFromXmlFile(file);
                             System.out.println("truckNumber = " + truckNumber);
-                            if (truckNumber == null) {
+                            if (truckNumber == null || truckNumber.equals("unknown")) {
                                 showAlert(Alert.AlertType.ERROR, "Xatolik", "Moshina raqami aniqlanmadi");
                                 return ResponseEntity.ok("NOT_MATCH");
                             }
                             if (!truckNumber.isEmpty()) {
+                                isWaiting = true;
 //                                if (!truckService.isValidTruckNumber(truckNumber)) {
 //                                    log.warn("Truck number does not match: {}", truckNumber);
 //                                    truckNumber = "";
@@ -98,6 +99,7 @@ public class CameraController implements BaseController {
                                     if (!truckService.isEntranceAvailableForCamera1(truckNumber)) {
                                         logService.save(new LogEntity(5L, truckNumber, "00001: (CameraController) Chiqishi topilmadi" + truckNumber));
                                         System.err.println("Chiqishi topilmadi" + truckNumber);
+                                        isWaiting = false;
                                         // showAlert(Alert.AlertType.ERROR, "Error", "Chiqishi topilmadi: "+truckNumber);
                                         return ResponseEntity.ok("Entrance exception");
                                     }
@@ -106,16 +108,18 @@ public class CameraController implements BaseController {
                                         logService.save(new LogEntity(5L, truckNumber, "00002: (CameraController) Kirishi topilmadi" + truckNumber));
                                         // showAlert(Alert.AlertType.ERROR, "Error", "Kirishi topilmadi: "+truckNumber);
                                         System.err.println("Kirishi topilmadi" + truckNumber);
+                                        isWaiting = false;
                                         return ResponseEntity.ok("Entrance exception");
                                     }
                                 }
+                                isWaiting = false;
                             }
-
                         }
                     } catch (Exception e) {
                         logService.save(new LogEntity(5L, truckNumber, "00003: (" + getClass().getName() + ") " + e.getMessage()));
                         showAlert(Alert.AlertType.ERROR, "ANPR Exception", e.getMessage());
                         System.out.println("ANPR Exception" + e.getMessage());
+                        isWaiting = false;
                         return ResponseEntity.ok("Entrance exception");
                     }
                     try {
@@ -125,7 +129,7 @@ public class CameraController implements BaseController {
                             if (attachResponse == null) {
                                 logService.save(new LogEntity(5L, truckNumber, "00004: (CameraController) Unable to save file"));
                                 log.warn("See logs for error cause. Unable to save file: {}", fileName);
-                                showAlert(Alert.AlertType.ERROR, "Error", "Unable to save file");
+                                showAlert(Alert.AlertType.ERROR, "Xatolik", "Rasmni saqlashda xatolik");
                                 return ResponseEntity.ok("Unable to save file");
                             }
                             if (cameraId == 1) {
