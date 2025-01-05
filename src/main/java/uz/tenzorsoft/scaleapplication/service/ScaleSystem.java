@@ -11,6 +11,20 @@ import java.net.InetAddress;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.SCALE_PORT;
 
 public class ScaleSystem {
+    /*--------------------------------------------------------------
+                            Raspberry pins
+    --------------------------------------------------------------*/
+    public static final Integer RASP_GREEN_LIGHT_1 = 21;
+    public static final Integer RASP_GREEN_LIGHT_2 = 20;
+    public static final Integer RASP_OPEN_GATE_1 = 23;
+    public static final Integer RASP_CLOSE_GATE_1 = 24;
+    public static final Integer RASP_OPEN_GATE_2 = 25;
+    public static final Integer RASP_CLOSE_GATE_2 = 12;
+    public static final Integer RASP_SENSOR_1 = 17;
+    public static final Integer RASP_SENSOR_2 = 27;
+    public static final Integer RASP_SENSOR_3 = 22;
+    /*--------------------------------------------------------------*/
+
     public static final Integer COIL_GREEN_LIGHT_1 = 0;
     public static final Integer COIL_RED_LIGHT_2 = 0;
     public static final Integer COIL_GREEN_LIGHT_2 = 1;

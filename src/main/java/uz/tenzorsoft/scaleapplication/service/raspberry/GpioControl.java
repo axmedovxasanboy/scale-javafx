@@ -1,0 +1,116 @@
+package uz.tenzorsoft.scaleapplication.service.raspberry;
+
+import com.pi4j.Pi4J;
+import com.pi4j.plugin.gpiod.provider.gpio.digital.GpioDDigitalOutputProvider;
+import com.pi4j.plugin.gpiod.provider.gpio.digital.GpioDDigitalInputProvider;
+import com.pi4j.context.Context;
+import com.pi4j.io.gpio.digital.*;
+import com.pi4j.platform.Platform;
+import org.springframework.stereotype.Service;
+import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.PinState;
+import uz.tenzorsoft.scaleapplication.service.LogService;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
+
+@Service
+public class GpioControl {
+
+    private static final int[] CONTROL_PINS = {21, 20, 26, 19};
+    private static final int[] SVETOFOR_PINS = {21, 20};
+    private static final int[] SHLAGBAUM_PINS = {23, 24, 25, 12};
+    private static final int[] STATUS_PINS = {17, 27, 22};
+
+    private static final Map<Integer, DigitalOutput> outputPins = new HashMap<>();
+    private static final Map<Integer, DigitalInput> inputPins = new HashMap<>();
+    private final LogService logService;
+
+    public GpioControl(LogService logService) {
+        Context pi4jOut = Pi4J.newContextBuilder()
+                .add(GpioDDigitalOutputProvider.newInstance())
+                .build();
+
+        Context pi4jIn = Pi4J.newContextBuilder()
+                .add(GpioDDigitalInputProvider.newInstance())
+                .build();
+        Platform platform = pi4jOut.platform();
+        System.out.println("Platform: " + (platform != null ? platform.name() : "Not Initialized"));
+
+        controlPinsInitialization(pi4jOut);
+        statusPinsInitialization(pi4jIn);
+        setStatusListeners();
+        this.logService = logService;
+    }
+
+    private void setStatusListeners() {
+        Map<Integer, Consumer<Boolean>> pinToSensorMap = Map.of(
+                17, (status) -> sensor1Connection = status,
+                22, (status) -> sensor2Connection = status,
+                27, (status) -> sensor3Connection = status
+        );
+
+        for (int pin : STATUS_PINS) {
+            DigitalInput input = inputPins.get(pin);
+            if (input != null && pinToSensorMap.containsKey(pin)) {
+                Consumer<Boolean> sensorUpdater = pinToSensorMap.get(pin);
+                input.addListener((event) -> {
+                    boolean isHigh = event.state().isHigh();
+                    sensorUpdater.accept(isHigh);
+                });
+            }
+        }
+    }
+
+    public boolean controlPin(int pin, PinState state) {
+        if (!outputPins.containsKey(pin)) {
+            throw new RuntimeException("Pin number not found");
+        }
+        DigitalOutput output = outputPins.get(pin);
+        if (state == PinState.HIGH) {
+            output.high();
+            return true;
+        } else if (state == PinState.LOW) {
+            output.low();
+            return true;
+        }
+        return false;
+    }
+
+    private void statusPinsInitialization(Context pi4jIn) {
+        for (int pinAddress : STATUS_PINS) {
+            try {
+                DigitalInputConfigBuilder config = DigitalInput.newConfigBuilder(pi4jIn)
+                        .id("pin-" + pinAddress)
+                        .name("Status Pin " + pinAddress)
+                        .address(pinAddress)
+                        .pull(PullResistance.PULL_DOWN);
+                inputPins.put(pinAddress, pi4jIn.create(config));
+            } catch (Exception e) {
+                logService.save(new LogEntity(5L, "", e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void controlPinsInitialization(Context pi4jOut) {
+        for (int pinAddress : CONTROL_PINS) {
+            try {
+                DigitalOutputConfigBuilder config = DigitalOutput.newConfigBuilder(pi4jOut)
+                        .id("pin-" + pinAddress)
+                        .name("Control Pin " + pinAddress)
+                        .address(pinAddress)
+                        .shutdown(DigitalState.LOW)
+                        .initial(DigitalState.LOW);
+                outputPins.put(pinAddress, pi4jOut.create(config));
+            } catch (Exception e) {
+                logService.save(new LogEntity(5L, "", e.getMessage()));
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
