@@ -1,9 +1,6 @@
 package uz.tenzorsoft.scaleapplication.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -11,6 +8,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 public class Configurations implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,4 +30,6 @@ public class Configurations implements Serializable {
     private String camera1;
     private String camera2;
     private String camera3;
+
+    private Integer raspberryUsing = 0;
 }

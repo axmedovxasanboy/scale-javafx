@@ -43,7 +43,7 @@ public class ConnectionsController implements BaseController {
         executors.execute(() -> {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    if (!isTesting) {
+                    if (!isTesting && !isRaspberryUsing) {
                         gate1Connection = controllerService.checkConnection(COIL_CLOSE_GATE_1);
                         gate2Connection = controllerService.checkConnection(COIL_CLOSE_GATE_2);
                         sensor1Connection = controllerService.checkConnection(COIL_SENSOR_1);
@@ -70,11 +70,11 @@ public class ConnectionsController implements BaseController {
 
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
-                    showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+                    //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00030: (" + getClass().getName() + ") " +e.getMessage()));
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00031: (" + getClass().getName() + ") " +e.getMessage()));
-                    showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                    //showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
                 }
             }
         });

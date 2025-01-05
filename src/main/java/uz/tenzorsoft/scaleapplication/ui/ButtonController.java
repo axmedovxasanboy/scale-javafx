@@ -23,6 +23,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.CheckCommandsDto;
 import uz.tenzorsoft.scaleapplication.service.*;
+import uz.tenzorsoft.scaleapplication.service.raspberry.RaspberryService;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.util.regex.Matcher;
@@ -49,11 +50,7 @@ public class ButtonController implements BaseController {
     @Lazy
     private TableController tableController;
     @Autowired
-    @Lazy
-    private TruckScalingController truckScalingController;
-
-    @FXML
-    private ImageView gate1, gate2;
+    private RaspberryService raspberryService;
 
     @FXML
     private Button button1, button2, button4, button5;
@@ -80,29 +77,40 @@ public class ButtonController implements BaseController {
     public boolean openGate1() {
         try {
             if (!isTesting) {
-                controllerService.openGate1();
+                if (isRaspberryUsing) {
+                    raspberryService.openGate1();
+                } else controllerService.openGate1();
+                gate1Connection = false;
                 commandComment = "Finished";
             }
-        } catch (ModbusException e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " +e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+            logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " + e.getMessage()));
+            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
     }
 
     public boolean openGate1(int truckPosition) {
         try {
-            if (!isTesting) return controllerService.openGate1(truckPosition);
-            else {
+            if (!isTesting) {
+                if (isRaspberryUsing) {
+                    boolean b = raspberryService.openGate1(truckPosition);
+                    if (b) gate1Connection = false;
+                    return b;
+                }
+                boolean b = controllerService.openGate1(truckPosition);
+                if (b) gate1Connection = false;
+                return b;
+            } else {
                 ScaleSystem.truckPosition = truckPosition;
                 gate1Connection = true;
                 return true;
             }
-        } catch (ModbusException e) {
+        } catch (Exception e) {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber, "00018: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00018: (" + getClass().getName() + ") " + e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
@@ -111,7 +119,7 @@ public class ButtonController implements BaseController {
     public boolean openGate1Manually() {
         try {
             if (!isConnected) {
-                showAlert(Alert.AlertType.ERROR, "Error","Controllerga ulanmagan");
+                showAlert(Alert.AlertType.ERROR, "Error", "Controllerga ulanmagan");
                 return false;
             }
             isWaiting = true;
@@ -148,21 +156,85 @@ public class ButtonController implements BaseController {
         return false;
     }
 
+    public boolean closeGate1() {
+        try {
+            if (!isTesting) {
+                if (isRaspberryUsing) {
+                    raspberryService.closeGate1();
+                } else controllerService.closeGate1();
+                commandComment = "Finished";
+                gate1Connection = true;
+            }
+        } catch (Exception e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
+            logService.save(new LogEntity(5L, truckNumber, "00024: (" + getClass().getName() + ") " + e.getMessage()));
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean openGate2() {
+        try {
+            if (!isTesting) {
+                if (isRaspberryUsing) {
+                    boolean b = raspberryService.closeGate2();
+                    if (b) gate2Connection = false;
+                    return b;
+                }
+                boolean b = controllerService.openGate2();
+                if (b) gate2Connection = false;
+                return b;
+            }
+        } catch (Exception e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
+            logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " + e.getMessage()));
+            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean openGate2(int truckPosition) {
+        try {
+            if (!isTesting) {
+                if (isRaspberryUsing) {
+                    boolean b = raspberryService.openGate2(truckPosition);
+                    if (b) gate2Connection = false;
+                    return b;
+                }
+                boolean b = controllerService.openGate2(truckPosition);
+                if (b) gate2Connection = false;
+                return b;
+            } else {
+                ScaleSystem.truckPosition = truckPosition;
+                gate2Connection = true;
+                return true;
+            }
+        } catch (Exception e) {
+            commandComment = e.getMessage();
+            System.err.println(e.getMessage());
+            logService.save(new LogEntity(5L, truckNumber, "00026: (" + getClass().getName() + ") " + e.getMessage()));
+            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+        }
+        return false;
+    }
+
     public boolean openGate2Manually() {
         try {
             if (!isConnected) {
-                showAlert(Alert.AlertType.ERROR, "Xatolik","Controllerga ulanmagan");
+                showAlert(Alert.AlertType.ERROR, "Xatolik", "Controllerga ulanmagan");
                 return false;
             }
             isWaiting = true;
             String truckNumber = showNotFinishedTrucksDialog(truckService.getNotFinishedTrucks());
             if (!truckNumber.isEmpty()) {
                 if (!truckService.isNotFinishedTrucksExists()) {
-                    logService.save(new LogEntity(5L, truckNumber, "00021: (" + getClass().getName() + ") " +"All trucks are exited!"));
+                    logService.save(new LogEntity(5L, truckNumber, "00021: (" + getClass().getName() + ") " + "All trucks are exited!"));
                     return false;
                 }
                 if (!truckService.isEntranceAvailableForCamera2(truckNumber)) {
-                    logService.save(new LogEntity(5L, truckNumber, "00022: (" + getClass().getName() + ") " +"Entrance not available"));
+                    logService.save(new LogEntity(5L, truckNumber, "00022: (" + getClass().getName() + ") " + "Entrance not available"));
                     return false;
                 }
                 currentTruck.setTruckNumber(truckNumber);
@@ -175,83 +247,50 @@ public class ButtonController implements BaseController {
                 return true;
             }
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, "00023: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00023: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
         }
         isWaiting = false;
         return false;
     }
 
-    public boolean closeGate1() {
-        try {
-            if (!isTesting) {
-                controllerService.closeGate1();
-                commandComment = "Finished";
-            }
-        } catch (ModbusException e) {
-            commandComment = e.getMessage();
-            System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber,"00024: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
-        }
-        return false;
-    }
-
-    public boolean openGate2() {
-        try {
-            if (!isTesting)  return controllerService.openGate2();
-        } catch (ModbusException e) {
-            commandComment = e.getMessage();
-            System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " +e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
-        }
-        return false;
-    }
-
-    public boolean openGate2(int truckPosition) {
-        try {
-            if (!isTesting) return controllerService.openGate2(truckPosition);
-            else {
-                ScaleSystem.truckPosition = truckPosition;
-                gate2Connection = true;
-                return true;
-            }
-        } catch (ModbusException e) {
-            commandComment = e.getMessage();
-            System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber,"00026: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
-        }
-        return false;
-    }
-
     public boolean closeGate2() {
         try {
             if (!isTesting) {
-                controllerService.closeGate2();
+                if (isRaspberryUsing) {
+                    raspberryService.closeGate2();
+                } else controllerService.closeGate2();
                 commandComment = "Finished";
+                gate2Connection = true;
             }
         } catch (ModbusException e) {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber,"00027: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            logService.save(new LogEntity(5L, truckNumber, "00027: (" + getClass().getName() + ") " + e.getMessage()));
+            //showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
         return false;
     }
 
     public void connect() {
         try {
+            if (isRaspberryUsing) {
+                isConnected = true;
+                return;
+            }
             controllerService.connect();
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, truckNumber, "00028: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, truckNumber, "00028: (" + getClass().getName() + ") " + e.getMessage()));
             showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
 
     }
 
     public void disconnect() {
+        if (isRaspberryUsing) {
+            isConnected = false;
+            return;
+        }
         controllerService.disconnect();
     }
 
@@ -259,20 +298,20 @@ public class ButtonController implements BaseController {
         if (commands.getOpenGate1()) {
             openGate1();
             sendCommandStatus(commands.getServerId(), commandComment);
-        }else if (commands.getOpenGate2()) {
+        } else if (commands.getOpenGate2()) {
             openGate2();
             sendCommandStatus(commands.getServerId(), commandComment);
         } else if (commands.getCloseGate1()) {
             closeGate1();
             sendCommandStatus(commands.getServerId(), commandComment);
-        }else if (commands.getCloseGate2()) {
+        } else if (commands.getCloseGate2()) {
             closeGate2();
             sendCommandStatus(commands.getServerId(), commandComment);
-        }else if(commands.getWeighing()){
+        } else if (commands.getWeighing()) {
             getTruckWeigh();
             sendCommandStatus(commands.getServerId(), commandComment);
         }
-            commandComment = "";
+        commandComment = "";
     }
 
     private void sendCommandStatus(long commandId, String commandComment) {

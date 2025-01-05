@@ -24,6 +24,7 @@ public class Settings {
     public static String CAMERA_1;
     public static String CAMERA_2;
     public static String CAMERA_3;
+    public static boolean IS_RASPBERRY_USING;
 
     private SerialPort serialPort;
 

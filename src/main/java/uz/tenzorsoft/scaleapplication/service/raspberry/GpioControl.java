@@ -27,9 +27,10 @@ public class GpioControl {
 
     private static final Map<Integer, DigitalOutput> outputPins = new HashMap<>();
     private static final Map<Integer, DigitalInput> inputPins = new HashMap<>();
-    private final LogService logService;
+    private LogService logService;
 
     public GpioControl(LogService logService) {
+        this.logService = logService;
         Context pi4jOut = Pi4J.newContextBuilder()
                 .add(GpioDDigitalOutputProvider.newInstance())
                 .build();
@@ -43,7 +44,6 @@ public class GpioControl {
         controlPinsInitialization(pi4jOut);
         statusPinsInitialization(pi4jIn);
         setStatusListeners();
-        this.logService = logService;
     }
 
     private void setStatusListeners() {

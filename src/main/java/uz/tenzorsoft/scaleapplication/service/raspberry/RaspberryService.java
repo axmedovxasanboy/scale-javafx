@@ -4,7 +4,13 @@ import com.ghgande.j2mod.modbus.ModbusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.PinState;
+import uz.tenzorsoft.scaleapplication.service.ScaleSystem;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static uz.tenzorsoft.scaleapplication.domain.Instances.gate1Connection;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.isConnected;
 import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
 
@@ -14,14 +20,81 @@ public class RaspberryService {
 
     private final GpioControl gpioControl;
 
-    public boolean openGate1() throws RuntimeException, InterruptedException {
+    public boolean openGate1() {
         if (!isConnected) {
-            throw new RuntimeException("Not connected to controller");
+            throw new RuntimeException("Not connected to raspberry");
         }
+
         sendCommand(RASP_GREEN_LIGHT_1, PinState.HIGH);
         sendCommand(RASP_OPEN_GATE_1, PinState.HIGH);
-        Thread.sleep(500);
-        sendCommand(RASP_OPEN_GATE_1, PinState.LOW);
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> {
+            sendCommand(RASP_OPEN_GATE_1, PinState.LOW);
+            scheduler.shutdown();
+        }, 500, TimeUnit.MILLISECONDS);
+
+        return true;
+    }
+
+    public boolean openGate1(int truckPosition) throws RuntimeException {
+        if (!isConnected) {
+            throw new RuntimeException("Controllerga ulanmagan");
+        }
+        ScaleSystem.truckPosition = truckPosition;
+        return openGate1();
+    }
+
+    public boolean closeGate1() throws RuntimeException {
+        if (!isConnected) {
+            throw new RuntimeException("Controllerga ulanmagan");
+        }
+
+        sendCommand(RASP_GREEN_LIGHT_1, PinState.LOW);
+        sendCommand(RASP_CLOSE_GATE_1, PinState.HIGH);
+
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> {
+            sendCommand(RASP_CLOSE_GATE_1, PinState.LOW);
+            scheduler.shutdown();
+        }, 500, TimeUnit.MILLISECONDS);
+
+        return true;
+    }
+
+    public boolean openGate2() throws RuntimeException {
+        if (!isConnected) {
+            throw new RuntimeException("Controllerga ulanmagan");
+        }
+        sendCommand(RASP_GREEN_LIGHT_2, PinState.HIGH);
+        sendCommand(RASP_OPEN_GATE_2, PinState.HIGH);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> {
+            sendCommand(RASP_OPEN_GATE_2, PinState.LOW);
+            scheduler.shutdown();
+        }, 500, TimeUnit.MILLISECONDS);
+        return true;
+    }
+
+    public boolean openGate2(int truckPosition) throws RuntimeException {
+        if (!isConnected) {
+            throw new RuntimeException("Controllerga ulanmagan");
+        }
+        ScaleSystem.truckPosition = truckPosition;
+        return openGate2();
+    }
+
+    public boolean closeGate2() throws ModbusException {
+        if (!isConnected) {
+            throw new ModbusException("Controllerga ulanmagan");
+        }
+        sendCommand(RASP_GREEN_LIGHT_2, PinState.LOW);
+        sendCommand(RASP_CLOSE_GATE_2, PinState.HIGH);
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.schedule(() -> {
+            sendCommand(RASP_CLOSE_GATE_2, PinState.LOW);
+            scheduler.shutdown();
+        }, 500, TimeUnit.MILLISECONDS);
         return true;
     }
 

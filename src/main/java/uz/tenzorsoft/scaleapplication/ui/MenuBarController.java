@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,6 +27,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.stage.StageStyle;
 import lombok.RequiredArgsConstructor;
+import org.controlsfx.control.ToggleSwitch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -329,6 +331,7 @@ public class MenuBarController implements BaseController {
     }
 
 
+/*
     private void showControllerPopup() {
         Stage popupStage = new Stage();
         popupStage.initModality(Modality.APPLICATION_MODAL);
@@ -396,6 +399,97 @@ public class MenuBarController implements BaseController {
         layout.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #c3c3c3; -fx-border-radius: 5; -fx-background-radius: 5;");
 
         Scene popupScene = new Scene(layout, 400, 300);
+        popupStage.setScene(popupScene);
+        popupStage.show();
+    }
+*/
+
+    private void showControllerPopup() {
+        Stage popupStage = new Stage();
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("Controller Sozlamalari");
+
+        Label controllerAddressLabel = new Label("Controller addresi:");
+        TextField controllerAddressField = new TextField(CONTROLLER_IP);
+
+        Label portLabel = new Label("Porti:");
+        TextField portField = new TextField(CONTROLLER_PORT.toString());
+
+        Label timeoutLabel = new Label("Time out (ms):");
+        TextField timeoutField = new TextField(CONTROLLER_CONNECT_TIMEOUT.toString());
+
+        Label toggleSwitchLabel = new Label("Raspberrydan foylanilyapti:");
+        ToggleSwitch toggleSwitch = new ToggleSwitch();
+
+        // Buttons
+        Button saveButton = new Button("Saqlash");
+        Button cancelButton = new Button("Bekor qilish");
+
+        saveButton.setDisable(true); // Disabled by default
+
+        ChangeListener<String> changeListener = (observable, oldValue, newValue) -> {
+            saveButton.setDisable(
+                    toggleSwitch.isSelected() &&
+                            controllerAddressField.getText().equals(CONTROLLER_IP) &&
+                            portField.getText().equals(CONTROLLER_PORT.toString()) &&
+                            timeoutField.getText().equals("" + CONTROLLER_CONNECT_TIMEOUT)
+            );
+        };
+
+        controllerAddressField.textProperty().addListener(changeListener);
+        portField.textProperty().addListener(changeListener);
+        timeoutField.textProperty().addListener(changeListener);
+
+        if (IS_RASPBERRY_USING) {
+            toggleSwitch.setSelected(true);
+            controllerAddressField.setDisable(true);
+            portField.setDisable(true);
+            timeoutField.setDisable(true);
+        }
+
+        toggleSwitch.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isControllerUsed = newValue;
+            controllerAddressField.setDisable(isControllerUsed);
+            portField.setDisable(isControllerUsed);
+            timeoutField.setDisable(isControllerUsed);
+            saveButton.setDisable(false);
+        });
+
+        saveButton.setOnAction(event -> {
+            if (!toggleSwitch.isSelected()) {
+                CONTROLLER_IP = controllerAddressField.getText();
+                CONTROLLER_PORT = Integer.parseInt(portField.getText());
+                CONTROLLER_CONNECT_TIMEOUT = Integer.parseInt(timeoutField.getText());
+                configurations.setControllerIp(controllerAddressField.getText());
+                configurations.setControllerPort(Integer.parseInt(portField.getText()));
+                configurations.setControllerConnectTimeout(Integer.parseInt(timeoutField.getText()));
+            }
+            configurations.setRaspberryUsing(toggleSwitch.isSelected() ? 1 : 0);
+            configUtilsService.saveConfig(configurations);
+            popupStage.close();
+        });
+
+        cancelButton.setOnAction(event -> popupStage.close());
+
+        saveButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 5 15;");
+        cancelButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-padding: 5 15;");
+
+        HBox buttonBox = new HBox(saveButton, cancelButton);
+        buttonBox.setSpacing(10);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        // Layout
+        VBox layout = new VBox(10,
+                toggleSwitchLabel, toggleSwitch,
+                controllerAddressLabel, controllerAddressField,
+                portLabel, portField,
+                timeoutLabel, timeoutField,
+                buttonBox);
+        layout.setSpacing(15);
+        layout.setPadding(new Insets(15));
+        layout.setStyle("-fx-background-color: #f4f4f4; -fx-border-color: #c3c3c3; -fx-border-radius: 5; -fx-background-radius: 5;");
+
+        Scene popupScene = new Scene(layout, 400, 350); // Adjusted height for the additional ToggleSwitch
         popupStage.setScene(popupScene);
         popupStage.show();
     }

@@ -41,7 +41,7 @@ public class ConfigUtilsService {
             System.out.println("Configuration saved successfully.");
 
         } catch (Exception e) {
-            logService.save(new LogEntity(5L, Instances.truckNumber, "00012: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00012: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -89,6 +89,7 @@ public class ConfigUtilsService {
         config.setCamera1("192.168.1.64");
         config.setCamera2("192.168.1.65");
         config.setCamera3("192.168.1.63");
+        config.setRaspberryUsing(0);
         return config;
     }
 
@@ -107,11 +108,15 @@ public class ConfigUtilsService {
         Settings.CAMERA_1 = config.getCamera1() == null ? defaultConfig.getCamera1() : config.getCamera1();
         Settings.CAMERA_2 = config.getCamera2() == null ? defaultConfig.getCamera2() : config.getCamera2();
         Settings.CAMERA_3 = config.getCamera3() == null ? defaultConfig.getCamera3() : config.getCamera3();
+        Settings.IS_RASPBERRY_USING = config.getRaspberryUsing() == 1;
+        Instances.isRaspberryUsing = config.getRaspberryUsing() == 1;
     }
 
     private Configurations deserialize(byte[] data) throws Exception {
         try (var bis = new ByteArrayInputStream(data); var in = new ObjectInputStream(bis)) {
-            return (Configurations) in.readObject();
+            Configurations configurations1 = (Configurations) in.readObject();
+            System.out.println(configurations1);
+            return configurations1;
         }
     }
 

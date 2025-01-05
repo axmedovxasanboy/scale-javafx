@@ -28,6 +28,7 @@ public class Instances<T> {
     public static boolean isWaiting = false;
     public static boolean isScaleControlOn = true;
     public static boolean isAvailableToConnect = false;
+    public static boolean isRaspberryUsing = false;
     public static short cargoConfirmationStatus = -1;
 
     public static Configurations configurations;

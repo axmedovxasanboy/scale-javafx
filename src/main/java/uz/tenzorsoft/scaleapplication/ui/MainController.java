@@ -156,7 +156,7 @@ public class MainController implements BaseController {
             scalePort = new Settings(SCALE_PORT).getSerialPort();
             webSocketClient.connect(Instances.WEBSOCKET_URL);
         } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, e.getMessage()));
             System.err.println(e.getMessage());
         }
