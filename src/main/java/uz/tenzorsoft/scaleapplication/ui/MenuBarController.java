@@ -46,6 +46,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.configurations;
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isRaspberryUsing;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.*;
 
 @Component
@@ -463,6 +464,9 @@ public class MenuBarController implements BaseController {
                 configurations.setControllerIp(controllerAddressField.getText());
                 configurations.setControllerPort(Integer.parseInt(portField.getText()));
                 configurations.setControllerConnectTimeout(Integer.parseInt(timeoutField.getText()));
+            } else {
+                isRaspberryUsing = true;
+                IS_RASPBERRY_USING = true;
             }
             configurations.setRaspberryUsing(toggleSwitch.isSelected() ? 1 : 0);
             configUtilsService.saveConfig(configurations);

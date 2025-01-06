@@ -68,10 +68,10 @@ public class GpioControl {
         }
         DigitalOutput output = outputPins.get(pin);
         if (state == PinState.HIGH) {
-            output.low();
+            output.high();
             return true;
         } else if (state == PinState.LOW) {
-            output.high();
+            output.low();
             return true;
         }
         return false;
@@ -79,24 +79,34 @@ public class GpioControl {
 
     private void statusPinsInitialization(Context pi4jIn) {
         for (int pinAddress : STATUS_PINS) {
-            DigitalInputConfigBuilder config = DigitalInput.newConfigBuilder(pi4jIn)
-                    .id("pin-" + pinAddress)
-                    .name("Status Pin " + pinAddress)
-                    .address(pinAddress)
-                    .pull(PullResistance.PULL_DOWN);
-            inputPins.put(pinAddress, pi4jIn.create(config));
+            try {
+                DigitalInputConfigBuilder config = DigitalInput.newConfigBuilder(pi4jIn)
+                        .id("pin-" + pinAddress)
+                        .name("Status Pin " + pinAddress)
+                        .address(pinAddress)
+                        .pull(PullResistance.PULL_DOWN);
+                inputPins.put(pinAddress, pi4jIn.create(config));
+                isAvailableToConnect = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
     private void controlPinsInitialization(Context pi4jOut) {
         for (int pinAddress : CONTROL_PINS) {
-            DigitalOutputConfigBuilder config = DigitalOutput.newConfigBuilder(pi4jOut)
-                    .id("pin-" + pinAddress)
-                    .name("Control Pin " + pinAddress)
-                    .address(pinAddress)
-                    .shutdown(DigitalState.LOW)
-                    .initial(DigitalState.LOW);
-            outputPins.put(pinAddress, pi4jOut.create(config));
+            try {
+                DigitalOutputConfigBuilder config = DigitalOutput.newConfigBuilder(pi4jOut)
+                        .id("pin-" + pinAddress)
+                        .name("Control Pin " + pinAddress)
+                        .address(pinAddress)
+                        .shutdown(DigitalState.LOW)
+                        .initial(DigitalState.LOW);
+                outputPins.put(pinAddress, pi4jOut.create(config));
+                isAvailableToConnect = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
