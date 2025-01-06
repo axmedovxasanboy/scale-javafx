@@ -27,6 +27,7 @@ import uz.tenzorsoft.scaleapplication.domain.enumerators.TruckAction;
 import uz.tenzorsoft.scaleapplication.service.ConfigUtilsService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.PrintCheck;
+import uz.tenzorsoft.scaleapplication.service.raspberry.GpioControl;
 import uz.tenzorsoft.scaleapplication.ui.components.DataSendController;
 import uz.tenzorsoft.scaleapplication.ui.components.SendStatuesDataController;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
@@ -55,6 +56,7 @@ public class MainController implements BaseController {
     private final SendStatuesDataController sendStatuesDataController;
     private final LogService logService;
     private final UserController userController;
+    private final GpioControl gpioControl;
 
     @Autowired
     @Lazy
@@ -152,6 +154,14 @@ public class MainController implements BaseController {
         configUtilsService.loadConfigurations();
         loadMainMenu();
         userController.loadUserMenu();
+        try {
+            if (isRaspberryUsing) gpioControl.initialize();
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Xatolik", "Raspberryga ulanishda xatolik");
+            logService.save(new LogEntity(5L, "", e.getMessage()));
+            isConnected = false;
+            gpioControl.shutdown();
+        }
         try {
             scalePort = new Settings(SCALE_PORT).getSerialPort();
             webSocketClient.connect(Instances.WEBSOCKET_URL);

@@ -1,10 +1,14 @@
 package uz.tenzorsoft.scaleapplication.domain;
 
-import lombok.Synchronized;
-import org.hibernate.annotations.Synchronize;
-import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import com.pi4j.io.gpio.digital.DigitalInput;
+import com.pi4j.io.gpio.digital.DigitalOutput;
 import uz.tenzorsoft.scaleapplication.domain.entity.UserEntity;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
+
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Instances<T> {
     public static UserEntity currentUser = new UserEntity();
@@ -30,6 +34,12 @@ public class Instances<T> {
     public static boolean isAvailableToConnect = false;
     public static boolean isRaspberryUsing = false;
     public static short cargoConfirmationStatus = -1;
+
+    public static final Map<Integer, DigitalOutput> outputPins = new HashMap<>();
+    public static final Map<Integer, DigitalInput> inputPins = new HashMap<>();
+
+    public static final int[] CONTROL_PINS = {RASP_GREEN_LIGHT_1, RASP_GREEN_LIGHT_2, RASP_OPEN_GATE_1, RASP_CLOSE_GATE_1, RASP_OPEN_GATE_2, RASP_CLOSE_GATE_2};
+    public static final int[] STATUS_PINS = {RASP_SENSOR_1, RASP_SENSOR_2, RASP_SENSOR_3};
 
     public static Configurations configurations;
 

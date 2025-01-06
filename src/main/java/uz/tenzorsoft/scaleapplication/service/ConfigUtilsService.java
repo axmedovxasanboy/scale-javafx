@@ -86,9 +86,9 @@ public class ConfigUtilsService {
         config.setDatabaseName("postgres");
         config.setUsername("postgres");
         config.setPassword("postgres");
-        config.setCamera1("192.168.1.64");
-        config.setCamera2("192.168.1.65");
-        config.setCamera3("192.168.1.63");
+        config.setCamera1("192.168.0.64");
+        config.setCamera2("192.168.0.65");
+        config.setCamera3("192.168.0.63");
         config.setRaspberryUsing(0);
         return config;
     }

@@ -23,6 +23,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.AttachIdWithStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.AttachResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.CheckCommandsDto;
 import uz.tenzorsoft.scaleapplication.service.*;
+import uz.tenzorsoft.scaleapplication.service.raspberry.GpioControl;
 import uz.tenzorsoft.scaleapplication.service.raspberry.RaspberryService;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
@@ -56,6 +57,8 @@ public class ButtonController implements BaseController {
     private Button button1, button2, button4, button5;
 
     private String commandComment = "";
+    @Autowired
+    private GpioControl gpioControl;
 
     @FXML
     public void initialize() {
@@ -73,7 +76,6 @@ public class ButtonController implements BaseController {
         button.setOnMouseReleased(event -> button.setStyle(originalColor));
     }
 
-
     public boolean openGate1() {
         try {
             if (!isTesting) {
@@ -86,7 +88,7 @@ public class ButtonController implements BaseController {
         } catch (Exception e) {
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00017: (" + getClass().getName() + ") " + e.getMessage()));
-            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
     }
@@ -190,7 +192,7 @@ public class ButtonController implements BaseController {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " + e.getMessage()));
-            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
     }
@@ -215,7 +217,7 @@ public class ButtonController implements BaseController {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00026: (" + getClass().getName() + ") " + e.getMessage()));
-            //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
     }
@@ -263,11 +265,11 @@ public class ButtonController implements BaseController {
                 commandComment = "Finished";
                 gate2Connection = true;
             }
-        } catch (ModbusException e) {
+        } catch (Exception e) {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00027: (" + getClass().getName() + ") " + e.getMessage()));
-            //showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
         }
         return false;
     }
@@ -275,6 +277,7 @@ public class ButtonController implements BaseController {
     public void connect() {
         try {
             if (isRaspberryUsing) {
+                gpioControl.initialize();
                 isConnected = true;
                 return;
             }
@@ -289,6 +292,7 @@ public class ButtonController implements BaseController {
     public void disconnect() {
         if (isRaspberryUsing) {
             isConnected = false;
+            gpioControl.shutdown();
             return;
         }
         controllerService.disconnect();

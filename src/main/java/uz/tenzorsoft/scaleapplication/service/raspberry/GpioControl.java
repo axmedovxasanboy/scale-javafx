@@ -6,6 +6,7 @@ import com.pi4j.plugin.gpiod.provider.gpio.digital.GpioDDigitalInputProvider;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.*;
 import com.pi4j.platform.Platform;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.PinState;
@@ -18,24 +19,19 @@ import java.util.function.Consumer;
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
 
 @Service
+@RequiredArgsConstructor
 public class GpioControl {
+    private final LogService logService;
 
-    private static final int[] CONTROL_PINS = {21, 20, 26, 19};
-    private static final int[] SVETOFOR_PINS = {21, 20};
-    private static final int[] SHLAGBAUM_PINS = {23, 24, 25, 12};
-    private static final int[] STATUS_PINS = {17, 27, 22};
+    private Context pi4jOut = Pi4J.newContextBuilder().build();
+    private Context pi4jIn = Pi4J.newContextBuilder().build();
 
-    private static final Map<Integer, DigitalOutput> outputPins = new HashMap<>();
-    private static final Map<Integer, DigitalInput> inputPins = new HashMap<>();
-    private LogService logService;
-
-    public GpioControl(LogService logService) {
-        this.logService = logService;
-        Context pi4jOut = Pi4J.newContextBuilder()
+    public void initialize() {
+        pi4jOut = Pi4J.newContextBuilder()
                 .add(GpioDDigitalOutputProvider.newInstance())
                 .build();
 
-        Context pi4jIn = Pi4J.newContextBuilder()
+        pi4jIn = Pi4J.newContextBuilder()
                 .add(GpioDDigitalInputProvider.newInstance())
                 .build();
         Platform platform = pi4jOut.platform();
@@ -66,15 +62,16 @@ public class GpioControl {
     }
 
     public boolean controlPin(int pin, PinState state) {
+        System.out.println("pin = " + pin);
         if (!outputPins.containsKey(pin)) {
-            throw new RuntimeException("Pin number not found");
+            throw new RuntimeException("Pin number not found " + pin);
         }
         DigitalOutput output = outputPins.get(pin);
         if (state == PinState.HIGH) {
-            output.high();
+            output.low();
             return true;
         } else if (state == PinState.LOW) {
-            output.low();
+            output.high();
             return true;
         }
         return false;
@@ -82,35 +79,30 @@ public class GpioControl {
 
     private void statusPinsInitialization(Context pi4jIn) {
         for (int pinAddress : STATUS_PINS) {
-            try {
-                DigitalInputConfigBuilder config = DigitalInput.newConfigBuilder(pi4jIn)
-                        .id("pin-" + pinAddress)
-                        .name("Status Pin " + pinAddress)
-                        .address(pinAddress)
-                        .pull(PullResistance.PULL_DOWN);
-                inputPins.put(pinAddress, pi4jIn.create(config));
-            } catch (Exception e) {
-                logService.save(new LogEntity(5L, "", e.getMessage()));
-                e.printStackTrace();
-            }
+            DigitalInputConfigBuilder config = DigitalInput.newConfigBuilder(pi4jIn)
+                    .id("pin-" + pinAddress)
+                    .name("Status Pin " + pinAddress)
+                    .address(pinAddress)
+                    .pull(PullResistance.PULL_DOWN);
+            inputPins.put(pinAddress, pi4jIn.create(config));
         }
     }
 
     private void controlPinsInitialization(Context pi4jOut) {
         for (int pinAddress : CONTROL_PINS) {
-            try {
-                DigitalOutputConfigBuilder config = DigitalOutput.newConfigBuilder(pi4jOut)
-                        .id("pin-" + pinAddress)
-                        .name("Control Pin " + pinAddress)
-                        .address(pinAddress)
-                        .shutdown(DigitalState.LOW)
-                        .initial(DigitalState.LOW);
-                outputPins.put(pinAddress, pi4jOut.create(config));
-            } catch (Exception e) {
-                logService.save(new LogEntity(5L, "", e.getMessage()));
-                e.printStackTrace();
-            }
+            DigitalOutputConfigBuilder config = DigitalOutput.newConfigBuilder(pi4jOut)
+                    .id("pin-" + pinAddress)
+                    .name("Control Pin " + pinAddress)
+                    .address(pinAddress)
+                    .shutdown(DigitalState.LOW)
+                    .initial(DigitalState.LOW);
+            outputPins.put(pinAddress, pi4jOut.create(config));
         }
+    }
+
+    public void shutdown() {
+        if (pi4jOut != null) pi4jOut.shutdown();
+        if (pi4jIn != null) pi4jIn.shutdown();
     }
 }
 

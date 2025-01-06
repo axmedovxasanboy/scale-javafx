@@ -20,9 +20,9 @@ public class RaspberryService {
 
     private final GpioControl gpioControl;
 
-    public boolean openGate1() {
+    public boolean openGate1() throws Exception {
         if (!isConnected) {
-            throw new RuntimeException("Not connected to raspberry");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
 
         sendCommand(RASP_GREEN_LIGHT_1, PinState.HIGH);
@@ -37,17 +37,17 @@ public class RaspberryService {
         return true;
     }
 
-    public boolean openGate1(int truckPosition) throws RuntimeException {
+    public boolean openGate1(int truckPosition) throws Exception {
         if (!isConnected) {
-            throw new RuntimeException("Controllerga ulanmagan");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
         ScaleSystem.truckPosition = truckPosition;
         return openGate1();
     }
 
-    public boolean closeGate1() throws RuntimeException {
+    public boolean closeGate1() throws Exception {
         if (!isConnected) {
-            throw new RuntimeException("Controllerga ulanmagan");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
 
         sendCommand(RASP_GREEN_LIGHT_1, PinState.LOW);
@@ -62,9 +62,9 @@ public class RaspberryService {
         return true;
     }
 
-    public boolean openGate2() throws RuntimeException {
+    public boolean openGate2() throws Exception {
         if (!isConnected) {
-            throw new RuntimeException("Controllerga ulanmagan");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
         sendCommand(RASP_GREEN_LIGHT_2, PinState.HIGH);
         sendCommand(RASP_OPEN_GATE_2, PinState.HIGH);
@@ -76,17 +76,17 @@ public class RaspberryService {
         return true;
     }
 
-    public boolean openGate2(int truckPosition) throws RuntimeException {
+    public boolean openGate2(int truckPosition) throws Exception {
         if (!isConnected) {
-            throw new RuntimeException("Controllerga ulanmagan");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
         ScaleSystem.truckPosition = truckPosition;
         return openGate2();
     }
 
-    public boolean closeGate2() throws ModbusException {
+    public boolean closeGate2() throws Exception {
         if (!isConnected) {
-            throw new ModbusException("Controllerga ulanmagan");
+            throw new ModbusException("Raspberryga ulanmagan");
         }
         sendCommand(RASP_GREEN_LIGHT_2, PinState.LOW);
         sendCommand(RASP_CLOSE_GATE_2, PinState.HIGH);

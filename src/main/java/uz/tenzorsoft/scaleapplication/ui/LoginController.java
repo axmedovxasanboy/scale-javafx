@@ -36,9 +36,9 @@ public class LoginController {
         UserResponse userResponse = userService.validateUser(phoneNumber, password);
 
         if (userResponse != null) {
-            mainController.load();
             Stage currentStage = (Stage) phoneNumberField.getScene().getWindow();
             currentStage.close();
+            mainController.load();
         } else {
             if (cloudService.login(phoneNumber, password)) {
                 showSmsVerificationPopup(phoneNumber, password);
