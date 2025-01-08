@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
 import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
+import uz.tenzorsoft.scaleapplication.domain.response.PhoneNumberResponse;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +60,12 @@ public class CloudService {
             // Send the POST request
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
+            ObjectMapper objectMapper = new ObjectMapper();
+            PhoneNumberResponse phoneNumberResponse = objectMapper.readValue(response.getBody(), PhoneNumberResponse.class);
+
             // Check if the response status is 200 OK
-            if (response.getStatusCodeValue() == 200) {
+            if (response.getStatusCodeValue() == 200 && !phoneNumberResponse.getStatus().equals("BAD_REQUEST")) {
+
                 System.out.println("CODE SENT SUCCESSFULLY");
                 return true;
             }

@@ -171,10 +171,30 @@ public class ButtonController implements BaseController {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00024: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            if (truckNumber.length() >= 3){
+                showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            }
         }
         return false;
     }
+
+//    public boolean closeGate1(String truckNumber) {
+//        try {
+//            if (!isTesting) {
+//                if (isRaspberryUsing) {
+//                    raspberryService.closeGate1();
+//                } else controllerService.closeGate1();
+//                commandComment = "Finished";
+//                gate1Connection = true;
+//            }
+//        } catch (Exception e) {
+//            commandComment = e.getMessage();
+//            System.err.println(e.getMessage());
+//            logService.save(new LogEntity(5L, truckNumber, "00024: (" + getClass().getName() + ") " + e.getMessage()));
+//            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+//        }
+//        return false;
+//    }
 
     public boolean openGate2() {
         try {
@@ -192,7 +212,6 @@ public class ButtonController implements BaseController {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00025: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
         }
         return false;
     }
@@ -269,7 +288,9 @@ public class ButtonController implements BaseController {
             commandComment = e.getMessage();
             System.err.println(e.getMessage());
             logService.save(new LogEntity(5L, truckNumber, "00027: (" + getClass().getName() + ") " + e.getMessage()));
-            showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            if (truckNumber.length() >= 3){
+                showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+            }
         }
         return false;
     }

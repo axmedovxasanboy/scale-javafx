@@ -86,7 +86,7 @@ public class RaspberryService {
 
     public boolean closeGate2() throws Exception {
         if (!isConnected) {
-            throw new ModbusException("Raspberryga ulanmagan");
+            throw new RuntimeException("Raspberryga ulanmagan");
         }
         sendCommand(RASP_GREEN_LIGHT_2, PinState.LOW);
         sendCommand(RASP_CLOSE_GATE_2, PinState.HIGH);
