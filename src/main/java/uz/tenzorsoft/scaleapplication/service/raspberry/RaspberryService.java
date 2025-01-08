@@ -70,7 +70,7 @@ public class RaspberryService {
         sendCommand(RASP_OPEN_GATE_2, PinState.HIGH);
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.schedule(() -> {
-            sendCommand(RASP_OPEN_GATE_2, PinState.LOW);
+            sendCommand(RASP_CLOSE_GATE_2, PinState.LOW);
             scheduler.shutdown();
         }, 500, TimeUnit.MILLISECONDS);
         return true;

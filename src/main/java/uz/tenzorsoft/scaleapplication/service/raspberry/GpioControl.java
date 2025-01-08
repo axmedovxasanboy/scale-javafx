@@ -63,7 +63,7 @@ public class GpioControl {
     }
 
     public boolean controlPin(int pin, PinState state) {
-        System.out.println("pin = " + pin);
+        System.out.println("pin = " + pin + " -> " + state);
         if (!outputPins.containsKey(pin)) {
             throw new RuntimeException("Pin number not found " + pin);
         }

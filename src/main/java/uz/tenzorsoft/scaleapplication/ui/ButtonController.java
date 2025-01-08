@@ -200,7 +200,7 @@ public class ButtonController implements BaseController {
         try {
             if (!isTesting) {
                 if (isRaspberryUsing) {
-                    boolean b = raspberryService.closeGate2();
+                    boolean b = raspberryService.openGate2();
                     if (b) gate2Connection = false;
                     return b;
                 }
