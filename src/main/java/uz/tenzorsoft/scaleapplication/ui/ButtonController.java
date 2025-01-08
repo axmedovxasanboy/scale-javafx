@@ -278,6 +278,9 @@ public class ButtonController implements BaseController {
         try {
             if (isRaspberryUsing) {
                 gpioControl.initialize();
+                gpioControl.getSensorStatuses();
+                closeGate1();
+                closeGate2();
                 isConnected = isAvailableToConnect;
                 return;
             }
@@ -290,12 +293,16 @@ public class ButtonController implements BaseController {
     }
 
     public void disconnect() {
-        if (isRaspberryUsing) {
-            isConnected = false;
-            gpioControl.shutdown();
-            return;
+        try {
+            if (isRaspberryUsing) {
+                isConnected = false;
+                gpioControl.shutdown();
+                return;
+            }
+            controllerService.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        controllerService.disconnect();
     }
 
     public void handleServerCommands(CommandsEntity commands) {

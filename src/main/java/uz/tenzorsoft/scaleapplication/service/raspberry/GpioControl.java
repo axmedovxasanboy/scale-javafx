@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
+import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.RASP_SENSOR_1;
 
 @Service
 @RequiredArgsConstructor
@@ -111,8 +112,26 @@ public class GpioControl {
     }
 
     public void shutdown() {
+        sensor1Connection = false;
+        sensor2Connection = false;
+        sensor3Connection = false;
+        gate1Connection = false;
+        gate2Connection = false;
         if (pi4jOut != null) pi4jOut.shutdown();
         if (pi4jIn != null) pi4jIn.shutdown();
+    }
+
+    public void getSensorStatuses() {
+        for (int pin : STATUS_PINS) {
+            DigitalInput input = inputPins.get(pin);
+            if (input != null) {
+                switch (pin) {
+                    case 17 -> sensor1Connection = input.isHigh();
+                    case 22 -> sensor2Connection = input.isHigh();
+                    case 27 -> sensor3Connection = input.isHigh();
+                }
+            }
+        }
     }
 }
 

@@ -20,6 +20,7 @@ import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.service.AttachService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 import uz.tenzorsoft.scaleapplication.service.TruckService;
+import uz.tenzorsoft.scaleapplication.service.raspberry.GpioControl;
 import uz.tenzorsoft.scaleapplication.ui.components.TruckScalingController;
 
 import java.util.concurrent.ExecutorService;
@@ -41,6 +42,7 @@ public class TestController implements BaseController {
     private final MainController mainController;
     @Lazy
     private final TruckScalingController truckScalingController;
+    private final GpioControl gpioControl;
 
     @FXML
     private Pane testSwitchPane, sensor1Pane, sensor2Pane, sensor3Pane;
@@ -78,6 +80,7 @@ public class TestController implements BaseController {
             isTesting = newValue;
             updateToggleSwitchesState();
             updateTruckPosition();
+            if (isRaspberryUsing) gpioControl.getSensorStatuses();
         });
         gate1Switch.setDisable(true); // Disable Gate 1
         gate2Switch.setDisable(true); // Disable Gate 2
