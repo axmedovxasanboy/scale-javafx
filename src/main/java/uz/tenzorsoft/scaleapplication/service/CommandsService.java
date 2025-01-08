@@ -12,7 +12,7 @@ import java.util.Optional;
 // CommansServiceImpl.java
 @Service
 @RequiredArgsConstructor
-public class CommandsService {
+public class  CommandsService {
 
     private final CommandsRepository commandsRepository;
     private final ButtonController buttonController;
