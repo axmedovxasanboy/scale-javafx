@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.controlsfx.control.ToggleSwitch;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,13 +15,20 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.service.raspberry.GpioControl;
 import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 @SpringBootApplication
 @EnableScheduling
 public class ScaleApplication extends Application {
+    @Autowired
+    private GpioControl gpioControl; // Inject GpioControl here (Spring will handle the injection)
     private ConfigurableApplicationContext context;
     private Parent rootNode;
+
+    // No-arg constructor (required by JavaFX Application)
+    public ScaleApplication() {
+    }
 
     public static void main(String[] args) {
         Application.launch(ScaleApplication.class, args);
@@ -51,6 +59,7 @@ public class ScaleApplication extends Application {
     @Override
     public void stop() throws Exception {
         context.close();
+        gpioControl.shutdownCompletely();
     }
 
 /*

@@ -300,9 +300,9 @@ public class ButtonController implements BaseController {
             if (isRaspberryUsing) {
                 gpioControl.initialize();
                 gpioControl.getSensorStatuses();
+                isConnected = isAvailableToConnect;
                 closeGate1();
                 closeGate2();
-                isConnected = isAvailableToConnect;
                 return;
             }
             controllerService.connect();

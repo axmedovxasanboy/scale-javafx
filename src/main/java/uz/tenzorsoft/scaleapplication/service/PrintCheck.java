@@ -11,11 +11,13 @@ import uz.tenzorsoft.scaleapplication.ui.MainController;
 
 import javax.print.*;
 import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static uz.tenzorsoft.scaleapplication.domain.Instances.isRaspberryUsing;
 import static uz.tenzorsoft.scaleapplication.domain.Settings.PRINTER_NAME;
 
 @Service
@@ -32,7 +34,7 @@ public class PrintCheck {
 
     public void printReceipt(TruckEntity response) {
         PrintService printer = findPrinter(PRINTER_NAME); // Specify your printer name here
-        if (printer == null) {
+        if (printer == null && !isRaspberryUsing) {
             mainController.showAlert(Alert.AlertType.ERROR, "Printer topilmadi", "Mavjud bo'lgan printer topilmadi");
             System.out.println(PRINTER_NAME + " printer not found.");
             return;
@@ -40,22 +42,52 @@ public class PrintCheck {
 
         String receipt = buildReceiptContent(response);
 
-        try (InputStream inputStream = new ByteArrayInputStream(receipt.getBytes(StandardCharsets.ISO_8859_1))) {
-            DocPrintJob printJob = printer.createPrintJob();
-            Doc doc = new SimpleDoc(inputStream, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
+        try {
+            if (isRaspberryUsing) {
+                // Prepare printing on Linux/Raspberry Pi
+                printToLinuxDevice(receipt);
+            } else {
+                try (InputStream inputStream = new ByteArrayInputStream(receipt.getBytes(StandardCharsets.ISO_8859_1))) {
+                    DocPrintJob printJob = printer.createPrintJob();
+                    Doc doc = new SimpleDoc(inputStream, DocFlavor.INPUT_STREAM.AUTOSENSE, null);
 
-            // Print the receipt
-            printJob.print(doc, null);
+                    // Print the receipt
+                    printJob.print(doc, null);
 
-            // Send the cut command after printing
-            sendCutCommand(printer);
-            System.out.println("Receipt printed and paper cut successfully.");
+                    // Send the cut command after printing
+                    sendCutCommand(printer);
+                    System.out.println("Receipt printed and paper cut successfully.");
+                }
+            }
         } catch (Exception e) {
             mainController.showAlert(Alert.AlertType.ERROR, "Kvitansiya chop etilishi va qog'oz kesilishi amalga oshmadi", e.getMessage());
-            logService.save(new LogEntity(5L, Instances.truckNumber, "00013: (" + getClass().getName() + ") " +e.getMessage()));
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00013: (" + getClass().getName() + ") " + e.getMessage()));
             e.printStackTrace();
         }
     }
+
+    private void printToLinuxDevice(String content) {
+        try (FileOutputStream fos = new FileOutputStream("/dev/usb/lp0")) {
+            // Send receipt content
+            fos.write(content.getBytes(StandardCharsets.ISO_8859_1));
+
+            // Flush to ensure all data is written
+            fos.flush();
+
+            // Send the cut command
+            byte[] cutCommand = new byte[]{0x1D, 0x56, 0x42, 0x00};
+            fos.write(cutCommand);
+            fos.flush();
+
+            System.out.println("Receipt printed and paper cut successfully on Linux.");
+        } catch (Exception e) {
+            mainController.showAlert(Alert.AlertType.ERROR, "Printer ishlamayapti", e.getMessage());
+            logService.save(new LogEntity(5L, Instances.truckNumber, "00015: (" + getClass().getName() + ") " + e.getMessage()));
+            e.printStackTrace();
+        }
+    }
+
+
 
     private PrintService findPrinter(String printerName) {
         PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null, null);

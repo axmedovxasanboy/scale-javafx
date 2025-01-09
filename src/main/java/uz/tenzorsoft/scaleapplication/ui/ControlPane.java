@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
@@ -57,6 +60,7 @@ public class ControlPane implements BaseController {
     private final TruckService truckService;
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Autowired
     @Lazy
@@ -374,28 +378,55 @@ public class ControlPane implements BaseController {
 
 
     public void controlConnectButton() {
-        executors.execute(() -> {
-            while (true) {
-                try {
-                    Platform.runLater(() -> {
-                        if (!isConnected) {
-                            connectButton.setText("Connect");
-                            connectButton.getStyleClass().removeAll("connect-button-disconnected");
-                            connectButton.getStyleClass().add("connect-button");
-                        } else {
-                            connectButton.setText("Disconnect");
-                            connectButton.getStyleClass().removeAll("connect-button");
-                            connectButton.getStyleClass().add("connect-button-disconnected");
-                        }
-                    });
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00033: (" + getClass().getName() + ") " + e.getMessage()));
+        scheduler.scheduleAtFixedRate(() -> {
+            Platform.runLater(() -> {
+                if (!isConnected) {
+                    connectButton.setText("Connect");
+                    connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    );
+
+                    connectButton.setOnMouseEntered(event -> connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#18b800, #156c00);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    ));
+                    connectButton.setOnMouseExited(event -> connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    ));
+                } else {
+                    connectButton.setText("Disconnect");
+                    connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    );
+
+                    connectButton.setOnMouseEntered(event -> connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#d00000, #7a0000);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    ));
+                    connectButton.setOnMouseExited(event -> connectButton.setStyle(
+                            "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
+                                    "-fx-background-radius: 30;" +
+                                    "-fx-background-insets: 0;" +
+                                    "-fx-text-fill: white;"
+                    ));
                 }
-            }
-        });
+            });
+        }, 0, 1, TimeUnit.SECONDS);
     }
+
 
     @FXML
     private void getFilteredData() {
@@ -421,6 +452,7 @@ public class ControlPane implements BaseController {
             return;
         }
         if (isConnected) {
+            System.out.println("Disconnecting...");
             buttonController.disconnect();
             truckPosition = -1;
             currentTruck = new TruckResponse();
@@ -429,6 +461,7 @@ public class ControlPane implements BaseController {
             isWaiting = false;
             truckNumber = "";
         } else {
+            System.out.println("Connecting...");
             buttonController.connect();
         }
     }

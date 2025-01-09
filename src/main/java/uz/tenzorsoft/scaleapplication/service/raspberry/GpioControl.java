@@ -24,17 +24,22 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.RASP_SENSOR_1;
 public class GpioControl {
     private final LogService logService;
 
-    private Context pi4jOut = Pi4J.newContextBuilder().build();
-    private Context pi4jIn = Pi4J.newContextBuilder().build();
+    private Context pi4jOut;
+    private Context pi4jIn;
 
     public void initialize() {
-        pi4jOut = Pi4J.newContextBuilder()
-                .add(GpioDDigitalOutputProvider.newInstance())
-                .build();
+        if (pi4jOut == null) {
+            pi4jOut = Pi4J.newContextBuilder()
+                    .add(GpioDDigitalOutputProvider.newInstance())
+                    .build();
+        }
 
-        pi4jIn = Pi4J.newContextBuilder()
-                .add(GpioDDigitalInputProvider.newInstance())
-                .build();
+        if (pi4jIn == null) {
+            pi4jIn = Pi4J.newContextBuilder()
+                    .add(GpioDDigitalInputProvider.newInstance())
+                    .build();
+        }
+
         Platform platform = pi4jOut.platform();
         System.out.println("Platform: " + (platform != null ? platform.name() : "Not Initialized"));
 
@@ -89,7 +94,7 @@ public class GpioControl {
                 inputPins.put(pinAddress, pi4jIn.create(config));
                 isAvailableToConnect = true;
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
             }
         }
     }
@@ -106,7 +111,7 @@ public class GpioControl {
                 outputPins.put(pinAddress, pi4jOut.create(config));
                 isAvailableToConnect = true;
             } catch (Exception e) {
-                e.printStackTrace();
+                e.getMessage();
             }
         }
     }
@@ -117,6 +122,11 @@ public class GpioControl {
         sensor3Connection = false;
         gate1Connection = false;
         gate2Connection = false;
+//        if (pi4jOut != null) pi4jOut.shutdown();
+//        if (pi4jIn != null) pi4jIn.shutdown();
+    }
+
+    public void shutdownCompletely() {
         if (pi4jOut != null) pi4jOut.shutdown();
         if (pi4jIn != null) pi4jIn.shutdown();
     }
