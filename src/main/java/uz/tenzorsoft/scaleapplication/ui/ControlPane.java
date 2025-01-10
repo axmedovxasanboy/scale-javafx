@@ -52,16 +52,9 @@ import static uz.tenzorsoft.scaleapplication.service.ScaleSystem.truckPosition;
 public class ControlPane implements BaseController {
     private final ExecutorService executors;
     private final LogService logService;
-    private final MainController mainController;
     private final TableController tableController;
     private final ButtonController buttonController;
     private final ProductService productService;
-    private final TruckActionService truckActionService;
-    private final TruckService truckService;
-    private final TruckRepository truckRepository;
-    private final TruckActionRepository truckActionRepository;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
     @Autowired
     @Lazy
     private TruckScalingController truckScalingController;
@@ -378,7 +371,7 @@ public class ControlPane implements BaseController {
 
 
     public void controlConnectButton() {
-        scheduler.scheduleAtFixedRate(() -> {
+        executors.execute(() -> {
             Platform.runLater(() -> {
                 if (!isConnected) {
                     connectButton.setText("Connect");
@@ -424,7 +417,8 @@ public class ControlPane implements BaseController {
                     ));
                 }
             });
-        }, 0, 1, TimeUnit.SECONDS);
+        });
+
     }
 
 
