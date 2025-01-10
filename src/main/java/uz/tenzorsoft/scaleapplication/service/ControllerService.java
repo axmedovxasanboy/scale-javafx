@@ -102,7 +102,7 @@ public class ControllerService {
 
     public boolean checkConnection(String ipAddress) throws IOException {
         InetAddress address = InetAddress.getByName(ipAddress);
-        return address.isReachable(1500);
+        return address.isReachable(1000);
     }
 
     private void writeCoil(Integer coil, boolean state) throws ModbusException {

@@ -10,6 +10,7 @@ import uz.tenzorsoft.scaleapplication.domain.entity.LogEntity;
 import uz.tenzorsoft.scaleapplication.service.ControllerService;
 import uz.tenzorsoft.scaleapplication.service.LogService;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 
 import static uz.tenzorsoft.scaleapplication.domain.Instances.*;
@@ -53,28 +54,38 @@ public class ConnectionsController implements BaseController {
                     camera1Connection = controllerService.checkConnection(CAMERA_1);
                     camera2Connection = controllerService.checkConnection(CAMERA_2);
                     camera3Connection = controllerService.checkConnection(CAMERA_3);
-
-                    controller.setImage(isConnected ? greenLight : redLight);
-                    camera1.setImage(camera1Connection ? greenLight : redLight);
-                    camera2.setImage(camera2Connection ? greenLight : redLight);
-                    camera3.setImage(camera3Connection ? greenLight : redLight);
-                    sensor1.setImage(sensor1Connection ? greenLight : redLight);
-                    sensor2.setImage(sensor2Connection ? greenLight : redLight);
-                    sensor3.setImage(sensor3Connection ? greenLight : redLight);
-//                    gate1.setImage(gate1Connection ? greenLight : redLight);
-                    gate1.setImage(gate1Connection ? greenLight : redLight);
-                    gate2.setImage(gate2Connection ? greenLight : redLight);
-//                    gate2.setImage(Math.random() > 0.5 ? greenLight : redLight);
-
                     isConnectedToInternet = controllerService.checkConnection(GOOGLE_DNS);
-
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     //showAlert(Alert.AlertType.ERROR, "Xatolik", e.getMessage());
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00030: (" + getClass().getName() + ") " +e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00030: (" + getClass().getName() + ") " + e.getMessage()));
                 } catch (Exception e) {
-                    logService.save(new LogEntity(5L, Instances.truckNumber, "00031: (" + getClass().getName() + ") " +e.getMessage()));
+                    logService.save(new LogEntity(5L, Instances.truckNumber, "00031: (" + getClass().getName() + ") " + e.getMessage()));
                     //showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void showConnections() {
+        executors.execute(() -> {
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    sensor1.setImage(sensor1Connection ? greenLight : redLight);
+                    sensor2.setImage(sensor2Connection ? greenLight : redLight);
+                    sensor3.setImage(sensor3Connection ? greenLight : redLight);
+
+                    camera1.setImage(camera1Connection ? greenLight : redLight);
+                    camera2.setImage(camera2Connection ? greenLight : redLight);
+                    camera3.setImage(camera3Connection ? greenLight : redLight);
+
+                    controller.setImage(isConnected ? greenLight : redLight);
+                    gate1.setImage(gate1Connection ? greenLight : redLight);
+                    gate2.setImage(gate2Connection ? greenLight : redLight);
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+                    e.printStackTrace();
                 }
             }
         });

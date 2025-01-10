@@ -171,6 +171,7 @@ public class MainController implements BaseController {
             System.err.println(e.getMessage());
         }
         connectionsController.updateConnections();
+        connectionsController.showConnections();
         dataSendController.sendNotSentData();
         truckScalingController.start();
         tableController.loadData();

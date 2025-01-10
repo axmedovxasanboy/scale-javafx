@@ -22,7 +22,9 @@ public class BeanConfig {
 
     @Bean
     public ExecutorService executors() {
-        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+        int threads = Runtime.getRuntime().availableProcessors() + 1;
+        System.out.println("threads = " + threads);
+        return Executors.newFixedThreadPool(threads);
     }
 
     @Bean
