@@ -67,19 +67,29 @@ public class PrintCheck {
     }
 
     private void printToLinuxDevice(String content) {
-        try (FileOutputStream fos = new FileOutputStream("/dev/usb/lp0")) {
-            // Send receipt content
-            fos.write(content.getBytes(StandardCharsets.ISO_8859_1));
+        try {
+            // Set permissions for /dev/usb/lp0
+            Process chmodProcess = Runtime.getRuntime().exec("sudo chmod 666 /dev/usb/lp0");
+            chmodProcess.waitFor(); // Wait for the command to complete
 
-            // Flush to ensure all data is written
-            fos.flush();
+            if (chmodProcess.exitValue() != 0) {
+                throw new Exception("Failed to set permissions for /dev/usb/lp0. Please check sudo permissions.");
+            }
 
-            // Send the cut command
-            byte[] cutCommand = new byte[]{0x1D, 0x56, 0x42, 0x00};
-            fos.write(cutCommand);
-            fos.flush();
+            try (FileOutputStream fos = new FileOutputStream("/dev/usb/lp0")) {
+                // Send receipt content
+                fos.write(content.getBytes(StandardCharsets.ISO_8859_1));
 
-            System.out.println("Receipt printed and paper cut successfully on Linux.");
+                // Flush to ensure all data is written
+                fos.flush();
+
+                // Send the cut command
+                byte[] cutCommand = new byte[]{0x1D, 0x56, 0x42, 0x00};
+                fos.write(cutCommand);
+                fos.flush();
+
+                System.out.println("Receipt printed and paper cut successfully on Linux.");
+            }
         } catch (Exception e) {
             mainController.showAlert(Alert.AlertType.ERROR, "Printer ishlamayapti", e.getMessage());
             logService.save(new LogEntity(5L, Instances.truckNumber, "00015: (" + getClass().getName() + ") " + e.getMessage()));
