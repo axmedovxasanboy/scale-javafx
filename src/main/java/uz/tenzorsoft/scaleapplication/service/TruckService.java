@@ -41,7 +41,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class TruckService implements BaseService<TruckEntity, TruckResponse, TruckRequest> {
 
-
     private static final Logger log = LoggerFactory.getLogger(TruckService.class);
     private final TruckRepository truckRepository;
     private final TruckActionRepository truckActionRepository;
@@ -49,7 +48,6 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
     private final UserService userService;
     private final CargoService cargoService;
     private final LogService logService;
-
 
     @Setter
     @Getter

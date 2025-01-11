@@ -372,51 +372,59 @@ public class ControlPane implements BaseController {
 
     public void controlConnectButton() {
         executors.execute(() -> {
-            Platform.runLater(() -> {
-                if (!isConnected) {
-                    connectButton.setText("Connect");
-                    connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    );
+            while (true) {
+                try {
+                    Platform.runLater(() -> {
+                        if (!isConnected) {
+                            connectButton.setText("Connect");
+                            connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            );
 
-                    connectButton.setOnMouseEntered(event -> connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#18b800, #156c00);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    ));
-                    connectButton.setOnMouseExited(event -> connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    ));
-                } else {
-                    connectButton.setText("Disconnect");
-                    connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    );
+                            connectButton.setOnMouseEntered(event -> connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#18b800, #156c00);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            ));
+                            connectButton.setOnMouseExited(event -> connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#24ff03, #21a301);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            ));
+                        } else {
+                            connectButton.setText("Disconnect");
+                            connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            );
 
-                    connectButton.setOnMouseEntered(event -> connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#d00000, #7a0000);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    ));
-                    connectButton.setOnMouseExited(event -> connectButton.setStyle(
-                            "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
-                                    "-fx-background-radius: 30;" +
-                                    "-fx-background-insets: 0;" +
-                                    "-fx-text-fill: white;"
-                    ));
+                            connectButton.setOnMouseEntered(event -> connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#d00000, #7a0000);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            ));
+                            connectButton.setOnMouseExited(event -> connectButton.setStyle(
+                                    "-fx-background-color: linear-gradient(#ff0000, #a30000);" +
+                                            "-fx-background-radius: 30;" +
+                                            "-fx-background-insets: 0;" +
+                                            "-fx-text-fill: white;"
+                            ));
+                        }
+                    });
+
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
-            });
+            }
         });
 
     }

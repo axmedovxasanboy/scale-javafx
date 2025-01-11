@@ -3,45 +3,49 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
-<AnchorPane prefHeight="715.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
-  <children>
-    <fx:include source="MenuBar.fxml"/>
+<?import javafx.scene.text.Font?>
 
-    <TabPane layoutY="25.0" prefHeight="674.0" prefWidth="1395.0">
+<AnchorPane prefHeight="815.0" prefWidth="1395.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.tenzorsoft.scaleapplication.ui.MainController">
+  <children>
+    <fx:include source="MenuBar.fxml" />
+
+    <TabPane layoutY="25.0" prefHeight="774.0" prefWidth="1395.0">
       <tabs>
         <Tab closable="false" text="Bosh sahifa">
           <content>
-            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                        prefHeight="670.0" prefWidth="1374.0">
+            <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="770.0" prefWidth="1374.0">
               <children>
-                <ScrollPane fitToHeight="true" layoutX="4.0" layoutY="44.0" prefHeight="612.0" prefWidth="919.0">
-                  <fx:include source="TableView.fxml"/>
+                <ScrollPane fitToHeight="true" layoutX="4.0" layoutY="44.0" prefHeight="706.0" prefWidth="919.0">
+                  <fx:include source="TableView.fxml" />
                 </ScrollPane>
 
-                <fx:include source="ControlPane.fxml"/>
+                <fx:include source="ControlPane.fxml" />
 
-                <fx:include source="GridView.fxml"/>
+                <fx:include source="GridView.fxml" />
 
-                <fx:include source="ImageView.fxml"/>
+                <fx:include source="ImageView.fxml" />
 
-                <fx:include source="ButtonPanel.fxml"/>
+                <fx:include source="Scale.fxml" />
 
-                <Pane fx:id="scaleAutomationPane" layoutX="1013.0" layoutY="373.0" prefHeight="35.0" prefWidth="222.0">
+                <fx:include source="ButtonPanel.fxml" />
+
+                <Pane fx:id="scaleAutomationPane" layoutX="1043.0" layoutY="467.0" prefHeight="35.0" prefWidth="222.0">
 
                 </Pane>
+
               </children>
             </AnchorPane>
           </content>
         </Tab>
 
-        <fx:include source="CameraView.fxml"/>
+        <fx:include source="CameraView.fxml" />
 
-        <fx:include source="UserView.fxml"/>
+        <fx:include source="UserView.fxml" />
 
-                <fx:include source="TestTab.fxml"/>
+<!--                <fx:include source="TestTab.fxml"/>-->
       </tabs>
     </TabPane>
   </children>
