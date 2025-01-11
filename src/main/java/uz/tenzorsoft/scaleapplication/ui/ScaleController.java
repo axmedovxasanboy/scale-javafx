@@ -29,7 +29,7 @@ public class ScaleController {
                 try {
                     Platform.runLater(() -> {
                         double weigh = buttonController.getTruckWeigh();
-                        scaleWeigh.setText(String.valueOf(weigh));
+                        scaleWeigh.setText(String.valueOf(weigh) + " kg");
                     });
 
                     Thread.sleep(500);

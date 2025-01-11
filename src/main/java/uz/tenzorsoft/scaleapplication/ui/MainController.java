@@ -88,6 +88,8 @@ public class MainController implements BaseController {
 
     @FXML
     private Pane scaleAutomationPane;
+    @Autowired
+    private ScaleController scaleController;
 
 
 //    public void showAlert(Alert.AlertType alertType, String headerText, String message) {
@@ -177,6 +179,7 @@ public class MainController implements BaseController {
         tableController.loadData();
         testController.start();
         sendStatuesDataController.startSending();
+        scaleController.showScale();
         printCheck.listAvailablePrinters();
         if (isAvailableToConnect) buttonController.connect();
         if (isConnected) {
