@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import uz.tenzorsoft.scaleapplication.domain.entity.CargoEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckActionEntity;
 import uz.tenzorsoft.scaleapplication.domain.entity.TruckEntity;
+import uz.tenzorsoft.scaleapplication.domain.enumerators.ActionStatus;
 import uz.tenzorsoft.scaleapplication.domain.enumerators.CargoStatus;
 import uz.tenzorsoft.scaleapplication.domain.response.TruckResponse;
 import uz.tenzorsoft.scaleapplication.domain.response.sendData.WeighingResponse;
@@ -31,12 +32,14 @@ public class CargoService {
 
         List<TruckActionEntity> truckAction = truckEntity.getTruckActions();
         for (TruckActionEntity action : truckAction) {
-            switch (action.getAction()) {
-                case ENTRANCE, MANUAL_ENTRANCE -> {
-                    enteredWeight = action.getWeight();
-                }
-                case EXIT, MANUAL_EXIT -> {
-                    exitedWeight = action.getWeight();
+            if(action.getActionStatus().equals(ActionStatus.COMPLETE)) {
+                switch (action.getAction()) {
+                    case ENTRANCE, MANUAL_ENTRANCE ->
+                        enteredWeight = action.getWeight();
+
+                    case EXIT, MANUAL_EXIT ->
+                        exitedWeight = action.getWeight();
+
                 }
             }
         }
