@@ -34,12 +34,12 @@ public class CargoService {
         for (TruckActionEntity action : truckAction) {
             if(action.getActionStatus().equals(ActionStatus.COMPLETE)) {
                 switch (action.getAction()) {
-                    case ENTRANCE, MANUAL_ENTRANCE -> {
+                    case ENTRANCE, MANUAL_ENTRANCE ->
                         enteredWeight = action.getWeight();
-                    }
-                    case EXIT, MANUAL_EXIT -> {
+
+                    case EXIT, MANUAL_EXIT ->
                         exitedWeight = action.getWeight();
-                    }
+
                 }
             }
         }
