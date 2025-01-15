@@ -70,6 +70,7 @@ public class SendDataService {
         );
 
         if (body == null) {
+            System.out.println("body = " + body);
             return;
         }
 
