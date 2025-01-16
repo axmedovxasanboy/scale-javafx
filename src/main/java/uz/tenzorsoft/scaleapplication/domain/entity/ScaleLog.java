@@ -14,6 +14,7 @@ import org.hibernate.Length;
 @Getter
 @Entity(name="scale_data_logs")
 public class ScaleLog extends BaseEntity{
+    @Column(columnDefinition = "text")
     private String data;
     @Column(length=1024)
     private String convertedData;

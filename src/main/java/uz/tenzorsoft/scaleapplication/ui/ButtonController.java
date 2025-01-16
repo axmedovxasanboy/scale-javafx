@@ -57,6 +57,7 @@ public class ButtonController implements BaseController {
     private Button button1, button2, button4, button5;
 
     private String commandComment = "";
+
     @Autowired
     private GpioControl gpioControl;
 
@@ -357,39 +358,92 @@ public class ButtonController implements BaseController {
 
     public double getTruckWeigh() {
         try {
-            if (isTesting) return (int) ((Math.random() * 10) + 100);
-            scalePort.closePort();
-            scalePort.openPort();
+            if (isTesting) {
+                return (int) ((Math.random() * 10) + 100);
+            }
 
+            if (scalePort.isOpen()) {
+                scalePort.closePort();
+            }
+            scalePort.openPort();
             scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
             scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
 
             byte[] readBuffer = new byte[1024];
             int bytesRead = scalePort.readBytes(readBuffer, readBuffer.length);
+
+            if (bytesRead == -1) {
+                commandComment = "Error: No data received (bytesRead == -1). Check device connection or configuration.";
+                System.err.println(commandComment);
+                return 0.0;
+            }
+
+            System.out.println("ScalePort read bytes: " + bytesRead);
             if (bytesRead > 0) {
                 String data = new String(readBuffer, 0, bytesRead).trim();
+                System.out.println("Scale data: " + data);
 
-                try {
-                    System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
-                } catch (Exception e) {
-                    commandComment = e.getMessage();
-                    System.err.println(e.getMessage());
-                    return 0.0;
-                }
                 double numericValue = parseWeightData(data);
-                scaleLogService.save(data, String.valueOf(numericValue));
+                if (numericValue != 0.0) {
+                    scaleLogService.save(data, String.valueOf(numericValue));
+                }
                 System.out.println("Kg: " + numericValue);
                 commandComment = "Finished";
                 return numericValue;
+            } else {
+                commandComment = "No data received (bytesRead == 0).";
             }
-            commandComment = "bytes read is 0";
-
         } catch (Exception e) {
-            commandComment = e.getMessage();
-            return 0.0;
+            commandComment = "Unexpected error: " + e.getMessage();
+            System.err.println(e.getMessage());
+        } finally {
+            if (scalePort.isOpen()) {
+                scalePort.closePort();
+            }
         }
         return 0.0;
     }
+
+
+//    public double getTruckWeigh() {
+//        try {
+//            if (isTesting) return (int) ((Math.random() * 10) + 100);
+//            scalePort.closePort();
+//            scalePort.openPort();
+//
+//            scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+//            scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+//
+//            byte[] readBuffer = new byte[1024];
+//            int bytesRead = scalePort.readBytes(readBuffer, readBuffer.length);
+//            if (bytesRead > 0) {
+//                String data = new String(readBuffer, 0, bytesRead).trim();
+//
+//                try {
+//                    System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
+//                } catch (Exception e) {
+//                    commandComment = e.getMessage();
+//                    System.err.println(e.getMessage());
+//                    return 0.0;
+//                }
+//                double numericValue = parseWeightData(data);
+//                if(numericValue != 0.0){
+//                    scaleLogService.save(data, String.valueOf(numericValue));
+//                }
+//                System.out.println("Kg: " + numericValue);
+//                commandComment = "Finished";
+//                return numericValue;
+//            }
+//            commandComment = "bytes read is 0";
+//
+//        } catch (Exception e) {
+//            commandComment = e.getMessage();
+//            return 0.0;
+//        }
+//        return 0.0;
+//    }
+
+
 
     private double parseWeightData(String data) {
         try {

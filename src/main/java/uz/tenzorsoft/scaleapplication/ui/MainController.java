@@ -180,6 +180,7 @@ public class MainController implements BaseController {
         testController.start();
         sendStatuesDataController.startSending();
         scaleController.showScale();
+//        ----------------------------------------------------------------------------------------
         printCheck.listAvailablePrinters();
         if (isAvailableToConnect) buttonController.connect();
         if (isConnected) {
