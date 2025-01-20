@@ -26,6 +26,7 @@
         <TableColumn fx:id="exitedOnDuty" prefWidth="70.0" resizable="false" text="Navbatchi" />
       </columns>
     </TableColumn>
+      <TableColumn fx:id="actionStatus" prefWidth="80.0" resizable="false" text="Status" />
       <TableColumn fx:id="minWeight" prefWidth="60.0" resizable="false" text="Tara" />
       <TableColumn fx:id="maxWeight" prefWidth="60.0" resizable="false" text="Brutto" />
       <TableColumn prefWidth="75.0" text="Netto">

@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import uz.tenzorsoft.scaleapplication.domain.Instances;
+import uz.tenzorsoft.scaleapplication.service.raspberry.GpioControl;
 import uz.tenzorsoft.scaleapplication.websocket.WebSocketClient;
 
 @SpringBootApplication
@@ -45,6 +47,13 @@ public class ScaleApplication extends Application {
         primaryStage.setScene(new Scene(rootNode));
 
         primaryStage.setResizable(false);
+
+        primaryStage.setOnCloseRequest(event -> {
+            GpioControl.shutdown(true);
+            Platform.exit();
+            System.exit(0);
+        });
+
         primaryStage.show();
     }
 

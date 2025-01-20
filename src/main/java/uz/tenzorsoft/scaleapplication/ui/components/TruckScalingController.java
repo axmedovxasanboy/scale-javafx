@@ -108,7 +108,13 @@ public class TruckScalingController {
                                 }
 
                                 if (isScaled && !isCargoPhotoTaken && weigh > 0) { // weigh > 0
-                                    saveOnScalePhoto(AttachStatus.ENTRANCE_CARGO_PHOTO);
+                                    try {
+                                        AttachResponse response = cameraViewController.takePicture(CAMERA_2);
+                                        truckService.saveTruckAttaches(currentTruck, response, AttachStatus.ENTRANCE_CARGO_PHOTO);
+                                        isCargoPhotoTaken = true;
+                                    } catch (Exception e) {
+                                        System.out.println(e.getMessage());
+                                    }
 
                                     if (isCargoPhotoTaken) {
                                         System.out.println("Opening gate 2");
@@ -119,7 +125,7 @@ public class TruckScalingController {
                                         log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                                         currentTruck.setEnteredAt(LocalDateTime.now());
                                         currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                        //truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+//                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
                                         truckService.saveTruckEnteredActions(currentTruck);
                                     }
                                     // Save status as COMPLETE
@@ -226,7 +232,13 @@ public class TruckScalingController {
                                 }
 
                                 if (isScaled && weigh > 0.0 && !isCargoPhotoTaken && cargoConfirmationStatus == 1) {
-                                    saveOnScalePhoto(AttachStatus.EXIT_CARGO_PHOTO);
+                                    try {
+                                        AttachResponse response = cameraViewController.takePicture(CAMERA_2);
+                                        truckService.saveTruckAttaches(currentTruck, response, AttachStatus.EXIT_CARGO_PHOTO);
+                                        isCargoPhotoTaken = true;
+                                    } catch (Exception e) {
+                                        System.out.println(e.getMessage());
+                                    }
 
                                     if (isCargoPhotoTaken) {
                                         currentTruck.setExitedWeight(weigh);
