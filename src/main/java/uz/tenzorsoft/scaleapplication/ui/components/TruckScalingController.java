@@ -117,6 +117,7 @@ public class TruckScalingController {
                                     }
 //                                    saveOnScalePhoto(AttachStatus.ENTRANCE_CARGO_PHOTO);
 
+
                                     if (isCargoPhotoTaken) {
                                         System.out.println("Opening gate 2");
                                         buttonController.openGate2(); // Open Gate 2
@@ -126,7 +127,7 @@ public class TruckScalingController {
                                         log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                                         currentTruck.setEnteredAt(LocalDateTime.now());
                                         currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+                                        //truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
                                         truckService.saveTruckEnteredActions(currentTruck);
                                     }
                                     // Save status as COMPLETE

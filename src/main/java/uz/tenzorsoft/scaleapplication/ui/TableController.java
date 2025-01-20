@@ -91,6 +91,9 @@ public class TableController implements BaseController {
 //    private TableColumn<TableViewData, String> exitedOnDuty;
 
     @FXML
+    private TableColumn<TableViewData, String> actionStatus;
+
+    @FXML
     private TableColumn<TableViewData, String> minWeight;
 
     @FXML
@@ -121,6 +124,7 @@ public class TableController implements BaseController {
         exitedWeight.setCellValueFactory(new PropertyValueFactory<>("ExitedWeight"));
 //        exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
 
+        actionStatus.setCellValueFactory(new PropertyValueFactory<>("Status"));
         minWeight.setCellValueFactory(new PropertyValueFactory<>("MinWeight"));
         maxWeight.setCellValueFactory(new PropertyValueFactory<>("MaxWeight"));
         pickupWeight.setCellValueFactory(new PropertyValueFactory<>("PickupWeight"));

@@ -21,6 +21,7 @@ public class TableViewData {
     private String exitedTime;
     private Double exitedWeight;
     private String exitedOnDuty;
+    private String actionStatus;
     private String minWeight;
     private String maxWeight;
     private String pickupWeight = "0.0";

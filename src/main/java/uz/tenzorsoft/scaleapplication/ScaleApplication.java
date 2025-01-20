@@ -1,6 +1,7 @@
 package uz.tenzorsoft.scaleapplication;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,6 +54,13 @@ public class ScaleApplication extends Application {
         primaryStage.setScene(new Scene(rootNode));
 
         primaryStage.setResizable(false);
+
+        primaryStage.setOnCloseRequest(event -> {
+            GpioControl.shutdown(true);
+            Platform.exit();
+            System.exit(0);
+        });
+
         primaryStage.show();
     }
 
