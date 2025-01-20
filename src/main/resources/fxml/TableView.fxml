@@ -11,27 +11,27 @@
     <TableColumn maxWidth="6000.0" minWidth="0.0" prefWidth="295.20002365112305" text="Kirish">
       <columns>
         <TableColumn fx:id="enteredTruckNumber" prefWidth="70.0" resizable="false" text="Moshina raqami" />
-        <TableColumn fx:id="enteredDate" resizable="false" text="Kun, oy, yil" />
+        <TableColumn fx:id="enteredDate" prefWidth="70.0" resizable="false" text="Kun, oy, yil" />
         <TableColumn fx:id="enteredTime" prefWidth="50.0" resizable="false" text="Vaqt" />
-        <TableColumn fx:id="enteredWeight" prefWidth="70.0" resizable="false" text="Massa (kg)" />
+        <TableColumn fx:id="enteredWeight" prefWidth="60.0" resizable="false" text="Massa (kg)" />
         <TableColumn fx:id="enteredOnDuty" prefWidth="70.0" resizable="false" text="Navbatchi" />
       </columns>
     </TableColumn>
     <TableColumn maxWidth="6000.0" prefWidth="396.0" text="Chiqish">
       <columns>
         <TableColumn fx:id="exitedTruckNumber" prefWidth="70.0" resizable="false" text="Moshina raqami" />
-        <TableColumn fx:id="exitedDate" resizable="false" text="Kun, oy, yil" />
+        <TableColumn fx:id="exitedDate" prefWidth="70.0" resizable="false" text="Kun, oy, yil" />
         <TableColumn fx:id="exitedTime" prefWidth="50.0" resizable="false" text="Vaqt" />
-        <TableColumn fx:id="exitedWeight" prefWidth="70.0" resizable="false" text="Massa (kg)" />
-        <TableColumn fx:id="exitedOnDuty" prefWidth="70.0" resizable="false" text="Navbatchi" />
+        <TableColumn fx:id="exitedWeight" prefWidth="60.0" resizable="false" text="Massa (kg)" />
+<!--        <TableColumn fx:id="exitedOnDuty" prefWidth="70.0" resizable="false" text="Navbatchi" />-->
       </columns>
     </TableColumn>
       <TableColumn fx:id="minWeight" prefWidth="60.0" resizable="false" text="Tara" />
       <TableColumn fx:id="maxWeight" prefWidth="60.0" resizable="false" text="Brutto" />
       <TableColumn prefWidth="75.0" text="Netto">
          <columns>
-            <TableColumn fx:id="dropWeight" prefWidth="70.0" resizable="false" text="Kirim" />
-            <TableColumn fx:id="pickupWeight" prefWidth="70.0" resizable="false" text="Chiqim" />
+            <TableColumn fx:id="dropWeight" prefWidth="60.0" resizable="false" text="Kirim" />
+            <TableColumn fx:id="pickupWeight" prefWidth="60.0" resizable="false" text="Chiqim" />
          </columns>
       </TableColumn>
       <TableColumn fx:id="productType" prefWidth="75.0" text="Mahsulot" />

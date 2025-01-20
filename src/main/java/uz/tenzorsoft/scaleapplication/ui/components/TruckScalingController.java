@@ -126,7 +126,7 @@ public class TruckScalingController {
                                         log.info("Truck entered weigh: {}", currentTruck.getEnteredWeight());
                                         currentTruck.setEnteredAt(LocalDateTime.now());
                                         currentTruck.setEntranceConfirmedBy(currentUser.getPhoneNumber());
-                                        //truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
+                                        truckService.saveTruckStatus(currentTruck.getEnteredStatus(), ActionStatus.COMPLETE);
                                         truckService.saveTruckEnteredActions(currentTruck);
                                     }
                                     // Save status as COMPLETE
@@ -270,6 +270,7 @@ public class TruckScalingController {
 //                                        @Override
 //                                        public void run() {
                                             printCheck.printReceipt(truckService.getCurrentTruckEntity());
+                                            truckService.save(truckService.getCurrentTruckEntity());
 //                                        }
 //                                    }, 50);
                                         } catch (Exception e) {

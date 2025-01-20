@@ -117,11 +117,18 @@ public class WebSocketClient {
             }
         }
     }
+// nimaga har yarim sekundda yuboradi? nimaga socket orqli api orqalimas?
 
-    @Scheduled(fixedRate = 500)
+    //@Scheduled(fixedRate = 500)
     public void sendPeriodicMessage() {
+       try {
         if (Instances.currentUser.getId() == null) return;
         if (Instances.currentUser.getInternalScaleId() == null) return;
-        sendMessage("/sendCommends" + Instances.currentUser.getInternalScaleId());
+      //  sendMessage("/sendCommends" + Instances.currentUser.getInternalScaleId());
+
+    } catch (Exception e) {
+        logService.save(new LogEntity(5L, Instances.truckNumber, e.getMessage()));
+        System.err.println(e.getMessage());
+    }
     }
 }

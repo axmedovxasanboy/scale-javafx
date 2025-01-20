@@ -1,5 +1,6 @@
 package uz.tenzorsoft.scaleapplication.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -351,52 +352,112 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
 //        currentTruckEntity = truckRepository.findByTruckNumberAndIsFinished(currentTruck.getTruckNumber(), false)
 //                .orElse(new TruckEntity());
 //        currentTruckEntity.setTruckNumber(currentTruck.getTruckNumber());
-        List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
-        truckPhotos.removeIf(photo -> photo.getAttachStatus().equals(attachStatus));
+        if (currentTruckEntity == null || currentTruckEntity.getTruckPhotos() == null) {
+            log.error("Truck entity or its photos are null. Cannot proceed.");
+            throw new IllegalStateException("Truck entity or photos list is null.");
+        }
+
+//        List<TruckPhotosEntity> truckPhotos = currentTruckEntity.getTruckPhotos();
+//        truckPhotos.removeIf(photo -> photo.getAttachStatus().equals(attachStatus));
+
+        List<TruckPhotosEntity> truckPhotos = new ArrayList<>(currentTruckEntity.getTruckPhotos());
+        truckPhotos.removeIf(photo -> attachStatus.equals(photo.getAttachStatus()));
+
         AttachEntity attach = attachService.findById(response.getId());
+        if (attach == null) {
+            log.error("Attach entity not found for id: {}", response.getId());
+            throw new EntityNotFoundException("Attach not found with ID: " + response.getId());
+        }
+
         TruckPhotosEntity photosEntity = new TruckPhotosEntity(
                 attach, attachStatus
         );
         truckPhotoRepository.save(photosEntity);
+
         truckPhotos.add(photosEntity);
         currentTruckEntity.setTruckPhotos(truckPhotos);
         truckRepository.save(currentTruckEntity);
 
-    }
+        log.info("Truck photos updated successfully for truck number: {}", currentTruck.getTruckNumber());
 
+
+    }
     public void saveTruckEnteredActions(TruckResponse currentTruck) {
-        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
-            if (action.getAction() == currentTruck.getEnteredStatus()) {
-                action.setCreatedAt(currentTruck.getEnteredAt());
-                action.setWeight(currentTruck.getEnteredWeight());
-                action.setAction(currentTruck.getEnteredStatus() == null ? TruckAction.NO_ACTION : currentTruck.getEnteredStatus());
-                action.setOnDuty(Instances.currentUser);
-                action.setActionStatus(ActionStatus.COMPLETE);
-                truckActionRepository.save(action);
-                break;
-            }
-        }
+        saveTruckAction(
+                currentTruck.getEnteredStatus(),
+                currentTruck.getEnteredAt(),
+                currentTruck.getEnteredWeight()
+        );
         currentTruckEntity.setIsSentToCloud(false);
         currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
+        log.info("Truck entered action saved for status: {}", currentTruck.getEnteredStatus());
     }
 
     public void saveTruckExitedAction(TruckResponse currentTruck) {
-        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
-            if (action.getAction() == currentTruck.getExitedStatus()) {
-                action.setCreatedAt(currentTruck.getExitedAt());
-                action.setWeight(currentTruck.getExitedWeight());
-                action.setAction(currentTruck.getExitedStatus() == null ? TruckAction.NO_ACTION : currentTruck.getExitedStatus());
-                action.setOnDuty(Instances.currentUser);
-                action.setActionStatus(ActionStatus.COMPLETE);
-                truckActionRepository.save(action);
-                break;
-            }
-        }
+        saveTruckAction(
+                currentTruck.getExitedStatus(),
+                currentTruck.getExitedAt(),
+                currentTruck.getExitedWeight()
+        );
         currentTruckEntity.setIsSentToCloud(false);
         currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
         truckRepository.save(currentTruckEntity);
+        log.info("Truck exited action saved for status: {}", currentTruck.getExitedStatus());
     }
+
+    private void saveTruckAction(
+            TruckAction status,
+            LocalDateTime actionTime,
+            Double weight
+    ) {
+        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
+            if (action.getAction() != null && action.getAction().equals(status)) {
+                action.setCreatedAt(actionTime);
+                action.setWeight(weight);
+                action.setOnDuty(Instances.currentUser);
+                action.setActionStatus(ActionStatus.COMPLETE);
+                truckActionRepository.save(action);
+                log.info("Action updated with status: {}, weight: {}, time: {}", status, weight, actionTime);
+                break;
+            }
+        }
+    }
+
+
+//    public void saveTruckEnteredActions(TruckResponse currentTruck) {
+//        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
+//            if (action.getAction() == currentTruck.getEnteredStatus()) {
+//                action.setCreatedAt(currentTruck.getEnteredAt());
+//                action.setWeight(currentTruck.getEnteredWeight());
+//                action.setAction(currentTruck.getEnteredStatus() == null ? TruckAction.NO_ACTION : currentTruck.getEnteredStatus());
+//                action.setOnDuty(Instances.currentUser);
+//                action.setActionStatus(ActionStatus.COMPLETE);
+//                truckActionRepository.save(action);
+//                break;
+//            }
+//        }
+//        currentTruckEntity.setIsSentToCloud(false);
+//        currentTruckEntity.setNextEntranceTime(currentTruck.getEnteredAt().plusMinutes(5));
+//        truckRepository.save(currentTruckEntity);
+//    }
+//
+//    public void saveTruckExitedAction(TruckResponse currentTruck) {
+//        for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {
+//            if (action.getAction() == currentTruck.getExitedStatus()) {
+//                action.setCreatedAt(currentTruck.getExitedAt());
+//                action.setWeight(currentTruck.getExitedWeight());
+//                action.setAction(currentTruck.getExitedStatus() == null ? TruckAction.NO_ACTION : currentTruck.getExitedStatus());
+//                action.setOnDuty(Instances.currentUser);
+//                action.setActionStatus(ActionStatus.COMPLETE);
+//                truckActionRepository.save(action);
+//                break;
+//            }
+//        }
+//        currentTruckEntity.setIsSentToCloud(false);
+//        currentTruckEntity.setNextEntranceTime(currentTruck.getExitedAt().plusMinutes(5));
+//        truckRepository.save(currentTruckEntity);
+//    }
 
     public void saveTruckStatus(TruckAction currentTruckAction, ActionStatus status) {
         for (TruckActionEntity action : currentTruckEntity.getTruckActions()) {

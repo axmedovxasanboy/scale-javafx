@@ -87,8 +87,8 @@ public class TableController implements BaseController {
     @FXML
     private TableColumn<TableViewData, Double> exitedWeight;
 
-    @FXML
-    private TableColumn<TableViewData, String> exitedOnDuty;
+//    @FXML
+//    private TableColumn<TableViewData, String> exitedOnDuty;
 
     @FXML
     private TableColumn<TableViewData, String> minWeight;
@@ -119,7 +119,7 @@ public class TableController implements BaseController {
         exitedDate.setCellValueFactory(new PropertyValueFactory<>("ExitedDate"));
         exitedTime.setCellValueFactory(new PropertyValueFactory<>("ExitedTime"));
         exitedWeight.setCellValueFactory(new PropertyValueFactory<>("ExitedWeight"));
-        exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
+//        exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
 
         minWeight.setCellValueFactory(new PropertyValueFactory<>("MinWeight"));
         maxWeight.setCellValueFactory(new PropertyValueFactory<>("MaxWeight"));
@@ -251,7 +251,7 @@ public class TableController implements BaseController {
             while (true) {
                 loadDataNow();
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(30000);
                 } catch (Exception e) {
                     logService.save(new LogEntity(5L, Instances.truckNumber, "00034: (" + getClass().getName() + ") " + e.getMessage()));
                     showAlert(Alert.AlertType.ERROR, "Error", e.getMessage());

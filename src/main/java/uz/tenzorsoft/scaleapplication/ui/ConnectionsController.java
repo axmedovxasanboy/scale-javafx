@@ -52,8 +52,11 @@ public class ConnectionsController implements BaseController {
                         sensor3Connection = controllerService.checkConnection(COIL_SENSOR_3);
                     }
                     camera1Connection = controllerService.checkConnection(CAMERA_1);
+//                    System.out.println("camera1Connection: " + camera1Connection);
                     camera2Connection = controllerService.checkConnection(CAMERA_2);
+//                    System.out.println("camera2Connection: " + camera2Connection);
                     camera3Connection = controllerService.checkConnection(CAMERA_3);
+//                    System.out.println("camera3Connection: " + camera3Connection);
                     isConnectedToInternet = controllerService.checkConnection(GOOGLE_DNS);
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

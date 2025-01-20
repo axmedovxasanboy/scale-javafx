@@ -36,6 +36,40 @@ public class CameraViewController implements BaseController {
 
     }
 
+//    public AttachResponse takePicture(String cameraIpAddress) {
+//        String username = "admin";
+//        String password = "Joe@252544";
+//        String auth = username + ":" + password;
+//        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Authorization", "Basic " + encodedAuth);
+//
+//        try {
+//            if (isTesting) {
+//                if (cameraIpAddress.equals(CAMERA_2)) return attachService.getTestingImages();
+//                return attachService.getCameraImgTesting();
+//            }
+//            String url = "http://" + cameraIpAddress + "/ISAPI/Streaming/channels/1/picture";
+//            HttpEntity<String> entity = new HttpEntity<>(headers);
+//            ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+//            if (response.getStatusCode() == HttpStatus.OK) {
+//                byte[] fileBytes = response.getBody();
+//                if (fileBytes != null && currentTruck.getTruckNumber() != null) {
+//                    return attachService.saveToSystem(fileBytes);
+//                }
+//            } else {
+//                System.out.println("Failed to get snapshot, status: " + response.getStatusCode());
+//            }
+//        } catch (Exception e) {
+//            showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
+//            logService.save(new LogEntity(5L, truckNumber, "00029: (" + getClass().getName() + ") " +e.getMessage()));
+//        }
+//        return null;
+//    }
+
     public AttachResponse takePicture(String cameraIpAddress) {
         String username = "admin";
         String password = "Joe@252544";
@@ -47,25 +81,48 @@ public class CameraViewController implements BaseController {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Basic " + encodedAuth);
 
-        try {
-            if (isTesting) {
-                if (cameraIpAddress.equals(CAMERA_2)) return attachService.getTestingImages();
-                return attachService.getCameraImgTesting();
-            }
-            String url = "http://" + cameraIpAddress + "/ISAPI/Streaming/channels/1/picture";
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
-            if (response.getStatusCode() == HttpStatus.OK) {
-                byte[] fileBytes = response.getBody();
-                if (fileBytes != null && currentTruck.getTruckNumber() != null) {
-                    return attachService.saveToSystem(fileBytes);
+        int maxRetries = 3;
+        int retryDelay = 1000;
+
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+
+                if (isTesting) {
+                    if (cameraIpAddress.equals(CAMERA_2)) return attachService.getTestingImages();
+                    return attachService.getCameraImgTesting();
                 }
-            } else {
-                System.out.println("Failed to get snapshot, status: " + response.getStatusCode());
+
+                String url = "http://" + cameraIpAddress + "/ISAPI/Streaming/channels/1/picture";
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+                ResponseEntity<byte[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, byte[].class);
+
+                if (response.getStatusCode() == HttpStatus.OK) {
+                    byte[] fileBytes = response.getBody();
+                    if (fileBytes != null && currentTruck.getTruckNumber() != null) {
+                        return attachService.saveToSystem(fileBytes);
+                    }
+                } else {
+                    logService.save(new LogEntity(5L, truckNumber, "Failed to get snapshot, status: " + response.getStatusCode()));
+                }
+            } catch (Exception e) {
+                logService.save(new LogEntity(5L, truckNumber,
+                        "Attempt " + attempt + " failed: " + e.getMessage()));
+
+
+//                if (attempt == maxRetries) {
+//                    showAlert(Alert.AlertType.ERROR, "Error while taking picture",
+//                            "Failed after " + maxRetries + " attempts: " + e.getMessage());
+//                    throw new RuntimeException("Failed to take picture after " + maxRetries + " attempts", e);
+//                }
+
+
+                try {
+                    Thread.sleep(retryDelay);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("Retry interrupted", ie);
+                }
             }
-        } catch (Exception e) {
-            showAlert(Alert.AlertType.ERROR, "Error while taking picture", e.getMessage());
-            logService.save(new LogEntity(5L, truckNumber, "00029: (" + getClass().getName() + ") " +e.getMessage()));
         }
         return null;
     }
