@@ -25,7 +25,8 @@ public class CargoService {
 
     public void saveCargo(TruckEntity truckEntity) {
         CargoEntity cargoEntity = new CargoEntity();
-        cargoEntity.setTruck(truckEntity);
+        cargoEntity = cargoRepository.findByTruckId(truckEntity.getId()).orElse(new CargoEntity());
+        if (cargoEntity.getId() == null) cargoEntity.setTruck(truckEntity);
         double enteredWeight = 0.0;
         double exitedWeight = 0.0;
         double netWeight;

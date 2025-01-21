@@ -16,12 +16,13 @@ public class TableViewData {
     private String enteredTime;
     private Double enteredWeight;
     private String enteredOnDuty;
+    private String enteredActionStatus;
     private String exitedTruckNumber;
     private String exitedDate;
     private String exitedTime;
     private Double exitedWeight;
     private String exitedOnDuty;
-    private String actionStatus;
+    private String exitedActionStatus;
     private String minWeight;
     private String maxWeight;
     private String pickupWeight = "0.0";

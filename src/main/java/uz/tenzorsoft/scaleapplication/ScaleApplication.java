@@ -55,11 +55,11 @@ public class ScaleApplication extends Application {
 
         primaryStage.setResizable(false);
 
-        primaryStage.setOnCloseRequest(event -> {
-            GpioControl.shutdown(true);
-            Platform.exit();
-            System.exit(0);
-        });
+//        primaryStage.setOnCloseRequest(event -> {
+//            GpioControl.shutdown(true);
+//            Platform.exit();
+//            System.exit(0);
+//        });
 
         primaryStage.show();
     }

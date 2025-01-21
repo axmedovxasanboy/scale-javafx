@@ -1,5 +1,8 @@
 package uz.tenzorsoft.scaleapplication.ui.components;
 
+import com.sun.javafx.binding.SelectBinding;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.binding.IntegerBinding;
 import javafx.scene.control.Alert;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -290,11 +293,11 @@ public class TruckScalingController {
                         truckService.getCurrentTruckEntity().setNextEntranceTime(LocalDateTime.now().plusMinutes(2));
                         truckService.save(truckService.getCurrentTruckEntity());
                         buttonController.openGate2();
-                        truckPosition = 2;
+                        truckPosition = 2; ///nimaga2?
                         isScaled = true; // needed for exiting
                         CLOSE_GATE2_TIMEOUT = CLOSE_GATE2_TIMEOUT * 3;
                         isTimeoutChanged = true;
-                        cargoConfirmationStatus = -1;
+                        cargoConfirmationStatus = -1; /// nimaga?
                         isCargoConfirmationDialogOpened = true;
                         isTruckEntered = true;
                         isTruckExited = false;

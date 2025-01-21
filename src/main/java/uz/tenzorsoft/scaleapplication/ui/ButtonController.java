@@ -409,39 +409,66 @@ public class ButtonController implements BaseController {
     public double getTruckWeigh() {
         try {
             if (isTesting) return (int) ((Math.random() * 10) + 100);
-            scalePort.closePort();
-            scalePort.openPort();
+//            scalePort.closePort();
+//            scalePort.openPort();
+//
+//            scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+//            scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
 
-            scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
-            scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+            if (!scalePort.isOpen()) {
+                scalePort.openPort();
+                scalePort.setComPortParameters(9600, 8, SerialPort.ONE_STOP_BIT, SerialPort.NO_PARITY);
+                scalePort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 1000, 0);
+            }
 
             byte[] readBuffer = new byte[1024];
             int bytesRead = scalePort.readBytes(readBuffer, readBuffer.length);
+//            if (bytesRead > 0) {
+//                String data = new String(readBuffer, 0, bytesRead).trim();
+//
+//                try {
+//                    System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
+//                } catch (Exception e) {
+//                    commandComment = e.getMessage();
+//                    System.err.println(e.getMessage());
+//                    return 0.0;
+//                }
+//                double numericValue = parseWeightData(data);
+//                if(numericValue != 0.0){
+//                    scaleLogService.save(data, String.valueOf(numericValue));
+//                }
+//                System.out.println("Kg: " + numericValue);
+//                commandComment = "Finished";
+//                return numericValue;
+//            }
+//            commandComment = "bytes read is 0";
+
             if (bytesRead > 0) {
                 String data = new String(readBuffer, 0, bytesRead).trim();
+                System.out.println("Scale data: " + data);
 
-                try {
-                    System.out.println("Scale data: " + new String(data.getBytes(), "UTF-8"));
-                } catch (Exception e) {
-                    commandComment = e.getMessage();
-                    System.err.println(e.getMessage());
-                    return 0.0;
-                }
                 double numericValue = parseWeightData(data);
-                if(numericValue != 0.0){
-                    scaleLogService.save(data, String.valueOf(numericValue));
+                if (numericValue != 0.0) {
+                    scaleLogService.save(data, String.valueOf(numericValue)); // Ma'lumotni saqlash
                 }
-                System.out.println("Kg: " + numericValue);
+
                 commandComment = "Finished";
                 return numericValue;
             }
-            commandComment = "bytes read is 0";
+
+            commandComment = "No data received (bytesRead = 0)";
 
         } catch (Exception e) {
             commandComment = e.getMessage();
             return 0.0;
         }
         return 0.0;
+    }
+
+    public void closePort() {
+        if (scalePort.isOpen()) {
+            scalePort.closePort();
+        }
     }
 
 
@@ -464,4 +491,5 @@ public class ButtonController implements BaseController {
             return 0;
         }
     }
+
 }

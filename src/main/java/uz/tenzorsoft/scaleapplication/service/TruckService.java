@@ -203,7 +203,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setEnteredDate(getDate(action.getCreatedAt()));
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight());
-                    data.setActionStatus(String.valueOf(action.getActionStatus()));
+                    data.setEnteredActionStatus(String.valueOf(action.getActionStatus()));
                     enteredWeight = action.getWeight() == null ? 0.0 : action.getWeight();
                     if (action.getOnDuty() != null) {
                         data.setEnteredOnDuty(action.getOnDuty().getPhoneNumber());
@@ -216,7 +216,7 @@ public class TruckService implements BaseService<TruckEntity, TruckResponse, Tru
                     data.setExitedDate(getDate(action.getCreatedAt()));
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight());
-                    data.setActionStatus(String.valueOf(action.getActionStatus()));
+                    data.setExitedActionStatus(String.valueOf(action.getActionStatus()));
                     exitedWeight = action.getWeight();
                     if (action.getOnDuty() != null) {
                         data.setExitedOnDuty(action.getOnDuty().getPhoneNumber());

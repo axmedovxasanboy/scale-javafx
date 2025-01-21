@@ -27,13 +27,17 @@ public class TableService {
         double enteredWeight = 0.0;
         double exitedWeight = 0.0;
         boolean isActionAvailable = false;
+        TruckAction entranceAction = TruckAction.NO_ACTION;
+        TruckAction exitAction = TruckAction.NO_ACTION;
 
         if (truckEntity.getTruckActions() == null || truckEntity.getTruckActions().isEmpty()) return null;
 
         for (TruckActionEntity action : truckEntity.getTruckActions()) {
+
             if (action.getActionStatus() != ActionStatus.COMPLETE && action.getWeight() == 0) continue;
 
 //            if (action.getActionStatus() != ActionStatus.COMPLETE) continue;
+
 
             switch (action.getAction()) {
                 case ENTRANCE, MANUAL_ENTRANCE -> {
@@ -41,6 +45,7 @@ public class TableService {
                     data.setEnteredDate(getDate(action.getCreatedAt()));
                     data.setEnteredWeight(action.getWeight() == null ? 0.0 : action.getWeight());
                     enteredWeight = action.getWeight() == null ? 0.0 : action.getWeight();
+                    entranceAction = action.getAction();
                     data.setEnteredTime(getTime(action.getCreatedAt()));
                     data.setEnteredOnDuty(action.getOnDuty() == null ? "unknown" : action.getOnDuty().getPhoneNumber());
                     isActionAvailable = true;
@@ -50,6 +55,7 @@ public class TableService {
                     data.setExitedDate(getDate(action.getCreatedAt()));
                     data.setExitedWeight(action.getWeight() == null ? 0.0 : action.getWeight());
                     exitedWeight = action.getWeight() == null ? 0.0 : action.getWeight();
+                    exitAction = action.getAction();
                     data.setExitedTime(getTime(action.getCreatedAt()));
                     data.setExitedOnDuty(action.getOnDuty() == null ? "unknown" : action.getOnDuty().getPhoneNumber());
                     isActionAvailable = true;
@@ -64,6 +70,9 @@ public class TableService {
             case PICKUP -> data.setPickupWeight(String.valueOf(cargo.getNetWeight()));
             case DROP -> data.setDropWeight(String.valueOf(cargo.getNetWeight()));
         }
+        data.setEnteredActionStatus(getTruckActionStatus(truckEntity, entranceAction));
+        data.setExitedActionStatus(getTruckActionStatus(truckEntity, exitAction));
+//        data.setActionStatus(getStatus(truckEntity));
         data.setMinWeight(String.valueOf(Math.min(enteredWeight, exitedWeight)));
         data.setMaxWeight(String.valueOf(Math.max(enteredWeight, exitedWeight)));
         return data;
@@ -75,5 +84,28 @@ public class TableService {
 
     private String getDate(LocalDateTime dateTime) {
         return dateTime.getDayOfMonth() + "." + dateTime.getMonthValue() + "." + dateTime.getYear();
+    }
+
+    private String getStatus(TruckEntity truckEntity) {
+        StringBuilder status = new StringBuilder();
+        for (TruckActionEntity action : truckEntity.getTruckActions()) {
+            if (action.getActionStatus() != null) {
+                status.append(action.getActionStatus().name()).append(",");
+            }
+        }
+        return status.toString();
+    }
+
+    private String getTruckActionStatus(TruckEntity truckEntity, TruckAction truckAction) {
+
+        String truckActionStatus = "";
+        for (TruckActionEntity action : truckEntity.getTruckActions()) {
+            if (action.getActionStatus() != null &&
+                    (action.getAction().equals(truckAction))
+            ) {
+                truckActionStatus = action.getActionStatus().name();
+            }
+        }
+        return truckActionStatus.toString();
     }
 }

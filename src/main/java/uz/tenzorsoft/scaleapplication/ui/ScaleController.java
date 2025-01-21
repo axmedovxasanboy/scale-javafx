@@ -26,16 +26,24 @@ public class ScaleController {
     public void initialize() {
         scaleWeigh.setDisable(true);
         scaleWeigh.setText("000 kg");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> buttonController.closePort())); // Portni tozalash
     }
+
 
     public void showScale() {
         scheduler.scheduleAtFixedRate(() -> {
             double weigh = buttonController.getTruckWeigh();
-            Platform.runLater(() -> scaleWeigh.setText(weigh + " kg"));
+            Platform.runLater(() -> {
+                String displayText = weigh > 0 ? weigh + " kg" : "0.0 kg";
+                scaleWeigh.setText(displayText);
+            });
         }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
 
+
+
+}
 //    public void showScale() {
 //        executors.execute(() -> {
 //            while (true) {
@@ -52,5 +60,3 @@ public class ScaleController {
 //            }
 //        });
 //    }
-
-}

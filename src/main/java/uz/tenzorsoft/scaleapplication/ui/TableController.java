@@ -76,6 +76,9 @@ public class TableController implements BaseController {
     private TableColumn<TableViewData, String> enteredOnDuty;
 
     @FXML
+    private TableColumn<TableViewData, String> enteredActionStatus;
+
+    @FXML
     private TableColumn<TableViewData, String> exitedTruckNumber;
 
     @FXML
@@ -91,7 +94,7 @@ public class TableController implements BaseController {
 //    private TableColumn<TableViewData, String> exitedOnDuty;
 
     @FXML
-    private TableColumn<TableViewData, String> actionStatus;
+    private TableColumn<TableViewData, String> exitedActionStatus;
 
     @FXML
     private TableColumn<TableViewData, String> minWeight;
@@ -117,14 +120,15 @@ public class TableController implements BaseController {
         enteredTime.setCellValueFactory(new PropertyValueFactory<>("EnteredTime"));
         enteredWeight.setCellValueFactory(new PropertyValueFactory<>("EnteredWeight"));
         enteredOnDuty.setCellValueFactory(new PropertyValueFactory<>("EnteredOnDuty"));
+        enteredActionStatus.setCellValueFactory(new PropertyValueFactory<>("EnteredActionStatus"));
 
         exitedTruckNumber.setCellValueFactory(new PropertyValueFactory<>("ExitedTruckNumber"));
         exitedDate.setCellValueFactory(new PropertyValueFactory<>("ExitedDate"));
         exitedTime.setCellValueFactory(new PropertyValueFactory<>("ExitedTime"));
         exitedWeight.setCellValueFactory(new PropertyValueFactory<>("ExitedWeight"));
 //        exitedOnDuty.setCellValueFactory(new PropertyValueFactory<>("ExitedOnDuty"));
+        exitedActionStatus.setCellValueFactory(new PropertyValueFactory<>("ExitedActionStatus"));
 
-        actionStatus.setCellValueFactory(new PropertyValueFactory<>("Status"));
         minWeight.setCellValueFactory(new PropertyValueFactory<>("MinWeight"));
         maxWeight.setCellValueFactory(new PropertyValueFactory<>("MaxWeight"));
         pickupWeight.setCellValueFactory(new PropertyValueFactory<>("PickupWeight"));
